@@ -8,7 +8,7 @@
   <p>
     <a href="#news" style="text-decoration: none; font-weight: bold;">News</a> •
     <a href="#links" style="text-decoration: none; font-weight: bold;">Links</a> •
-    <a href="#Getting Started" style="text-decoration: none; font-weight: bold;">Getting Started</a> •
+    <a href="#getting-started" style="text-decoration: none; font-weight: bold;">Getting Started</a> •
     <a href="#evaluation" style="text-decoration: none; font-weight: bold;">Evaluation</a> •
     <a href="#citation" style="text-decoration: none; font-weight: bold;">Citation</a> •
     <a href="#acknowledgement" style="text-decoration: none; font-weight: bold;">Acknowledgement</a> 
