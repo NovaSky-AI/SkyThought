@@ -6,7 +6,7 @@ import random
 import re
 import numpy as np
 from datasets import load_dataset
-from typing import Dict
+from typing import Dict, Any
 from multiprocessing import Manager
 from .apps.testing_util import run_test as apps_run_test
 from .taco.testing_util import run_test as taco_run_test
@@ -21,6 +21,10 @@ def has_code(response):
     return matches
 
 class TaskHandler:
+    @staticmethod
+    def get_question_key():
+        raise NotImplementedError("Subclasses should implement this method.")
+
     def check_correctness(self, problem, generation):
         raise NotImplementedError("Subclasses should implement this method.")
     
@@ -620,6 +624,178 @@ class LiveCodeBenchTaskHandler(TaskHandler):
     def process_remaining_data(self, train_data, results):
         return [row.to_dict() for _, row in train_data.iterrows() if str(row["task_id"]) not in results]
 
+class GSM8KTaskHandler(TaskHandler):
+    def __init__(self) -> None:
+        super().__init__()
+        self.dataset = "openai/gsm8k"
+        self.ans_re = re.compile(r"The final answer is ((-?[$0-9.,]{2,})|(-?[0-9]+))")
+        self.gt_re =  re.compile(r"#### (\-?[0-9\.\,]+)")
+        self.invalid_ans = "[invalid]"
+
+    @staticmethod
+    def get_question_key():
+        return "question"
+
+    @staticmethod
+    def generate_prompt(problem):
+        question = problem["question"] 
+        full_prompt = f"Given the following problem, reason and give a final answer to the problem.\nProblem: {question}\nYour response should end with \"The final answer is [answer]\" where [answer] is the response to the problem."
+        return full_prompt
+    
+    def check_correctness(self, problem: Dict[str, Any], completion: str) -> bool: 
+        gt_answer = self.extract_gt_answer(problem["answer"])
+        assert gt_answer != self.invalid_ans
+        model_answer = self.extract_answer(completion)
+        print(f"{problem=}, {model_answer=}, {gt_answer=}")
+        return model_answer == gt_answer, model_answer, gt_answer
+    
+    def update_results(self, problem, response):
+        if not isinstance(response, str):
+            response = response.outputs[0].text.strip()
+        # Initialize the response structure
+        response_entry = {
+            "content": response,
+            "correctness": None,
+            "reason": None,
+            "model_answer": None,
+            "gt_answer": None,
+        }
+        curr_res, model_answer, gt_answer = self.check_correctness(problem, completion=response)
+        response_entry["model_answer"] = model_answer
+        response_entry["gt_answer"] = gt_answer
+        if curr_res:
+            response_entry["correctness"] = True
+            response_entry["reason"] = ""
+        else:
+            response_entry["correctness"] = False
+            response_entry["reason"] = "Solution is incorrect."
+    
+        return response_entry
+
+    def make_conversations(self, data, system_prompt):
+        conversations = []
+        for problem in data:
+            prompt_text = self.generate_prompt(problem)
+            conversations.append([
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": prompt_text}
+            ])
+        return conversations
+
+    def load_and_filter_dataset(self, start, end, split="train", source=None, filter_difficulty=False):
+        dataset = load_dataset(self.dataset, "main")
+        train_data = dataset[split].to_pandas()
+        return train_data.iloc[start:end] if end > 0 else train_data.iloc[start:]
+
+    def process_remaining_data(self, train_data, results):
+        return [row.to_dict() for _, row in train_data.iterrows() if str(row["question"]) not in results]
+    
+    def extract_gt_answer(self, completion):
+        match = self.gt_re.search(completion)
+        if match:
+            match_str = match.group(1).strip()
+            match_str = match_str.replace(",", "")
+            return match_str
+        else:
+            return self.invalid_ans
+
+    def extract_answer(self, completion):
+        match = self.ans_re.search(completion)
+        if not match: 
+            return self.invalid_ans
+        answer = match.group(1).strip()
+
+        patterns_to_remove = [
+            ',',           # Remove commas
+            r'\$',         # Remove dollar signs
+            r'\.$'         # Remove trailing period
+        ]
+        
+        for pattern in patterns_to_remove:
+            answer = re.sub(pattern, '', answer)
+
+        return answer
+
+# TODO: For this, we don't want model reasoning chains, just the final answer. 
+class ARCChallengeTaskHandler(TaskHandler): 
+    def __init__(self) -> None:
+        super().__init__()
+        self.dataset = "openai/gsm8k"
+        self.ans_re = re.compile(r"The best answer is ([A-D][\.\,]+)")
+        self.invalid_ans = "[invalid]"
+
+    @staticmethod
+    def get_question_key():
+        return "question"
+
+    @staticmethod
+    def generate_prompt(problem):
+        question = problem["question"] 
+        full_prompt = f"Given the following question and four candidate answers (A, B, C and D), choose the best answer.\nQuestion: {question}\nYour response should only contain the final answer and nothing more. Only respond with the one of the answer letters A, B, C or D corresponding to the best. The best answer is"
+        return full_prompt
+    
+    def check_correctness(self, problem: Dict[str, Any], completion: str) -> bool: 
+        gt_answer = problem["answerKey"]
+        model_answer = self.extract_answer(completion)
+        return model_answer == gt_answer, model_answer
+    
+    def update_results(self, problem, response):
+        if not isinstance(response, str):
+            response = response.outputs[0].text.strip()
+        # Initialize the response structure
+        response_entry = {
+            "content": response,
+            "correctness": None,
+            "reason": None,
+            "model_answer_extracted": None,
+        }
+        curr_res, model_answer_extracted = self.check_correctness(problem, completion=response)
+        response_entry["model_answer_extracted"] = model_answer_extracted
+        if curr_res:
+            response_entry["correctness"] = True
+            response_entry["reason"] = ""
+        else:
+            response_entry["correctness"] = False
+            response_entry["reason"] = "Solution is incorrect."
+    
+        return response_entry
+
+    def make_conversations(self, data, system_prompt):
+        conversations = []
+        for problem in data:
+            prompt_text = self.generate_prompt(problem)
+            conversations.append([
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": prompt_text}
+            ])
+        return conversations
+
+    def load_and_filter_dataset(self, start, end, split="train", source=None, filter_difficulty=False):
+        dataset = load_dataset(self.dataset, "main")
+        train_data = dataset[split].to_pandas()
+        return train_data.iloc[start:end] if end > 0 else train_data.iloc[start:]
+
+    def process_remaining_data(self, train_data, results):
+        return [row.to_dict() for _, row in train_data.iterrows() if str(row["question"]) not in results]
+
+    def extract_answer(self, completion):
+        match = self.ans_re.search(completion)
+        if not match: 
+            return self.invalid_ans
+        answer = match.group(1).strip()
+
+        patterns_to_remove = [
+            ',',           # Remove commas
+            r'\$',         # Remove dollar signs
+            r'\.$'         # Remove trailing period
+        ]
+        
+        for pattern in patterns_to_remove:
+            answer = re.sub(pattern, '', answer)
+
+        return answer
+
+
 
 TASK_HANDLERS = {
     "NUMINA": NUMINATaskHandler,
@@ -629,5 +805,6 @@ TASK_HANDLERS = {
     "AIME": AIMETaskHandler,
     "GPQADiamond": GPQADiamondTaskHandler,
     "MMLU": MMLUTaskHandler,
-    "LiveCodeBench": LiveCodeBenchTaskHandler
+    "LiveCodeBench": LiveCodeBenchTaskHandler,
+    "GSM8K": GSM8KTaskHandler,
 }
