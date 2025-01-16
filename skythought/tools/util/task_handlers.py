@@ -705,10 +705,10 @@ class GSM8KTaskHandler(TaskHandler):
         for pattern in patterns_to_remove:
             answer = re.sub(pattern, '', answer)
         
-        match = self.ans_re.search(answer)
-        if match:
-            match_str = match.group(1).strip()
-            match_str = match_str.replace(",", "")
+        matches = self.ans_re.findall(answer)
+        if matches:
+            # Get the last match and sanitize
+            match_str = matches[-1].group(1).strip()
             return match_str
         else:
             return self.invalid_ans
@@ -718,7 +718,9 @@ class ARCChallengeTaskHandler(TaskHandler):
     def __init__(self) -> None:
         super().__init__()
         self.dataset = "allenai/ai2_arc"
-        self.ans_re = re.compile(r"[Tt]he final answer is ([A-D])[\.\,]*")
+        self.ans_re = re.compile(r"[Tt]he best answer is ([A-D])[\.\,]*", re.IGNORECASE)
+        self.letter_re = re.compile(r"([A-D])[\.\,]*") 
+        self.canonical_options = ["A", "B", "C", "D"]
         self.invalid_ans = "[invalid]"
 
     @staticmethod
@@ -729,14 +731,17 @@ class ARCChallengeTaskHandler(TaskHandler):
     def generate_prompt(problem):
         question = problem["question"] 
         choices = problem["choices"]
-        choices_text = '\n'.join([f"{label}.{choice}" for label, choice in zip(choices["label"], choices["text"])])
-        full_prompt = "Given the following question and four candidate answers (A, B, C and D), choose the best answer. Your response should end with \"The final answer is [answer]\" where [answer] is one of the four letter choice (A, B, C, or D).\n" + f"{question}\n{choices_text}"
+        choices_text = '\n'.join([f"{label}.{choice}" for label, choice in zip(["A", "B", "C", "D"], choices["text"])])
+        full_prompt = "Given the following question and four candidate answers (A, B, C and D), choose the best answer. Your response should end with \"The best answer is [the_answer_letter]\" where [the_answer_letter] is one of the four letter choice (A, B, C, or D).\n" + f"{question}\n{choices_text}"
+        # full_prompt = "Given the following question and four candidate answers (A, B, C and D), choose the best answer. Provide only the final answer in your response. Your response should only contain  \"The best answer is [the_answer_letter]\" where [the_answer_letter] is one of the four letter choice (A, B, C, or D).\n" + f"{question}\n{choices_text}"
         return full_prompt
     
     def check_correctness(self, problem: Dict[str, Any], generation: str) -> bool: 
         gt_answer = problem["answerKey"]
-        model_answer = self.extract_answer(generation)
-        return model_answer == gt_answer, model_answer
+        if gt_answer not in self.canonical_options:
+            gt_answer = self.canonical_options[int(problem["answerKey"]) - 1]
+        model_answer = self.get_answer(generation)
+        return model_answer == gt_answer
     
     def update_results(self, problem, response):
         if not isinstance(response, str):
@@ -746,10 +751,8 @@ class ARCChallengeTaskHandler(TaskHandler):
             "content": response,
             "correctness": None,
             "reason": None,
-            "model_answer_extracted": None,
         }
-        curr_res, model_answer_extracted = self.check_correctness(problem, generation=response)
-        response_entry["model_answer_extracted"] = model_answer_extracted
+        curr_res = self.check_correctness(problem, generation=response)
         if curr_res:
             response_entry["correctness"] = True
             response_entry["reason"] = ""
@@ -777,23 +780,32 @@ class ARCChallengeTaskHandler(TaskHandler):
     def process_remaining_data(self, train_data, results):
         return [row.to_dict() for _, row in train_data.iterrows() if str(row["question"]) not in results]
 
-    def extract_answer(self, completion):
-
-        patterns_to_remove = [
-            ',',           # Remove commas
-            r'\$',         # Remove dollar signs
-            r'\.$'         # Remove trailing period
-            r"\\",         # Remove stray backslashes
-        ]
-        answer = completion
-        for pattern in patterns_to_remove:
-            answer = re.sub(pattern, '', answer)
-        
-        match = self.ans_re.search(answer)
-        if not match: 
-            return self.invalid_ans
-        else:
-            return match.group(1).strip()
+    def get_answer(self, completion):
+        # First, we try to extract similar to MATH answers
+        answer = extract_answer(completion)
+        match = None
+        if answer: 
+             # match for the letter answer needed.
+            match = self.letter_re.search(answer)
+            if match: 
+                return match.group(1).strip()
+            
+        if not answer or not match: 
+            # try basic-regex based search 
+            patterns_to_remove = [
+                ',',           # Remove commas
+                r'\$',         # Remove dollar signs
+                r'\.$'         # Remove trailing period
+                r"\\",         # Remove stray backslashes
+                r"\*",           # Remove asterisks
+            ]
+            answer = completion
+            for pattern in patterns_to_remove:
+                answer = re.sub(pattern, '', answer)
+            matches = self.ans_re.findall(answer)
+            if not matches: 
+                return self.invalid_ans
+            return matches[-1].strip()
 
 
 
