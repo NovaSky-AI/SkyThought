@@ -26,7 +26,7 @@ SYSTEM_PROMPT = {
     "openai/o1-mini": "Question: {input}\nAnswer: ",
     "openai/o1-preview": "Question: {input}\nAnswer: ",
     "openai/gpt-4o-mini": "User: {input}\nPlease reason step by step, and put your final answer within \\boxed{{}}.\n\nAssistant:",
-    "meta-llama/llama-3.2-1b-instruct":  "You are a helpful and harmless assistant. You are Llama developed by Meta. You should think step-by-step."
+    "meta-llama/Llama-3.2-1B-Instruct":  "You are a helpful and harmless assistant. You are Llama developed by Meta. You should think step-by-step."
 }
 
 MODEL_TO_NAME = {
@@ -39,5 +39,5 @@ MODEL_TO_NAME = {
     "openai/o1-mini": "o1-mini",
     "openai/o1-preview": "o1-preview",  
     "openai/gpt-4o-mini": "gpt-4o-mini",
-    "meta-llama/llama-3.2-1b-instruct": "Llama-3.2-1B-Instruct"
+    "meta-llama/Llama-3.2-1B-Instruct": "Llama-3.2-1B-Instruct"
 }

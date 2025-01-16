@@ -628,7 +628,7 @@ class GSM8KTaskHandler(TaskHandler):
     def __init__(self) -> None:
         super().__init__()
         self.dataset = "openai/gsm8k"
-        self.ans_re = re.compile(r"The final answer is ((-?[$0-9.,]{2,})|(-?[0-9]+))")
+        self.ans_re = re.compile(r"((-?[$0-9.,]{2,})|(-?[0-9]+))")
         self.gt_re =  re.compile(r"#### (\-?[0-9\.\,]+)")
         self.invalid_ans = "[invalid]"
 
@@ -642,12 +642,12 @@ class GSM8KTaskHandler(TaskHandler):
         full_prompt = f"Given the following problem, reason and give a final answer to the problem.\nProblem: {question}\nYour response should end with \"The final answer is [answer]\" where [answer] is the response to the problem."
         return full_prompt
     
-    def check_correctness(self, problem: Dict[str, Any], completion: str) -> bool: 
+    def check_correctness(self, problem: Dict[str, Any], generation: str) -> bool: 
         gt_answer = self.extract_gt_answer(problem["answer"])
-        assert gt_answer != self.invalid_ans
-        model_answer = self.extract_answer(completion)
-        print(f"{problem=}, {model_answer=}, {gt_answer=}")
-        return model_answer == gt_answer, model_answer, gt_answer
+        model_answer = extract_answer(generation)
+        model_answer = self.sanitize_answer(model_answer)
+        # print(f"{problem=}, {model_answer=}, {gt_answer=}")
+        return model_answer == gt_answer
     
     def update_results(self, problem, response):
         if not isinstance(response, str):
@@ -657,12 +657,8 @@ class GSM8KTaskHandler(TaskHandler):
             "content": response,
             "correctness": None,
             "reason": None,
-            "model_answer": None,
-            "gt_answer": None,
         }
-        curr_res, model_answer, gt_answer = self.check_correctness(problem, completion=response)
-        response_entry["model_answer"] = model_answer
-        response_entry["gt_answer"] = gt_answer
+        curr_res= self.check_correctness(problem, generation=response)
         if curr_res:
             response_entry["correctness"] = True
             response_entry["reason"] = ""
@@ -699,29 +695,30 @@ class GSM8KTaskHandler(TaskHandler):
         else:
             return self.invalid_ans
 
-    def extract_answer(self, completion):
-        match = self.ans_re.search(completion)
-        if not match: 
-            return self.invalid_ans
-        answer = match.group(1).strip()
-
+    def sanitize_answer(self, answer):
         patterns_to_remove = [
             ',',           # Remove commas
             r'\$',         # Remove dollar signs
             r'\.$'         # Remove trailing period
+            r"\*",           # Remove asterisks
         ]
-        
         for pattern in patterns_to_remove:
             answer = re.sub(pattern, '', answer)
-
-        return answer
+        
+        match = self.ans_re.search(answer)
+        if match:
+            match_str = match.group(1).strip()
+            match_str = match_str.replace(",", "")
+            return match_str
+        else:
+            return self.invalid_ans
 
 # TODO: For this, we don't want model reasoning chains, just the final answer. 
 class ARCChallengeTaskHandler(TaskHandler): 
     def __init__(self) -> None:
         super().__init__()
-        self.dataset = "openai/gsm8k"
-        self.ans_re = re.compile(r"The best answer is ([A-D][\.\,]+)")
+        self.dataset = "allenai/ai2_arc"
+        self.ans_re = re.compile(r"[Tt]he final answer is ([A-D])[\.\,]*")
         self.invalid_ans = "[invalid]"
 
     @staticmethod
@@ -731,12 +728,14 @@ class ARCChallengeTaskHandler(TaskHandler):
     @staticmethod
     def generate_prompt(problem):
         question = problem["question"] 
-        full_prompt = f"Given the following question and four candidate answers (A, B, C and D), choose the best answer.\nQuestion: {question}\nYour response should only contain the final answer and nothing more. Only respond with the one of the answer letters A, B, C or D corresponding to the best. The best answer is"
+        choices = problem["choices"]
+        choices_text = '\n'.join([f"{label}.{choice}" for label, choice in zip(choices["label"], choices["text"])])
+        full_prompt = "Given the following question and four candidate answers (A, B, C and D), choose the best answer. Your response should end with \"The final answer is [answer]\" where [answer] is one of the four letter choice (A, B, C, or D).\n" + f"{question}\n{choices_text}"
         return full_prompt
     
-    def check_correctness(self, problem: Dict[str, Any], completion: str) -> bool: 
+    def check_correctness(self, problem: Dict[str, Any], generation: str) -> bool: 
         gt_answer = problem["answerKey"]
-        model_answer = self.extract_answer(completion)
+        model_answer = self.extract_answer(generation)
         return model_answer == gt_answer, model_answer
     
     def update_results(self, problem, response):
@@ -749,7 +748,7 @@ class ARCChallengeTaskHandler(TaskHandler):
             "reason": None,
             "model_answer_extracted": None,
         }
-        curr_res, model_answer_extracted = self.check_correctness(problem, completion=response)
+        curr_res, model_answer_extracted = self.check_correctness(problem, generation=response)
         response_entry["model_answer_extracted"] = model_answer_extracted
         if curr_res:
             response_entry["correctness"] = True
@@ -771,7 +770,7 @@ class ARCChallengeTaskHandler(TaskHandler):
         return conversations
 
     def load_and_filter_dataset(self, start, end, split="train", source=None, filter_difficulty=False):
-        dataset = load_dataset(self.dataset, "main")
+        dataset = load_dataset(self.dataset, "ARC-Challenge")
         train_data = dataset[split].to_pandas()
         return train_data.iloc[start:end] if end > 0 else train_data.iloc[start:]
 
@@ -779,21 +778,22 @@ class ARCChallengeTaskHandler(TaskHandler):
         return [row.to_dict() for _, row in train_data.iterrows() if str(row["question"]) not in results]
 
     def extract_answer(self, completion):
-        match = self.ans_re.search(completion)
-        if not match: 
-            return self.invalid_ans
-        answer = match.group(1).strip()
 
         patterns_to_remove = [
             ',',           # Remove commas
             r'\$',         # Remove dollar signs
             r'\.$'         # Remove trailing period
+            r"\\",         # Remove stray backslashes
         ]
-        
+        answer = completion
         for pattern in patterns_to_remove:
             answer = re.sub(pattern, '', answer)
-
-        return answer
+        
+        match = self.ans_re.search(answer)
+        if not match: 
+            return self.invalid_ans
+        else:
+            return match.group(1).strip()
 
 
 
@@ -807,4 +807,5 @@ TASK_HANDLERS = {
     "MMLU": MMLUTaskHandler,
     "LiveCodeBench": LiveCodeBenchTaskHandler,
     "GSM8K": GSM8KTaskHandler,
+    "ARC-C": ARCChallengeTaskHandler,
 }
