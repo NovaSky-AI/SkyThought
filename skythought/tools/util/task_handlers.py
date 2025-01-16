@@ -12,6 +12,7 @@ from .apps.testing_util import run_test as apps_run_test
 from .taco.testing_util import run_test as taco_run_test
 from .math.testing_util import strip_answer_string, get_multiple_choice_answer, extract_answer, math_equal
 from .livecodebench.testing_util import unsafe_lcb_runTests, map_to_example, has_test_type, post_process_code, translate_private_test_cases
+from .common import TimeoutException, timeout
 
 def has_code(response):
     pattern = r"```(?:[a-zA-Z]*)\n(.*?)```"
@@ -49,8 +50,9 @@ class MathTaskHandler(TaskHandler):
         return prompt + "\nReturn your final response within \\boxed{{}}" 
     
     def check_correctness(self, problem, generation):
-        answer = problem["answer"]
+        answer = strip_answer_string(problem["answer"])
         pred = extract_answer(generation)
+        # print(problem)
         pred = strip_answer_string(pred)
         return math_equal(pred, answer)
     
@@ -261,11 +263,13 @@ class NUMINATaskHandler(TaskHandler):
     def generate_prompt(prompt):
         return "Return your final response within \\boxed{{}}. " + prompt
     
+    @timeout(5)  # Add timeout of 5 seconds
     def check_correctness(self, problem, generation):
-        solution = problem["solution"]
-        sol = find_box(solution)
-        pred = find_box(generation)
-        return sol == pred
+        solution = extract_answer(problem["solution"])
+        solution = strip_answer_string(solution)
+        pred = extract_answer(generation)
+        pred = strip_answer_string(pred)
+        return math_equal(pred, solution)
     
     def update_results(self, problem, response):
         if not isinstance(response, str):
@@ -276,39 +280,28 @@ class NUMINATaskHandler(TaskHandler):
             "correctness": None,
             "reason": None,
         }
-        curr_res = self.check_correctness(problem, generation=response)
-        if curr_res:
-            response_entry["correctness"] = True
-            response_entry["reason"] = ""
-        else:
+
+        try:
+            curr_res = self.check_correctness(problem, generation=response)
+            if curr_res:
+                response_entry["correctness"] = True
+                response_entry["reason"] = ""
+            else:
+                response_entry["correctness"] = False
+                response_entry["reason"] = "Solution is incorrect."
+        except TimeoutException as e:
             response_entry["correctness"] = False
-            response_entry["reason"] = "Solution is incorrect."
-    
+            response_entry["reason"] = str(e)
+
         return response_entry
 
     @staticmethod
     def get_difficulty_dict(source, start, end):
         diff_dict = {}
-        if source == "math":
-            # The math has ground truth score
-            dataset = load_dataset("lighteval/MATH", trust_remote_code=True)
-
-            # Iterating through the dataset
-            for split_name, split_data in dataset.items():
-                print(f"Processing split: {split_name}")
-                for example in split_data:
-                    # Access the fields of each example
-                    try:
-                        score = int(example["level"].split("Level ")[1])
-                    except:
-                        score = -1
-                    diff_dict[example["problem"]] = score
-        else:
-            label_file = f"./labeled_{source}_0_-1.json"
-            with open(label_file, "r") as f:
-                labeled_data = json.load(f)
-            for data in labeled_data:
-                diff_dict[data["problem"]] = data["gpt_difficulty_parsed"]
+        dataset = load_dataset("NovaSky-AI/labeled_numina_difficulty_859K", trust_remote_code=True, split="train")
+        for example in dataset:
+            # print(example)
+            diff_dict[example["problem"]] = example["gpt_difficulty_parsed"]
         return diff_dict
 
     def make_conversations(self, data, system_prompt):
