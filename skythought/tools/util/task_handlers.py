@@ -38,7 +38,7 @@ class TaskHandler:
             records = json.load(f)
         return records
 
-    def load_and_filter_dataset(self, start, end, split="train", source=None, filter_difficulty=False):
+    def load_and_filter_dataset(self, start, end, split="train", source=None, filter_difficulty=False, math_difficulty_lower_bound=None, math_difficulty_upper_bound=None):
         raise NotImplementedError("Subclasses should implement this method.")
 
     def process_remaining_data(self, train_data, results):
@@ -88,7 +88,7 @@ class MathTaskHandler(TaskHandler):
     def process_remaining_data(self, train_data, results):
         return [row.to_dict() for _, row in train_data.iterrows() if str(row["problem"]) not in results]
 
-    def load_and_filter_dataset(self, start, end, split="test", source=None, filter_difficulty=False):
+    def load_and_filter_dataset(self, start, end, split="test", source=None, filter_difficulty=False, math_difficulty_lower_bound=None, math_difficulty_upper_bound=None):
         dataset = load_dataset(self.dataset)
         train_data = dataset[split].to_pandas()
         return train_data.iloc[start:end] if end > 0 else train_data.iloc[start:]
@@ -109,7 +109,7 @@ class AIMETaskHandler(MathTaskHandler):
     def get_question_key():
         return "problem"
     
-    def load_and_filter_dataset(self, start, end, split="train", source=None, filter_difficulty=False):
+    def load_and_filter_dataset(self, start, end, split="train", source=None, filter_difficulty=False, math_difficulty_lower_bound=None, math_difficulty_upper_bound=None):
         dataset = load_dataset(self.dataset)
         train_data = dataset[split].to_pandas()
         filtered_data = train_data[train_data['url'].str.contains("2024", na=False)]
@@ -184,7 +184,7 @@ class GPQADiamondTaskHandler(TaskHandler):
             ])
         return conversations
 
-    def load_and_filter_dataset(self, start, end, split="train", source=None, filter_difficulty=False):
+    def load_and_filter_dataset(self, start, end, split="train", source=None, filter_difficulty=False, math_difficulty_lower_bound=None, math_difficulty_upper_bound=None):
         dataset = load_dataset(self.dataset, "gpqa_diamond")
         train_data = dataset[split].to_pandas()
         return train_data.iloc[start:end] if end > 0 else train_data.iloc[start:]
@@ -249,7 +249,7 @@ class MMLUTaskHandler(TaskHandler):
     def process_remaining_data(self, train_data, results):
         return [row.to_dict() for _, row in train_data.iterrows() if str(row["question"]) not in results]
 
-    def load_and_filter_dataset(self, start, end, split="test", source=None, filter_difficulty=False):
+    def load_and_filter_dataset(self, start, end, split="test", source=None, filter_difficulty=False, math_difficulty_lower_bound=None, math_difficulty_upper_bound=None):
         dataset = load_dataset(self.dataset, "all")
         train_data = dataset[split].to_pandas()
         return train_data.iloc[start:end] if end > 0 else train_data.iloc[start:]
@@ -314,7 +314,7 @@ class NUMINATaskHandler(TaskHandler):
             ])
         return conversations
 
-    def load_and_filter_dataset(self, start, end, split="train", source=None, filter_difficulty=False):
+    def load_and_filter_dataset(self, start, end, split="train", source=None, filter_difficulty=False, math_difficulty_lower_bound=None, math_difficulty_upper_bound=None):
         dataset = load_dataset("AI-MO/NuminaMath-CoT")
         train_data = dataset[split].to_pandas()
         train_data = train_data.query('source == @source').iloc[start:end] if end > 0 else train_data.query('source == @source').iloc[start:]
@@ -418,7 +418,7 @@ class APPSTaskHandler(TaskHandler):
             ])
         return conversations
 
-    def load_and_filter_dataset(self, start, end, split="train", source=None, filter_difficulty=False):
+    def load_and_filter_dataset(self, start, end, split="train", source=None, filter_difficulty=False, math_difficulty_lower_bound=None, math_difficulty_upper_bound=None):
         dataset = load_dataset("codeparrot/apps", trust_remote_code=True)
         train_data = dataset[split].to_pandas()
         if not filter_difficulty:
@@ -494,7 +494,6 @@ class TACOTaskHandler(TaskHandler):
     def make_conversations(self, data, system_prompt):
         conversations = []
         for idx, problem in enumerate(data):
-            test_case = json.loads(problem["input_output"])
             starter_code = None if len(problem["starter_code"]) == 0 else problem["starter_code"]
             try:
                 input_outpout = json.loads(problem["input_output"])
@@ -510,7 +509,7 @@ class TACOTaskHandler(TaskHandler):
             ])
         return conversations
 
-    def load_and_filter_dataset(self, start, end, split="train", source=None, filter_difficulty=False):
+    def load_and_filter_dataset(self, start, end, split="train", source=None, filter_difficulty=False, math_difficulty_lower_bound=None, math_difficulty_upper_bound=None):
         dataset = load_dataset("BAAI/TACO", "ALL", trust_remote_code=True)
         train_data = dataset[split].to_pandas()
         if not filter_difficulty:
@@ -597,7 +596,7 @@ class LiveCodeBenchTaskHandler(TaskHandler):
             ])
         return conversations
 
-    def load_and_filter_dataset(self, start, end, split="test", source=None, filter_difficulty=False):
+    def load_and_filter_dataset(self, start, end, split="test", source=None, filter_difficulty=False, math_difficulty_lower_bound=None, math_difficulty_upper_bound=None):
         dataset = load_dataset("livecodebench/code_generation_lite", version_tag="release_v2", split=split, trust_remote_code=True)
         if filter_difficulty:
             dataset = dataset.filter(lambda example: example['difficulty'] == source)
