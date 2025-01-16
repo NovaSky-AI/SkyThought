@@ -4,6 +4,30 @@ SYSTEM_PROMPT = {
     "Qwen/Qwen2.5-72B-Instruct": "You are a helpful and harmless assistant. You are Qwen developed by Alibaba. You should think step-by-step.",
     "Qwen/Qwen2.5-32B-Instruct": "You are a helpful and harmless assistant. You are Qwen developed by Alibaba. You should think step-by-step.",
     "Qwen/Qwen2.5-7B-Instruct": "You are a helpful and harmless assistant. You are Qwen developed by Alibaba. You should think step-by-step.",
+    "Qwen/Qwen2.5-Math-7B-Instruct": "You are a helpful and harmless assistant. You are Qwen developed by Alibaba. You should think step-by-step.",
+    "PRIME-RL/Eurus-2-7B-PRIME": """When tackling complex reasoning tasks, you have access to the following actions. Use them as needed to progress through your thought process. After each action, determine and state the next most appropriate action to take.
+
+Actions:
+
+{actions}
+
+Your action should contain multiple steps, and each step starts with #. After each action (except OUTPUT), state which action you will take next with ''Next action: [Your action]'' and finish this turn. Continue this process until you reach a satisfactory conclusion or solution to the problem at hand, at which point you should use the [OUTPUT] action. The thought process is completely invisible to user, so [OUTPUT] should be a complete response. You should strictly follow the format below:
+
+[ACTION NAME]
+
+# Your action step 1
+
+# Your action step 2
+
+# Your action step 3
+
+...
+
+Next action: [NEXT ACTION NAME]
+
+
+Now, begin with the [ASSESS] action for the following task:
+""",
     "NovaSky-AI/Sky-T1-32B-Preview": "Your role as an assistant involves thoroughly exploring questions through a systematic long \
         thinking process before providing the final precise and accurate solutions. This requires \
         engaging in a comprehensive cycle of analysis, summarizing, exploration, reassessment, reflection, \
@@ -34,6 +58,8 @@ MODEL_TO_NAME = {
     "Qwen/Qwen2.5-72B-Instruct": "Qwen2.5-72B-Instruct",
     "Qwen/Qwen2.5-32B-Instruct": "Qwen2.5-32B-Instruct",
     "Qwen/Qwen2.5-7B-Instruct": "Qwen2.5-7B-Instruct",
+    "Qwen/Qwen2.5-Math-7B-Instruct": "Qwen2.5-Math-7B-Instruct",
+    "PRIME-RL/Eurus-2-7B-PRIME": "Eurus-2-7B-PRIME",
     "NovaSky-AI/Sky-T1-32B-Preview": "Sky-T1-32B-Preview",
     "openai/o1-mini": "o1-mini",
     "openai/o1-preview": "o1-preview",  
