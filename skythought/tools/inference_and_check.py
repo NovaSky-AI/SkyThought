@@ -317,7 +317,7 @@ def main():
     parser.add_argument("--result-dir", type=str, default="./", help="Result dir to save files.")
     parser.add_argument("--check", action="store_true", help="Perform evaluation checks on generated samples.")
     parser.add_argument("--inference", action="store_true", help="Perform inference.")
-    parser.add_argument("--temperatures", type=float, nargs="+", default=[0.7], help="Temperature for sampling.")
+    parser.add_argument("--temperatures", type=float, nargs="+", default=[0], help="Temperature for sampling.")
     parser.add_argument("--math-difficulty-lower-bound", type=int, default=None, help="Lowest difficulty level for math.")
     parser.add_argument("--math-difficulty-upper-bound", type=int, default=None, help="Highest difficulty level for math.")
     parser.add_argument("--n", type=int, default=1, help="Number of samples generated per problem.")
@@ -326,6 +326,9 @@ def main():
     handler: TaskHandler = TASK_HANDLERS[args.dataset]()
     temperatures = [1] if args.model.startswith("openai/o1") else args.temperatures
     max_tokens = args.max_tokens
+    if temperatures == [0] and args.n > 1:
+        args.n = 1
+        print("Warning: Temperature 0 does not support multiple samples. Setting n=1.")
 
     # create result dir if not exists
     if args.result_dir and not os.path.exists(args.result_dir):
