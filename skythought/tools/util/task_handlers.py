@@ -659,7 +659,7 @@ class GSM8KTaskHandler(TaskHandler):
     def __init__(self) -> None:
         super().__init__()
         self.dataset = "openai/gsm8k"
-        self.ans_re = re.compile(r"The final answer is ((-?[$0-9.,]{2,})|(-?[0-9]+))")
+        self.ans_re = re.compile(r"((-?[$0-9.,]{2,})|(-?[0-9]+))")
         self.gt_re =  re.compile(r"#### (\-?[0-9\.\,]+)")
         self.invalid_ans = "[invalid]"
 
@@ -675,8 +675,8 @@ class GSM8KTaskHandler(TaskHandler):
     
     def check_correctness(self, problem: Dict[str, Any], completion: str) -> bool: 
         gt_answer = self.extract_gt_answer(problem["answer"])
-        assert gt_answer != self.invalid_ans
-        model_answer = self.extract_answer(completion)
+        model_answer = extract_answer(completion)
+        model_answer = self.sanitize_answer(model_answer)
         print(f"{problem=}, {model_answer=}, {gt_answer=}")
         return model_answer == gt_answer, model_answer, gt_answer
     
@@ -730,22 +730,23 @@ class GSM8KTaskHandler(TaskHandler):
         else:
             return self.invalid_ans
 
-    def extract_answer(self, completion):
-        match = self.ans_re.search(completion)
-        if not match: 
-            return self.invalid_ans
-        answer = match.group(1).strip()
-
+    def sanitize_answer(self, answer):
         patterns_to_remove = [
             ',',           # Remove commas
             r'\$',         # Remove dollar signs
             r'\.$'         # Remove trailing period
+            r"\*",           # Remove asterisks
         ]
-        
         for pattern in patterns_to_remove:
             answer = re.sub(pattern, '', answer)
-
-        return answer
+        
+        match = self.ans_re.search(answer)
+        if match:
+            match_str = match.group(1).strip()
+            match_str = match_str.replace(",", "")
+            return match_str
+        else:
+            return self.invalid_ans
 
 # TODO: For this, we don't want model reasoning chains, just the final answer. 
 class ARCChallengeTaskHandler(TaskHandler): 
@@ -767,7 +768,8 @@ class ARCChallengeTaskHandler(TaskHandler):
     
     def check_correctness(self, problem: Dict[str, Any], completion: str) -> bool: 
         gt_answer = problem["answerKey"]
-        model_answer = self.extract_answer(completion)
+        completion = self.sanitize_answer(completion)
+        model_answer = extract_answer(completion)
         return model_answer == gt_answer, model_answer
     
     def update_results(self, problem, response):
@@ -809,18 +811,15 @@ class ARCChallengeTaskHandler(TaskHandler):
     def process_remaining_data(self, train_data, results):
         return [row.to_dict() for _, row in train_data.iterrows() if str(row["question"]) not in results]
 
-    def extract_answer(self, completion):
-        match = self.ans_re.search(completion)
-        if not match: 
-            return self.invalid_ans
-        answer = match.group(1).strip()
+    def sanitize_answer(self, completion):
 
         patterns_to_remove = [
             ',',           # Remove commas
             r'\$',         # Remove dollar signs
             r'\.$'         # Remove trailing period
+            r"\\",         # Remove stray backslashes
         ]
-        
+        answer = completion
         for pattern in patterns_to_remove:
             answer = re.sub(pattern, '', answer)
 
