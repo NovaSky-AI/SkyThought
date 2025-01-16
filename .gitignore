@@ -1,0 +1,4 @@
+__pycache__/
+results.txt
+token_usage/
+*.json

@@ -4,6 +4,7 @@ SYSTEM_PROMPT = {
     "Qwen/Qwen2.5-72B-Instruct": "You are a helpful and harmless assistant. You are Qwen developed by Alibaba. You should think step-by-step.",
     "Qwen/Qwen2.5-32B-Instruct": "You are a helpful and harmless assistant. You are Qwen developed by Alibaba. You should think step-by-step.",
     "Qwen/Qwen2.5-7B-Instruct": "You are a helpful and harmless assistant. You are Qwen developed by Alibaba. You should think step-by-step.",
+    "Qwen/Qwen2.5-1.5B-Instruct": "You are a helpful and harmless assistant. You are Qwen developed by Alibaba. You should think step-by-step.",
     "NovaSky-AI/Sky-T1-32B-Preview": "Your role as an assistant involves thoroughly exploring questions through a systematic long \
         thinking process before providing the final precise and accurate solutions. This requires \
         engaging in a comprehensive cycle of analysis, summarizing, exploration, reassessment, reflection, \
@@ -35,6 +36,7 @@ MODEL_TO_NAME = {
     "Qwen/Qwen2.5-72B-Instruct": "Qwen2.5-72B-Instruct",
     "Qwen/Qwen2.5-32B-Instruct": "Qwen2.5-32B-Instruct",
     "Qwen/Qwen2.5-7B-Instruct": "Qwen2.5-7B-Instruct",
+    "Qwen/Qwen2.5-1.5B-Instruct": "Qwen2.5-1.5B-Instruct",
     "NovaSky-AI/Sky-T1-32B-Preview": "Sky-T1-32B-Preview",
     "openai/o1-mini": "o1-mini",
     "openai/o1-preview": "o1-preview",  

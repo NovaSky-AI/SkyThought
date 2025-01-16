@@ -9,6 +9,7 @@ eval_to_split = {
   "AIME": "train", 
   "GPQADiamond": "train", 
   "MMLU": "test",
+  "MMLUPro": "test",
   "LiveCodeBench": "test",
   "GSM8K": "test",
 }
