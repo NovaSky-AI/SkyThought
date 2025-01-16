@@ -737,7 +737,8 @@ class GSM8KTaskHandler(TaskHandler):
         
         matches = self.ans_re.findall(answer)
         if matches:
-            match_str = matches[-1].strip()
+            # get the last match (i.e final response) and the first / outer capturing group
+            match_str = matches[-1][0].strip()
             return match_str
         else:
             return self.invalid_ans
