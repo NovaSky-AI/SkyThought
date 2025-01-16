@@ -742,7 +742,6 @@ class GSM8KTaskHandler(TaskHandler):
         else:
             return self.invalid_ans
 
-# TODO: For this, we don't want model reasoning chains, just the final answer. 
 class ARCChallengeTaskHandler(TaskHandler): 
     def __init__(self) -> None:
         super().__init__()
@@ -762,7 +761,6 @@ class ARCChallengeTaskHandler(TaskHandler):
         choices = problem["choices"]
         choices_text = '\n'.join([f"{label}.{choice}" for label, choice in zip(["A", "B", "C", "D"], choices["text"])])
         full_prompt = "Given the following question and four candidate answers (A, B, C and D), choose the best answer. Your response should end with \"The best answer is [the_answer_letter]\" where [the_answer_letter] is one of the four letter choice (A, B, C, or D).\n" + f"{question}\n{choices_text}"
-        # full_prompt = "Given the following question and four candidate answers (A, B, C and D), choose the best answer. Provide only the final answer in your response. Your response should only contain  \"The best answer is [the_answer_letter]\" where [the_answer_letter] is one of the four letter choice (A, B, C, or D).\n" + f"{question}\n{choices_text}"
         return full_prompt
     
     def check_correctness(self, problem: Dict[str, Any], generation: str) -> bool: 
