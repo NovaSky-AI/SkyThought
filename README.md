@@ -49,7 +49,21 @@ Following, we show our evaluation results for the Sky-T1-32B-Preview model acros
 | LiveCodeBench-Hard   | 17.9                    | 9.8   | 17.1  | 16.3       |
 | GPQA-Diamond         | 56.8                    | 45.5   | 52.5  | 75.2       |
 
+#### Results on instruction-following benchmarks
 
+We also evaluate on classic instruction-following benchmarks to test whether the model has traded-off capability in other domains for better performance in reasoning-related benchmarks. 
+
+| Metric | Sky-T1-32B-Preview | Qwen-2.5-32B-Instruct | QwQ-32B-Preview | Eval Implementation |
+|---------|-------------------|---------------------|-----------------|-------------------|
+| MMLU (0 shot; no CoT) | 78.36 | 74.14 | 71.23 | [lm_eval](https://github.com/EleutherAI/lm-evaluation-harness) |
+| MMLU (5 shot; no CoT) | 82.46 | 82.62 | 82.32 | [lm_eval](https://github.com/EleutherAI/lm-evaluation-harness) |
+| ARC-C (0 shot; no CoT) | 49.49 | 49.4 | 46.25 | [lm_eval](https://github.com/EleutherAI/lm-evaluation-harness) |
+| IFEval | 74.68 | 79.3 | 34.75 | [lm_eval](https://github.com/EleutherAI/lm-evaluation-harness) |
+| LLM-as-a-Judge | 9.12	| 9.19 | 8.36| [fastchat](https://github.com/lm-sys/FastChat/tree/main/fastchat/llm_judge) |
+| MGSM (no CoT) | 33 | 42.3 | 15.5 | [lm_eval](https://github.com/EleutherAI/lm-evaluation-harness) |
+| BFCL-v3 | 53.18 | 58.92 | 17.41 | [BFCL](https://github.com/ShishirPatil/gorilla/tree/main/berkeley-function-call-leaderboard) |
+
+For more details, refer [here](./instruct_evals.md). 
 
 ## Fully Open-source: Driving Progress Together
 We believe that open-source collaboration drives progress, and with Sky-T1-32B-Preview, we are fully committed to empowering the community. We open-source all details (i.e., data, codes, model weights) to enable the community to replicate and improve on our results *easily*:
