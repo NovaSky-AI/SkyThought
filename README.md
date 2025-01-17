@@ -49,9 +49,9 @@ Following, we show our evaluation results for the Sky-T1-32B-Preview model acros
 | LiveCodeBench-Hard   | 17.9                    | 9.8   | 17.1  | 16.3       |
 | GPQA-Diamond         | 56.8                    | 45.5   | 52.5  | 75.2       |
 
-#### Results on instruction-following benchmarks
+#### Results on QA and instruction-following benchmarks
 
-We also evaluate on classic instruction-following benchmarks to test whether the model has traded-off capability in other domains for better performance in reasoning-related benchmarks. 
+We also evaluate on classic QA and instruction-following benchmarks to test whether the model has traded-off capability in other domains for better performance in reasoning-related benchmarks. 
 
 | Metric | Sky-T1-32B-Preview | Qwen-2.5-32B-Instruct | QwQ-32B-Preview | Eval Implementation |
 |---------|-------------------|---------------------|-----------------|-------------------|

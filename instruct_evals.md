@@ -85,7 +85,7 @@ python show_result.py
 
 ### BFCL-v3
 
-Our results are reported on `test_category` `all` . Make sure to get the API keys for the `exec_multiple` subcategory by following the instructions [here](https://github.com/ShishirPatil/gorilla/tree/main/berkeley-function-call-leaderboard#api-keys-for-executable-test-categories)
+Our results are reported on `test-category` `all` . Make sure to get the API keys for the executable test categories by following the instructions [here](https://github.com/ShishirPatil/gorilla/tree/main/berkeley-function-call-leaderboard#api-keys-for-executable-test-categories)
 
 Run
 
