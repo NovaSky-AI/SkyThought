@@ -20,6 +20,7 @@ def parse_arguments():
     parser.add_argument("--filter-difficulty", action="store_true", help="Filter difficulty.")
     parser.add_argument("--source", type=str, help="Source for the dataset.")
     parser.add_argument("--output_file", required=True, type=str, help="Output file to write results to.")
+    parser.add_argument("--temperatures", type=float, nargs="+", default=[0], help="Temperature for sampling.")
     return parser.parse_args()
 
 def extract_accuracy_from_output(output):
@@ -51,6 +52,7 @@ def main():
     evals = args.evals.split(",")
     output_file = args.output_file
     tp = args.tp
+    temperatures = [str(t) for t in args.temperatures]
 
     script_path = "inference_and_check.py"
 
@@ -65,11 +67,14 @@ def main():
             "--model", model_path, 
             "--dataset", eval_name, 
             "--split", eval_to_split[eval_name], 
-            "--tp", str(tp)]
-        
+            "--tp", str(tp),
+            "--temperatures"
+        ]
+        command.extend(temperatures)  # Add temperatures as separate arguments
+
         # Add additional arguments for specific models
-        if "NovaSky-AI/Sky-T1-32B-Preview" in model_path and ("AIME" in eval_name or "GPQADiamond" in eval_name):
-            command.extend(["--temperatures", "0.7"])
+        # if "NovaSky-AI/Sky-T1-32B-Preview" in model_path and ("AIME" in eval_name or "GPQADiamond" in eval_name):
+        #     command.extend(["--temperatures", "0.7"])
             
         if args.filter_difficulty:
             assert args.source != "", "No source passed for filtering difficulty."

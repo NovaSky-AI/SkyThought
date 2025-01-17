@@ -13,6 +13,7 @@ from .taco.testing_util import run_test as taco_run_test
 from .math.testing_util import strip_answer_string, get_multiple_choice_answer, extract_answer, math_equal
 from .livecodebench.testing_util import unsafe_lcb_runTests, map_to_example, has_test_type, post_process_code, translate_private_test_cases
 from .common import TimeoutException, timeout
+from util.model_utils import *
 
 def has_code(response):
     pattern = r"```(?:[a-zA-Z]*)\n(.*?)```"
@@ -107,7 +108,7 @@ class AIMETaskHandler(MathTaskHandler):
     
     @staticmethod
     def generate_prompt(prompt, model):
-        if "NovaSky-AI/Sky-T1-32B-Preview" in model:
+        if MODEL_TO_NAME[model] == "Sky-T1-32B-Preview":
             return prompt + "\nReturn your final response within \\boxed{{}}"
         else:
             return "Return your final response within \\boxed{{}}. " + prompt
