@@ -38,6 +38,8 @@ lm_eval --model vllm     --model_args pretrained=NovaSky-AI/Sky-T1-32B-Preview,t
 lm_eval --model vllm     --model_args pretrained=NovaSky-AI/Sky-T1-32B-Preview,tensor_parallel_size=4,dtype=auto,gpu_memory_utilization=0.9,data_parallel_size=1     --tasks leaderboard_ifeval --trust_remote_code   --batch_size auto --apply_chat_template --fewshot_as_multiturn
 ```
 
+We use the `prompt_level_strict_acc` metric following Qwen-2.5.
+
 ### MGSM (native CoT)
 
 ```bash 
