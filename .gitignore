@@ -1,7 +1,0 @@
-token_usage
-token_usage/*
-__pycache__
-__pycache__/*
-test_*
-
-run_all.sh
