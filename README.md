@@ -42,7 +42,7 @@ Following, we show our evaluation results for the Sky-T1-32B-Preview model acros
 ### Evaluation results
 | Metric                | Sky-T1-32B-Preview | Qwen-2.5-32B-Instruct | QwQ   | o1-preview |
 |-----------------------|---------------------|--------|-------|------------|
-| Math500              | 82.4                    | 76.2    | 85.4 | 81.4       |
+| Math500              | 86.4                    | 81.4    | 92.2 | 81.4       |
 | AIME2024             | 43.3                    | 16.7    | 50.0  | 40.0       |
 | LiveCodeBench-Easy   | 86.3                    | 84.6   | 90.7  | 92.9       |
 | LiveCodeBench-Medium | 56.8                    | 40.8   | 56.3  | 54.9       |
