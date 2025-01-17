@@ -47,7 +47,7 @@ def perform_inference_and_check(handler: TaskHandler, temperatures, max_tokens, 
     train_data = handler.load_and_filter_dataset(args.start, args.end, split=args.split, source=args.source, \
                                                  filter_difficulty=args.filter_difficulty, args=args)
     remaining_data = handler.process_remaining_data(train_data, results)
-    conversations = handler.make_conversations(remaining_data, system_prompt)
+    conversations = handler.make_conversations(remaining_data, system_prompt, args.model)
 
     for temp in temperatures:
         
@@ -221,7 +221,7 @@ def perform_inference_and_save(handler: TaskHandler, temperatures, max_tokens, r
     train_data = handler.load_and_filter_dataset(args.start, args.end, split=args.split, source=args.source, \
                                                  filter_difficulty=args.filter_difficulty, args=args)
     remaining_data = handler.process_remaining_data(train_data, results)
-    conversations = handler.make_conversations(remaining_data, system_prompt)
+    conversations = handler.make_conversations(remaining_data, system_prompt, args.model)
     
     for temp in temperatures:
         if args.model.startswith("openai"):
@@ -324,7 +324,9 @@ def main():
     args = parser.parse_args()
     
     handler: TaskHandler = TASK_HANDLERS[args.dataset]()
-    temperatures = [1] if args.model.startswith("openai/o1") else args.temperatures
+    temperatures = [1] if args.model.startswith("openai/o1") else args.temperatures 
+    
+    print(f"Temperature: {temperatures}")
     max_tokens = args.max_tokens
     if temperatures == [0] and args.n > 1:
         args.n = 1
@@ -340,7 +342,7 @@ def main():
 
     if args.check:
         # check if converted file exists
-        if args.math_difficulty_lower_bound is not None or  args.math_difficulty_upper_bound is not None:
+        if args.math_difficulty_lower_bound is not None or args.math_difficulty_upper_bound is not None:
             converted_file = f"{args.result_dir}/converted_{MODEL_TO_NAME[args.model]}_{args.dataset}_{args.split}_{args.source}_{args.start}_{args.end}_{args.math_difficulty_lower_bound}_{args.math_difficulty_upper_bound}.json"
         else:
             converted_file = f"{args.result_dir}/converted_{MODEL_TO_NAME[args.model]}_{args.dataset}_{args.split}_{args.source}_{args.start}_{args.end}.json"
