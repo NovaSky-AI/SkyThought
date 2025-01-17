@@ -61,7 +61,7 @@ We also evaluate on non-reasoning benchmarks (these are benchmarks for instructi
 | ARC-C (0 shot; no CoT) | 49.49 | 49.4 | 46.25 | [lm_eval](https://github.com/EleutherAI/lm-evaluation-harness) |
 | IFEval | 74.68 | 79.3 | 34.75 | [lm_eval](https://github.com/EleutherAI/lm-evaluation-harness) |
 | LLM-as-a-Judge | 9.12	| 9.19 | 8.36| [fastchat](https://github.com/lm-sys/FastChat/tree/main/fastchat/llm_judge) |
-| MGSM (`direct`) | 33 | 42.3 | 15.5 | [lm_eval](https://github.com/EleutherAI/lm-evaluation-harness) |
+| MGSM (0 shot; `direct`) | 33 | 42.3 | 15.5 | [lm_eval](https://github.com/EleutherAI/lm-evaluation-harness) |
 | MGSM (8-shot; `direct`) | 58.4 | 61.47 | 59.97 | [lm_eval](https://github.com/EleutherAI/lm-evaluation-harness) |
 | BFCL-v3 | 53.18 | 58.92 | 17.41 | [BFCL](https://github.com/ShishirPatil/gorilla/tree/main/berkeley-function-call-leaderboard) |
 
