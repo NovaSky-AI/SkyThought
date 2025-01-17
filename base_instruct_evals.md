@@ -1,4 +1,4 @@
-# Reproducing results on instruction-following benchmarks
+# Reproducing results on non-reasoning benchmarks
 
 For the full set of results, see [here](./README.md#results-on-qa-and-instruction-following-benchmarks). 
 

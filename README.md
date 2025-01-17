@@ -49,9 +49,10 @@ Following, we show our evaluation results for the Sky-T1-32B-Preview model acros
 | LiveCodeBench-Hard   | 17.9                    | 9.8   | 17.1  | 16.3       |
 | GPQA-Diamond         | 56.8                    | 45.5   | 52.5  | 75.2       |
 
-#### Results on QA and instruction-following benchmarks
+#### Results on non-reasoning benchmarks
 
-We also evaluate on classic QA and instruction-following benchmarks to test whether the model has traded-off capability in other domains for better performance in reasoning-related benchmarks. 
+We also evaluate on non-reasoning benchmarks (these are benchmarks for instruction-following, QA, etc) to test whether the model has traded-off capability in other domains for better performance in reasoning-related benchmarks. 
+
 
 | Metric | Sky-T1-32B-Preview | Qwen-2.5-32B-Instruct | QwQ-32B-Preview | Eval Implementation |
 |---------|-------------------|---------------------|-----------------|-------------------|
@@ -60,7 +61,7 @@ We also evaluate on classic QA and instruction-following benchmarks to test whet
 | ARC-C (0 shot; no CoT) | 49.49 | 49.4 | 46.25 | [lm_eval](https://github.com/EleutherAI/lm-evaluation-harness) |
 | IFEval | 74.68 | 79.3 | 34.75 | [lm_eval](https://github.com/EleutherAI/lm-evaluation-harness) |
 | LLM-as-a-Judge | 9.12	| 9.19 | 8.36| [fastchat](https://github.com/lm-sys/FastChat/tree/main/fastchat/llm_judge) |
-| MGSM (native CoT) | 33 | 42.3 | 15.5 | [lm_eval](https://github.com/EleutherAI/lm-evaluation-harness) |
+| MGSM (`direct`) | 33 | 42.3 | 15.5 | [lm_eval](https://github.com/EleutherAI/lm-evaluation-harness) |
 | BFCL-v3 | 53.18 | 58.92 | 17.41 | [BFCL](https://github.com/ShishirPatil/gorilla/tree/main/berkeley-function-call-leaderboard) |
 
 For more details, refer [here](./instruct_evals.md). 
