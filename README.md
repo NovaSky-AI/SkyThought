@@ -60,7 +60,7 @@ We also evaluate on classic QA and instruction-following benchmarks to test whet
 | ARC-C (0 shot; no CoT) | 49.49 | 49.4 | 46.25 | [lm_eval](https://github.com/EleutherAI/lm-evaluation-harness) |
 | IFEval | 74.68 | 79.3 | 34.75 | [lm_eval](https://github.com/EleutherAI/lm-evaluation-harness) |
 | LLM-as-a-Judge | 9.12	| 9.19 | 8.36| [fastchat](https://github.com/lm-sys/FastChat/tree/main/fastchat/llm_judge) |
-| MGSM (no CoT) | 33 | 42.3 | 15.5 | [lm_eval](https://github.com/EleutherAI/lm-evaluation-harness) |
+| MGSM (native CoT) | 33 | 42.3 | 15.5 | [lm_eval](https://github.com/EleutherAI/lm-evaluation-harness) |
 | BFCL-v3 | 53.18 | 58.92 | 17.41 | [BFCL](https://github.com/ShishirPatil/gorilla/tree/main/berkeley-function-call-leaderboard) |
 
 For more details, refer [here](./instruct_evals.md). 
