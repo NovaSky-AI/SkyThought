@@ -306,8 +306,6 @@ def main():
     
     handler: TaskHandler = TASK_HANDLERS[args.dataset]()
     temperatures = [1] if args.model.startswith("openai/o1") else args.temperatures 
-    if args.model.startswith("NovaSky-AI/Sky-T1-32B-Preview") and ("AIME" in args.dataset or "GPQADiamond" in args.dataset):
-        temperatures = [0.7]
     
     print(f"Temperature: {temperatures}")
     max_tokens = args.max_tokens

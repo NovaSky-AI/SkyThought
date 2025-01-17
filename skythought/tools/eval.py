@@ -57,7 +57,7 @@ def main():
     # Hold all logs 
     all_logs = ""
     results = {}
-
+        
     # Run the Python command for each eval and collect logs
     for eval_name in evals:
         command = [
@@ -66,6 +66,11 @@ def main():
             "--dataset", eval_name, 
             "--split", eval_to_split[eval_name], 
             "--tp", str(tp)]
+        
+        # Add additional arguments for specific models
+        if "NovaSky-AI/Sky-T1-32B-Preview" in model_path and ("AIME" in eval_name or "GPQADiamond" in eval_name):
+            command.extend(["--temperatures", "0.7"])
+            
         if args.filter_difficulty:
             assert args.source != "", "No source passed for filtering difficulty."
             command.append("--filter-difficulty")
