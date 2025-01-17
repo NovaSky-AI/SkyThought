@@ -71,10 +71,6 @@ def main():
             "--temperatures"
         ]
         command.extend(temperatures)  # Add temperatures as separate arguments
-
-        # Add additional arguments for specific models
-        # if "NovaSky-AI/Sky-T1-32B-Preview" in model_path and ("AIME" in eval_name or "GPQADiamond" in eval_name):
-        #     command.extend(["--temperatures", "0.7"])
             
         if args.filter_difficulty:
             assert args.source != "", "No source passed for filtering difficulty."
