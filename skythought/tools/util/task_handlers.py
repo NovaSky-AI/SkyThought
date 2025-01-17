@@ -28,7 +28,7 @@ class TaskHandler:
     def update_results(self, problem, response):
         raise NotImplementedError("Subclasses should implement this method.")
 
-    def make_conversations(self, data, system_prompt):
+    def make_conversations(self, data, system_prompt, model=None):
         raise NotImplementedError("Subclasses should implement this method.")
 
     def load_existing_results(self, result_file):
@@ -75,7 +75,7 @@ class MathTaskHandler(TaskHandler):
     
         return response_entry
     
-    def make_conversations(self, data, system_prompt):
+    def make_conversations(self, data, system_prompt, model=None):
         conversations = []
         for problem in data:
             prompt_text = self.generate_prompt(problem["problem"])
@@ -106,8 +106,25 @@ class AIMETaskHandler(MathTaskHandler):
         self.dataset = "AI-MO/aimo-validation-aime"
     
     @staticmethod
+    def generate_prompt(prompt, model):
+        if "NovaSky-AI/Sky-T1-32B-Preview" in model:
+            return prompt + "\nReturn your final response within \\boxed{{}}"
+        else:
+            return "Return your final response within \\boxed{{}}. " + prompt
+    
+    @staticmethod
     def get_question_key():
         return "problem"
+    
+    def make_conversations(self, data, system_prompt, model=None):
+        conversations = []
+        for problem in data:
+            prompt_text = self.generate_prompt(problem["problem"], model)
+            conversations.append([
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": prompt_text}
+            ])
+        return conversations
     
     def load_and_filter_dataset(self, start, end, split="train", source=None, filter_difficulty=False, args=None):
         dataset = load_dataset(self.dataset)
@@ -172,7 +189,7 @@ class GPQADiamondTaskHandler(TaskHandler):
 
         return multiple_choice_string, correct_answer_letter
     
-    def make_conversations(self, data, system_prompt):
+    def make_conversations(self, data, system_prompt, model=None):
         conversations = []
         for problem in data:
             multiple_choice_string, correct_answer_letter = self.get_multiple_choice_answers(problem)
@@ -235,7 +252,7 @@ class MMLUTaskHandler(TaskHandler):
         options = " ".join(options)
         return f"Answer Choices: {options}"
     
-    def make_conversations(self, data, system_prompt):
+    def make_conversations(self, data, system_prompt, model=None):
         conversations = []
         for problem in data:
             multiple_choice_string = self.get_multiple_choice_answers(problem)
@@ -304,7 +321,7 @@ class NUMINATaskHandler(TaskHandler):
             diff_dict[example["problem"]] = example["gpt_difficulty_parsed"]
         return diff_dict
 
-    def make_conversations(self, data, system_prompt):
+    def make_conversations(self, data, system_prompt, model=None):
         conversations = []
         for problem in data:
             prompt_text = self.generate_prompt(problem["problem"])
@@ -401,7 +418,7 @@ class APPSTaskHandler(TaskHandler):
         
         return response_entry
 
-    def make_conversations(self, data, system_prompt):
+    def make_conversations(self, data, system_prompt, model=None):
         conversations = []
         for problem in data:
             test_case = json.loads(problem["input_output"])
@@ -486,7 +503,7 @@ class TACOTaskHandler(TaskHandler):
         
         return response_entry
 
-    def make_conversations(self, data, system_prompt):
+    def make_conversations(self, data, system_prompt, model=None):
         conversations = []
         for idx, problem in enumerate(data):
             starter_code = None if len(problem["starter_code"]) == 0 else problem["starter_code"]
@@ -581,7 +598,7 @@ class LiveCodeBenchTaskHandler(TaskHandler):
         
         return response_entry
 
-    def make_conversations(self, data, system_prompt):
+    def make_conversations(self, data, system_prompt, model=None):
         conversations = []
         for problem in data:
             prompt_text = self.generate_prompt(problem)
