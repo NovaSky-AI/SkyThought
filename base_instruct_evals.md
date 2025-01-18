@@ -6,7 +6,8 @@ For the full set of results, see [here](./README.md#results-on-qa-and-instructio
 
 1. For `lm_eval`, please follow the instructions [here](https://github.com/EleutherAI/lm-evaluation-harness/tree/703fbffd6fe5e136bbb9d884cb40844e5503ae5d?tab=readme-ov-file#install) and use commit https://github.com/EleutherAI/lm-evaluation-harness/commit/703fbffd6fe5e136bbb9d884cb40844e5503ae5d 
 2. For `fastchat`, follow the instructions [here](https://github.com/lm-sys/FastChat/tree/main/fastchat/llm_judge#install). The current implementation of Fastchat is based on OpenAI version <= 0.28.0. For making use of the latest vllm backend, it is recommended to migrate the `llm_judge` folder to use openai>=1.0.0. You can run `openai migrate` for the fastchat codebase or follow the PR [here](https://github.com/lm-sys/FastChat/pull/2915/files)
-3. For `BFCL`, you can follow the official instructions [here](https://github.com/ShishirPatil/gorilla/tree/main/berkeley-function-call-leaderboard#basic-installation). We further evaulate on all test categories, which requires [setting up environment variables](https://github.com/ShishirPatil/gorilla/tree/main/berkeley-function-call-leaderboard#setting-up-environment-variables), and [obtaining API keys for executable test categories](https://github.com/ShishirPatil/gorilla/tree/main/berkeley-function-call-leaderboard#api-keys-for-executable-test-categories). Make sure to use changes from [this PR](https://github.com/ShishirPatil/gorilla/pull/888) for QwQ and Sky-T1 model support. 
+3. For `BFCL`, you can follow the official instructions [here](https://github.com/ShishirPatil/gorilla/tree/main/berkeley-function-call-leaderboard#basic-installation). We further evaulate on all test categories, which requires [setting up environment variables](https://github.com/ShishirPatil/gorilla/tree/main/berkeley-function-call-leaderboard#setting-up-environment-variables), and [obtaining API keys for executable test categories](https://github.com/ShishirPatil/gorilla/tree/main/berkeley-function-call-leaderboard#api-keys-for-executable-test-categories). Make sure to use changes from [this PR](https://github.com/ShishirPatil/gorilla/pull/888) for QwQ and Sky-T1 model support.
+4. For `Arena-Hard` results, you can follow the instructions [here](https://github.com/lmarena/arena-hard-auto). We use `gpt-4-1106-preview` as the judge.
 
 ## Commands for reproducing results
 
@@ -91,5 +92,28 @@ For evaluation, you can simply run
 ```bash
 bfcl evaluate --model Qwen/QwQ-32B-Preview,NovaSky-AI/Sky-T1-32B-Preview,Qwen/Qwen2.5-32B-Instruct  --test-category all --api-sanity-check
 ```
+### Arena Hard
+For `Arena-Hard`, we use the following script to start a `TGI` service for generating answers 
+```bash
+hf_pat=
+model=NovaSky-AI/Sky-T1-32B-Preview
+volume=/mnt/local_storage/data/cache
+port=1996
 
+huggingface-cli download $model
+sudo docker run --gpus 8 -e HUGGING_FACE_HUB_TOKEN=$hf_pat --shm-size 2000g -p $port:80 -v $volume:/data ghcr.io/huggingface/text-generation-inference:2.2.0 --model-id $model --max-input-length 8192 --max-batch-total-tokens 8193 --max-batch-prefill-tokens 8193 --max-total-tokens 8193 --sharded true
+```
+For running the `gen_answer.py` script, we use the following `config_api` yaml setting
+```yaml
+...
+sky-T1-32B-Preview:
+    model_name: sky-T1-32B-Preview
+    endpoints:
+        - api_base: http://localhost:1996/v1
+          api_key: empty
+    api_type: openai
+    parallel: 8
+...
+```
+and finally for `gen_judgment.py`, we use `gpt-4-1106-preview` as the judge.
 
