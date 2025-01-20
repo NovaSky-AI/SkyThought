@@ -14,6 +14,7 @@ from .math.testing_util import strip_answer_string, get_multiple_choice_answer, 
 from .livecodebench.testing_util import unsafe_lcb_runTests, map_to_example, has_test_type, post_process_code, translate_private_test_cases
 from .common import TimeoutException, timeout
 from util.model_utils import *
+from util.prompts import ReasoningFewShot
 
 def has_code(response):
     pattern = r"```(?:[a-zA-Z]*)\n(.*?)```"
@@ -29,7 +30,7 @@ class TaskHandler:
     def update_results(self, problem, response):
         raise NotImplementedError("Subclasses should implement this method.")
 
-    def make_conversations(self, data, system_prompt, model=None):
+    def make_conversations(self, data, system_prompt, model=None, args=None):
         raise NotImplementedError("Subclasses should implement this method.")
 
     def load_existing_results(self, result_file):
@@ -76,14 +77,38 @@ class MathTaskHandler(TaskHandler):
     
         return response_entry
     
-    def make_conversations(self, data, system_prompt, model=None):
+    def make_conversations(self, data, system_prompt, model=None, args=None):
         conversations = []
+        # print(data)
+        # assert False
+        existing_response = None
+        if args.partial_json_path:
+            # print(args.partial_json_path)
+            # assert False
+            with open(args.partial_json_path, 'r', encoding='utf-8') as f:
+                existing_response = json.load(f)
         for problem in data:
             prompt_text = self.generate_prompt(problem["problem"])
-            conversations.append([
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": prompt_text}
-            ])
+            assert not (args.ICL and args.partial_json_path)
+            if args.ICL:
+                conversations.append([
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": ReasoningFewShot},
+                    {"role": "user", "content": prompt_text}
+                ])
+            elif args.partial_json_path:
+                cur_response = existing_response[problem["problem"]]["responses"]["0.0"]["content"]
+                partial_response = cur_response[: int(len(cur_response) * args.partial_json_ratio)]
+                print(f"Original length: {len(cur_response)}, Partial length: {len(partial_response)}")
+                conversations.append([
+                    {"role": "system", "content": system_prompt + "You will be provided with an initial response. Please first copy the initial response, and then continue writing it."},
+                    {"role": "user", "content": prompt_text + "The initial response is " + partial_response}
+                ])
+            else:
+                conversations.append([
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": prompt_text}
+                ])
         return conversations
     
     def process_remaining_data(self, train_data, results):
@@ -117,14 +142,23 @@ class AIMETaskHandler(MathTaskHandler):
     def get_question_key():
         return "problem"
     
-    def make_conversations(self, data, system_prompt, model=None):
+    def make_conversations(self, data, system_prompt, model=None, args=None):
         conversations = []
         for problem in data:
             prompt_text = self.generate_prompt(problem["problem"], model)
-            conversations.append([
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": prompt_text}
-            ])
+            if args.ICL:
+                conversations.append([
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": ReasoningFewShot},
+                    {"role": "user", "content": prompt_text}
+                ])
+            else:
+                conversations.append([
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": prompt_text}
+                ])
+            print(conversations)
+            # assert False
         return conversations
     
     def load_and_filter_dataset(self, start, end, split="train", source=None, filter_difficulty=False, args=None):
@@ -190,7 +224,7 @@ class GPQADiamondTaskHandler(TaskHandler):
 
         return multiple_choice_string, correct_answer_letter
     
-    def make_conversations(self, data, system_prompt, model=None):
+    def make_conversations(self, data, system_prompt, model=None, args=None):
         conversations = []
         for problem in data:
             multiple_choice_string, correct_answer_letter = self.get_multiple_choice_answers(problem)
@@ -253,7 +287,7 @@ class MMLUTaskHandler(TaskHandler):
         options = " ".join(options)
         return f"Answer Choices: {options}"
     
-    def make_conversations(self, data, system_prompt, model=None):
+    def make_conversations(self, data, system_prompt, model=None, args=None):
         conversations = []
         for problem in data:
             multiple_choice_string = self.get_multiple_choice_answers(problem)
@@ -322,7 +356,7 @@ class NUMINATaskHandler(TaskHandler):
             diff_dict[example["problem"]] = example["gpt_difficulty_parsed"]
         return diff_dict
 
-    def make_conversations(self, data, system_prompt, model=None):
+    def make_conversations(self, data, system_prompt, model=None, args=None):
         conversations = []
         for problem in data:
             prompt_text = self.generate_prompt(problem["problem"])
@@ -419,7 +453,7 @@ class APPSTaskHandler(TaskHandler):
         
         return response_entry
 
-    def make_conversations(self, data, system_prompt, model=None):
+    def make_conversations(self, data, system_prompt, model=None, args=None):
         conversations = []
         for problem in data:
             test_case = json.loads(problem["input_output"])
@@ -504,7 +538,7 @@ class TACOTaskHandler(TaskHandler):
         
         return response_entry
 
-    def make_conversations(self, data, system_prompt, model=None):
+    def make_conversations(self, data, system_prompt, model=None, args=None):
         conversations = []
         for idx, problem in enumerate(data):
             starter_code = None if len(problem["starter_code"]) == 0 else problem["starter_code"]
@@ -599,7 +633,7 @@ class LiveCodeBenchTaskHandler(TaskHandler):
         
         return response_entry
 
-    def make_conversations(self, data, system_prompt, model=None):
+    def make_conversations(self, data, system_prompt, model=None, args=None):
         conversations = []
         for problem in data:
             prompt_text = self.generate_prompt(problem)

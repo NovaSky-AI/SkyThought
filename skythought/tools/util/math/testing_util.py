@@ -222,7 +222,10 @@ def strip_answer_string(string):
     # If the answer is a list of integers (without parenthesis), sort them
     if re.fullmatch(r"(\s*-?\d+\s*,)*\s*-?\d+\s*", string):
         # Split the string into a list of integers
-        integer_list = list(map(int, string.split(',')))
+        try:
+            integer_list = list(map(int, string.split(',')))
+        except:
+            integer_list = list(map(int, "-1,-1".split(',')))
 
         # Sort the list in ascending order
         sorted_list = sorted(integer_list)

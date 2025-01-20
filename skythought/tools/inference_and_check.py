@@ -47,7 +47,7 @@ def perform_inference_and_check(handler: TaskHandler, temperatures, max_tokens, 
     train_data = handler.load_and_filter_dataset(args.start, args.end, split=args.split, source=args.source, \
                                                  filter_difficulty=args.filter_difficulty, args=args)
     remaining_data = handler.process_remaining_data(train_data, results)
-    conversations = handler.make_conversations(remaining_data, system_prompt, args.model)
+    conversations = handler.make_conversations(remaining_data, system_prompt, args.model, args)
 
     for temp in temperatures:
         
@@ -321,6 +321,9 @@ def main():
     parser.add_argument("--math-difficulty-lower-bound", type=int, default=None, help="Lowest difficulty level for math.")
     parser.add_argument("--math-difficulty-upper-bound", type=int, default=None, help="Highest difficulty level for math.")
     parser.add_argument("--n", type=int, default=1, help="Number of samples generated per problem.")
+    parser.add_argument("--ICL", action="store_true", help="Enable In-Context Learning (ICL).")
+    parser.add_argument("--partial_json_path", default="", type=str, help="Ask the model to continue generate from a partial json files.")
+    parser.add_argument("--partial_json_ratio", default=0, type=float, help="Ask the model to continue generate from a partial json files, ratio.")
     args = parser.parse_args()
     
     handler: TaskHandler = TASK_HANDLERS[args.dataset]()

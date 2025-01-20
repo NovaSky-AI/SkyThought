@@ -21,6 +21,9 @@ def parse_arguments():
     parser.add_argument("--source", type=str, help="Source for the dataset.")
     parser.add_argument("--output_file", required=True, type=str, help="Output file to write results to.")
     parser.add_argument("--temperatures", type=float, nargs="+", default=[0], help="Temperature for sampling.")
+    parser.add_argument("--ICL", action="store_true", help="Enable In-Context Learning (ICL).")
+    parser.add_argument("--partial_json_path", default="", type=str, help="Ask the model to continue generate from a partial json files.")
+    parser.add_argument("--partial_json_ratio", type=float, default=0, help="Ask the model to continue generate from a partial json files. ratio.")
     return parser.parse_args()
 
 def extract_accuracy_from_output(output):
@@ -77,6 +80,13 @@ def main():
             command.append("--filter-difficulty")
             command.append("--source")
             command.append(args.source)
+        if args.ICL:
+            command.append("--ICL")
+        if args.partial_json_path:
+            command.append("--partial_json_path")
+            command.append(args.partial_json_path)
+            command.append("--partial_json_ratio")
+            command.append(str(args.partial_json_ratio))
         print(f"Running eval {eval_name} with command {command}")
         all_logs += f"\nRunning eval: {eval_name} with command {command}\n"
         try:
