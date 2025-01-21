@@ -4,14 +4,23 @@ For the full set of results, see [here](./README.md#results-on-qa-and-instructio
 
 ## Installation instructions
 
-1. For `lm_eval`, please follow the instructions [here](https://github.com/EleutherAI/lm-evaluation-harness/tree/703fbffd6fe5e136bbb9d884cb40844e5503ae5d?tab=readme-ov-file#install) and use commit https://github.com/EleutherAI/lm-evaluation-harness/commit/703fbffd6fe5e136bbb9d884cb40844e5503ae5d 
+1. For `lm_eval`, install the package by executing the following : 
+
+```bash
+git clone --depth 1 https://github.com/EleutherAI/lm-evaluation-harness
+cd lm-evaluation-harness
+git checkout 703fbff
+pip install -e ".[ifeval]"
+```
+
+For more details, you can refer to the official instructions [here](https://github.com/EleutherAI/lm-evaluation-harness/tree/703fbffd6fe5`e136bbb9d884cb40844e5503ae5d?tab=readme-ov-file#install). We report results with commmit https://github.com/EleutherAI/lm-evaluation-harness/commit/703fbffd6fe5e136bbb9d884cb40844e5503ae5d
 2. For `fastchat`, follow the instructions [here](https://github.com/lm-sys/FastChat/tree/main/fastchat/llm_judge#install). The current implementation of Fastchat is based on OpenAI version <= 0.28.0. For making use of the latest vllm backend, it is recommended to migrate the `llm_judge` folder to use openai>=1.0.0. You can run `openai migrate` for the fastchat codebase or follow the PR [here](https://github.com/lm-sys/FastChat/pull/2915/files)
 3. For `BFCL`, you can follow the official instructions [here](https://github.com/ShishirPatil/gorilla/tree/main/berkeley-function-call-leaderboard#basic-installation). We further evaulate on all test categories, which requires [setting up environment variables](https://github.com/ShishirPatil/gorilla/tree/main/berkeley-function-call-leaderboard#setting-up-environment-variables), and [obtaining API keys for executable test categories](https://github.com/ShishirPatil/gorilla/tree/main/berkeley-function-call-leaderboard#api-keys-for-executable-test-categories). Make sure to use changes from [this PR](https://github.com/ShishirPatil/gorilla/pull/888) for QwQ and Sky-T1 model support.
 4. For `Arena-Hard` results, you can follow the instructions [here](https://github.com/lmarena/arena-hard-auto). We use `gpt-4-1106-preview` as the judge.
 
 ## Commands for reproducing results
 
-All the benchmarks were run on a 8xH100 machine with the `vllm` backend on version `0.6.4.post2.dev338+g2c97eca1`. If you're running on a different device, make sure to tweak `tensor_parallel_size` and if needed the `batch_size` arguments. 
+All the benchmarks were run on a 8xH100 machine with the `vllm` backend on version `0.6.4.post2.dev338+g2c97eca1`. If you're running on a different device, make sure to tweak `tensor_parallel_size` and if needed the `batch_size` arguments.  Expect some variance in scores (+/- 1%) for different evaluation settings (ex: `tensor_parallel_size`)
 
 All the commands below are given for `NovaSky-AI/Sky-T1-32B-Preview`. Simply substitute the appropriate model name for other models `Qwen/Qwen-2.5-32B-Instruct` and `Qwen/QwQ-32B-Preview`. 
 
@@ -36,10 +45,10 @@ lm_eval --model vllm     --model_args pretrained=NovaSky-AI/Sky-T1-32B-Preview,t
 ### IFEval
 
 ```bash
-lm_eval --model vllm     --model_args pretrained=NovaSky-AI/Sky-T1-32B-Preview,tensor_parallel_size=4,dtype=auto,gpu_memory_utilization=0.9,data_parallel_size=1     --tasks leaderboard_ifeval --trust_remote_code   --batch_size auto --apply_chat_template --fewshot_as_multiturn
+lm_eval --model vllm     --model_args pretrained=NovaSky-AI/Sky-T1-32B-Preview,tensor_parallel_size=8,dtype=auto,gpu_memory_utilization=0.9,data_parallel_size=1     --tasks leaderboard_ifeval --trust_remote_code   --batch_size auto --apply_chat_template --fewshot_as_multiturn
 ```
 
-We use the `prompt_level_strict_acc` metric following Qwen-2.5.
+We use the `prompt_level_strict_acc` metric following Qwen-2.5. 
 
 ### MGSM (native CoT)
 
