@@ -13,7 +13,8 @@ git checkout 703fbff
 pip install -e ".[ifeval]"
 ```
 
-For more details, you can refer to the official instructions [here](https://github.com/EleutherAI/lm-evaluation-harness/tree/703fbffd6fe5`e136bbb9d884cb40844e5503ae5d?tab=readme-ov-file#install). We report results with commmit https://github.com/EleutherAI/lm-evaluation-harness/commit/703fbffd6fe5e136bbb9d884cb40844e5503ae5d
+For more details, you can refer to the official instructions [here](https://github.com/EleutherAI/lm-evaluation-harness/tree/703fbffd6fe5`e136bbb9d884cb40844e5503ae5d?tab=readme-ov-file#install). We report results with commit https://github.com/EleutherAI/lm-evaluation-harness/commit/703fbffd6fe5e136bbb9d884cb40844e5503ae5d
+
 2. For `fastchat`, follow the instructions [here](https://github.com/lm-sys/FastChat/tree/main/fastchat/llm_judge#install). The current implementation of Fastchat is based on OpenAI version <= 0.28.0. For making use of the latest vllm backend, it is recommended to migrate the `llm_judge` folder to use openai>=1.0.0. You can run `openai migrate` for the fastchat codebase or follow the PR [here](https://github.com/lm-sys/FastChat/pull/2915/files)
 3. For `BFCL`, you can follow the official instructions [here](https://github.com/ShishirPatil/gorilla/tree/main/berkeley-function-call-leaderboard#basic-installation). We further evaulate on all test categories, which requires [setting up environment variables](https://github.com/ShishirPatil/gorilla/tree/main/berkeley-function-call-leaderboard#setting-up-environment-variables), and [obtaining API keys for executable test categories](https://github.com/ShishirPatil/gorilla/tree/main/berkeley-function-call-leaderboard#api-keys-for-executable-test-categories). Make sure to use changes from [this PR](https://github.com/ShishirPatil/gorilla/pull/888) for QwQ and Sky-T1 model support.
 4. For `Arena-Hard` results, you can follow the instructions [here](https://github.com/lmarena/arena-hard-auto). We use `gpt-4-1106-preview` as the judge.
@@ -126,3 +127,15 @@ sky-T1-32B-Preview:
 ```
 and finally for `gen_judgment.py`, we use `gpt-4-1106-preview` as the judge.
 
+#### Supplementary results for Arena-Hard
+
+Here are some supplementary results for Arena-Hard, compared with o1-mini which is the best performing model on this benchmark (as of Jan 2025). 
+
+| model | score | rating_q025 | rating_q975 | CI | avg_tokens | date |
+|-------|--------|------------|-------------|-------|------------|-------|
+| o1-mini-2024-09-12 | 91.98 | 90.71 | 93.03 | (-1.27, +1.05) | 1399.0 | 2025-01-18 |
+| sky-T1-32B-Preview | 74.79 | 72.87 | 76.59 | (-1.92, +1.80) | 847.0 | 2025-01-18 |
+| qwen2.5-32b-instruct | 66.51 | 64.62 | 68.49 | (-1.89, +1.98) | 611.0 | 2025-01-18 |
+| qwq-32b-preview | 39.46 | 36.76 | 41.42 | (-2.70, +1.96) | 2401.0 | 2025-01-18 |
+
+For more details, see: https://github.com/NovaSky-AI/SkyThought/pull/26#issuecomment-2599525551 
