@@ -302,7 +302,7 @@ class MMLUProTaskHandler(MMLUTaskHandler):
         options = " ".join(options)
         return f"Answer Choices: {options}"
 
-    def load_and_filter_dataset(self, start, end, split="test", source=None, filter_difficulty=False):
+    def load_and_filter_dataset(self, start, end, split="test", source=None, filter_difficulty=False, args=None):
         dataset = load_dataset(self.dataset, "default")
         train_data = dataset[split].to_pandas()
         return train_data.iloc[start:end] if end > 0 else train_data.iloc[start:]
@@ -703,7 +703,7 @@ class GSM8KTaskHandler(TaskHandler):
     
         return response_entry
 
-    def make_conversations(self, data, system_prompt):
+    def make_conversations(self, data, system_prompt, model=None):
         conversations = []
         for problem in data:
             prompt_text = self.generate_prompt(problem)
@@ -713,7 +713,7 @@ class GSM8KTaskHandler(TaskHandler):
             ])
         return conversations
 
-    def load_and_filter_dataset(self, start, end, split="train", source=None, filter_difficulty=False):
+    def load_and_filter_dataset(self, start, end, split="train", source=None, filter_difficulty=False, args=None):
         dataset = load_dataset(self.dataset, "main")
         train_data = dataset[split].to_pandas()
         return train_data.iloc[start:end] if end > 0 else train_data.iloc[start:]
@@ -795,7 +795,7 @@ class ARCChallengeTaskHandler(TaskHandler):
     
         return response_entry
 
-    def make_conversations(self, data, system_prompt):
+    def make_conversations(self, data, system_prompt, model=None):
         conversations = []
         for problem in data:
             prompt_text = self.generate_prompt(problem)
@@ -805,7 +805,7 @@ class ARCChallengeTaskHandler(TaskHandler):
             ])
         return conversations
 
-    def load_and_filter_dataset(self, start, end, split="train", source=None, filter_difficulty=False):
+    def load_and_filter_dataset(self, start, end, split="train", source=None, filter_difficulty=False, args=None):
         dataset = load_dataset(self.dataset, "ARC-Challenge")
         train_data = dataset[split].to_pandas()
         return train_data.iloc[start:end] if end > 0 else train_data.iloc[start:]
