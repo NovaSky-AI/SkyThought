@@ -65,7 +65,7 @@ We also evaluate on non-reasoning benchmarks (these are benchmarks for instructi
 | MGSM (8-shot; `direct`) | 58.4 | **61.47** | 59.97 | [lm_eval](https://github.com/EleutherAI/lm-evaluation-harness) |
 | BFCL-v3 | 53.18 | **58.92** | 17.41 | [BFCL](https://github.com/ShishirPatil/gorilla/tree/main/berkeley-function-call-leaderboard) |
 
-For more details, refer [here](./base_instruct_evals.md). 
+For more details, refer [here](./skythought/tools/base_instruct_evals.md). 
 
 ## Fully Open-source: Driving Progress Together
 We believe that open-source collaboration drives progress, and with Sky-T1-32B-Preview, we are fully committed to empowering the community. We open-source all details (i.e., data, codes, model weights) to enable the community to replicate and improve on our results *easily*:
