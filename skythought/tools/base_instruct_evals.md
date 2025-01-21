@@ -7,7 +7,7 @@ For the full set of results, see [here](./README.md#results-on-qa-and-instructio
 1. For `lm_eval`, install the package by executing the following : 
 
 ```bash
-git clone --depth 1 https://github.com/EleutherAI/lm-evaluation-harness
+git clone https://github.com/EleutherAI/lm-evaluation-harness
 cd lm-evaluation-harness
 git checkout 703fbff
 pip install -e ".[ifeval]"
