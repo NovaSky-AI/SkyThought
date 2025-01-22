@@ -10,13 +10,13 @@ deepspeed: examples/deepspeed/ds_z3_offload_config.json  # choices: [ds_z0_confi
 ### dataset
 dataset: Sky-T1-math-correct-5k
 template: gemma
-cutoff_len: 6144
+cutoff_len: 8192
 max_samples: 1000000
 overwrite_cache: true
 preprocessing_num_workers: 16
 
 ### output
-output_dir: /shared/sycao/dcli/icml_models/Sky-T1-math-correct-5K-27B
+output_dir: /home/ubuntu/skyov1-dl/Sky-T1-math-correct-5K-27B
 logging_steps: 1
 save_steps: 100
 plot_loss: true

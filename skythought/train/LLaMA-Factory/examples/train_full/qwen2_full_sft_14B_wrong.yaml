@@ -1,5 +1,5 @@
 ### model
-model_name_or_path: Qwen/Qwen2.5-14B
+model_name_or_path: Qwen/Qwen2.5-14B-Instruct
 
 ### method
 stage: sft
@@ -16,7 +16,7 @@ overwrite_cache: true
 preprocessing_num_workers: 16
 
 ### output
-output_dir: /shared/sycao/dcli/icml_models/Sky-T1-math-wrong-5K-14B
+output_dir: /home/ubuntu/skyov1-dl/Sky-T1-math-wrong-5K-14B
 logging_steps: 1
 save_steps: 100
 plot_loss: true

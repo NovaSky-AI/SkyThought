@@ -634,7 +634,7 @@
     "folder": "python"
   },
   "Sky-T1-math-correct-5k": {
-    "file_name": "/shared/sycao/dcli/data/Sky-T1-math-correct-5k.json",
+    "file_name": "/home/ubuntu/skyov1-dl/Sky-T1-math-correct-5k.json",
     "formatting": "sharegpt",
     "columns": {
       "messages": "conversations",
@@ -648,7 +648,7 @@
     }
   },
   "Sky-T1-math-wrong-5k": {
-    "file_name": "/shared/sycao/dcli/data/Sky-T1-math-wrong-5k.json",
+    "file_name": "/home/ubuntu/skyov1-dl/Sky-T1-math-wrong-5k.json",
     "formatting": "sharegpt",
     "columns": {
       "messages": "conversations",
