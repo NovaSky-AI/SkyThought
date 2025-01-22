@@ -633,8 +633,22 @@
     },
     "folder": "python"
   },
-  "Sky-T1": {
-    "file_name": "your data path here",
+  "Sky-T1-math-correct-5k": {
+    "file_name": "/shared/sycao/dcli/data/Sky-T1-math-correct-5k.json",
+    "formatting": "sharegpt",
+    "columns": {
+      "messages": "conversations",
+      "system": "system"
+    },
+    "tags": {
+      "role_tag": "from",
+      "content_tag": "value",
+      "user_tag": "user",
+      "assistant_tag": "assistant"
+    }
+  },
+  "Sky-T1-math-wrong-5k": {
+    "file_name": "/shared/sycao/dcli/data/Sky-T1-math-wrong-5k.json",
     "formatting": "sharegpt",
     "columns": {
       "messages": "conversations",
