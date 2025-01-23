@@ -101,7 +101,8 @@ def perform_inference_and_check(handler: TaskHandler, temperatures, max_tokens, 
                     results[problem_key]["token_usages"] = {}
                     prompt = conversations[idx][1]["content"]
                     results[problem_key]["prompt"] = prompt
-
+                    results[problem_key]["input_conversation"] = conversations[idx]
+                    
                 results[problem_key]["responses"][str(temp)] = response_entry
                 
                 if args.model.startswith("openai"):
