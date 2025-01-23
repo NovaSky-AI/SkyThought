@@ -145,7 +145,7 @@ PROMPT_TEMPLATES = {
         "{output}",
         "\n\n",
     ),
-    "still-2": (
+    "Sky-T1": (
         "<|im_start|>system\nYour role as an assistant involves thoroughly exploring questions through a systematic long \
 thinking process before providing the final precise and accurate solutions. This requires \
 engaging in a comprehensive cycle of analysis, summarizing, exploration, reassessment, reflection, \
