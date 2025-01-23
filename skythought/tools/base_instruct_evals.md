@@ -21,14 +21,20 @@ For more details, you can refer to the official instructions [here](https://gith
 
 ## Commands for reproducing results
 
-All the benchmarks were run on a 8xH100 machine with the `vllm` backend on version `0.6.4.post2.dev338+g2c97eca1`. If you're running on a different device, make sure to tweak `tensor_parallel_size` and if needed the `batch_size` arguments.  Expect some variance in scores (+/- 1%) for different evaluation settings (ex: `tensor_parallel_size`)
+All the benchmarks were run on a 8xH100 machine with the `vllm` backend. If you're running on a different device, make sure to tweak `tensor_parallel_size` and if needed the `batch_size` arguments.  Expect some variance in scores (+/- 1%) for different evaluation settings (ex: `tensor_parallel_size`)
 
-All the commands below are given for `NovaSky-AI/Sky-T1-32B-Preview`. Simply substitute the appropriate model name for other models `Qwen/Qwen-2.5-32B-Instruct` and `Qwen/QwQ-32B-Preview`. 
+All the commands below are given for `NovaSky-AI/Sky-T1-32B-Preview`. Simply substitute the model name for `Qwen/Qwen-2.5-32B-Instruct`. For `Qwen/QwQ-32B-Preview`, we further make use of two arguments `revision=refs/pr/58,tokenizer_revision=refs/pr/58` to use a corrected revision of QwQ. For more details on this, see https://github.com/NovaSky-AI/SkyThought/pull/26#issuecomment-2606435601. 
 
 ### MMLU (0 shot; no CoT)
 
 ```bash
 lm_eval --model vllm     --model_args pretrained=NovaSky-AI/Sky-T1-32B-Preview,tensor_parallel_size=8,dtype=auto,gpu_memory_utilization=0.8,data_parallel_size=1,max_model_len=2048     --tasks mmlu --trust_remote_code     --batch_size 8 --apply_chat_template --fewshot_as_multiturn
+```
+
+For QwQ, you would do 
+
+```bash
+lm_eval --model vllm     --model_args pretrained=Qwen/QwQ-32B-Preview,tensor_parallel_size=8,dtype=auto,gpu_memory_utilization=0.8,data_parallel_size=1,max_model_len=2048revision=refs/pr/58,tokenizer_revision=refs/pr/58   --tasks mmlu --trust_remote_code     --batch_size 8 --apply_chat_template --fewshot_as_multiturn
 ```
 
 ### MMLU (5 shot; no CoT)
@@ -57,14 +63,29 @@ We use the `prompt_level_strict_acc` metric following Qwen-2.5.
 lm_eval --model vllm     --model_args pretrained=NovaSky-AI/Sky-T1-32B-Preview,tensor_parallel_size=8,dtype=auto,gpu_memory_utilization=0.8,data_parallel_size=1,max_model_len=2048     --tasks mgsm_direct --trust_remote_code     --batch_size 8 --apply_chat_template --fewshot_as_multiturn
 ```
 
+We report the average value of `flexible-extract` filter. 
+
+### MGSM (8-shot; native CoT)
+
+```bash
+lm_eval --model vllm     --model_args pretrained=NovaSky-AI/Sky-T1-32B-Preview,tensor_parallel_size=8,dtype=auto,gpu_memory_utilization=0.8,data_parallel_size=1,max_model_len=2048     --tasks mgsm_direct --trust_remote_code --batch_size 8 --apply_chat_template --fewshot_as_multiturn --num_fewshot 8
+```
+
 ### LLM-as-a-Judge
 
 We use the default settings - with `max_tokens` 1024 and the `gpt-4` judge. We observe that some reasoning models like `Qwen/QwQ-32B-Preview` are unable to provide brief responses sometimes and thus get truncated responses at the used `max_tokens`. While this will effect the final rating, given the context length limitations of the commonly used `gpt-4` judge (8K tokens), we stick to the 1024 `max_tokens` budget for consistency. 
 
 1. First, serve the model with vLLM 
 
+
 ```bash
 vllm serve NovaSky-AI/Sky-T1-32B-Preview --dtype auto --tensor-parallel-size 8 --gpu-memory-utilization 0.9
+```
+
+For `Qwen/QwQ-32B-Preview`,  use 
+
+```bash 
+vllm serve Qwen/QwQ-32B-Preview --dtype auto --tensor-parallel-size 8 --gpu-memory-utilization 0.9 --revision refs/pr/58 --tokenizer-revision refs/pr/58
 ```
 
 2. Next, generate model response 
