@@ -243,6 +243,18 @@ def strip_string(string, skip_unit=False):
     string = string.replace("\\{", "{")
     string = string.replace("\\}", "}")
 
+    # Function to replace number words with corresponding digits
+    def replace_match(match):
+        word = match.group(1).lower()
+        if convert_word_number(word) == word:
+          return match.group(0)
+        else:
+          return convert_word_number(word)
+    string = re.sub(r"\\text\{([a-zA-Z]+)\}", replace_match, string)
+
+    # Before removing unit, check if the unit is squared (for surface area)
+    string = re.sub(r"(cm|inches)\}\^2", r"\1}", string)
+
     # Remove unit: miles, dollars if after is not none
     _string = re.sub(r"\\text{.*?}$", "", string).strip()
     if _string != "" and _string != string:
@@ -347,6 +359,23 @@ def strip_string(string, skip_unit=False):
     # NOTE: X/Y changed to \frac{X}{Y} in dataset, but in simple cases fix in case the model output is X/Y
     string = _fix_a_slash_b(string)
 
+    # Remove unnecessary '\' before integers
+    string = re.sub(r"\\(?=\-?\d+(\\|\)|,|\]|$))", "", string)
+
+    # Remove grade level (e.g., 12th grade) and just maintain the integer
+    string = re.sub(r"thgrade$", "", string)
+
+    # If the answer is a list of integers (without parenthesis), sort them
+    if re.fullmatch(r"(\s*-?\d+\s*,)*\s*-?\d+\s*", string):
+        # Split the string into a list of integers
+        integer_list = list(map(int, string.split(',')))
+
+        # Sort the list in ascending order
+        sorted_list = sorted(integer_list)
+
+        # Join the sorted list back into a comma-separated string
+        string = ','.join(map(str, sorted_list))
+
     return string
 
 
@@ -407,6 +436,23 @@ def choice_answer_clean(pred: str):
 
     return pred
 
+
+def gpqa_choice_answer_clean(pred: str):
+    tmp = re.findall(r"\b(A|B|C|D)\b", pred.upper())
+    if tmp:
+        pred = tmp
+    else:
+        pred = [pred.strip().strip(".")]
+
+    if len(pred) == 0:
+        pred = ""
+    else:
+      pred = pred[-1]
+
+    # Remove the period at the end, again!
+    pred = pred.rstrip(".").rstrip("/")
+
+    return pred
 
 def find_box(pred_str: str):
     ans = pred_str.split("boxed")[-1]
@@ -501,6 +547,10 @@ def extract_answer(pred_str, data_name, use_last_number=True):
     if data_name in ["mmlu_stem", "sat_math", "aqua", "gaokao2023"]:
         # TODO check multiple choice
         return choice_answer_clean(pred_str)
+    elif data_name in ["gpqa", "mmlu"]:
+        result = gpqa_choice_answer_clean(pred_str) 
+        # print("TGRIGGS: result --> ", result)
+        return result
 
     if "final answer is $" in pred_str and "$. I hope" in pred_str:
         # minerva_math
@@ -547,7 +597,7 @@ def extract_answer(pred_str, data_name, use_last_number=True):
 
     # choice answer
     if (
-        data_name in ["sat_math", "aqua"]
+        data_name in ["sat_math", "aqua", "gpqa"]
         or "mmlu" in data_name
     ):
         tmp = re.findall(r"\b(A|B|C|D|E)\b", pred.upper())
@@ -586,6 +636,9 @@ def parse_ground_truth(example: Dict[str, Any], data_name):
     if data_name in ["math", "minerva_math"]:
         gt_cot = example["solution"]
         gt_ans = extract_answer(gt_cot, data_name)
+    elif data_name in ["math500"]:
+        gt_cot = example["solution"]
+        gt_ans = example["answer"]
     elif data_name == "gsm8k":
         gt_cot, gt_ans = example["answer"].split("####")
     elif data_name == "svamp":
@@ -609,10 +662,12 @@ def parse_ground_truth(example: Dict[str, Any], data_name):
                 gt_ans = float(gt_ans)
     elif data_name == "carp_en":
         gt_cot, gt_ans = example["steps"], example["answer"]
-    elif data_name == "mmlu_stem":
+    elif data_name in ["mmlu", "mmlu_stem"]:
         abcd = "ABCD"
         gt_cot, gt_ans = None, abcd[example["answer"]]
     elif data_name == "sat_math":
+        gt_cot, gt_ans = None, example["Answer"]
+    elif data_name == "gpqa":
         gt_cot, gt_ans = None, example["Answer"]
     elif data_name == "aqua":
         gt_cot, gt_ans = None, example["correct"]
@@ -672,7 +727,7 @@ def parse_question(example, data_name):
             )
     elif data_name == "carp_en":
         question = example["content"]
-    elif data_name == "mmlu_stem":
+    elif data_name in ["mmlu_stem",  "mmlu"]:
         options = example["choices"]
         assert len(options) == 4
         for i, (label, option) in enumerate(zip("ABCD", options)):
@@ -689,6 +744,8 @@ def parse_question(example, data_name):
                 options = regex.sub(f" {ch}\) ", f" ({ch}) ", options)
         # question = f"{example['question'].strip()}\nWhat of the following is the right choice? Explain your answer.\n{options.strip()}"
         question = f"{example['question'].strip()}\nAnswer Choices: {options}"
+    elif data_name == "gpqa":
+        question = example["Question"]
     elif "aqua" in data_name:
         options = example["options"]
         choice = "(" + "(".join(options)

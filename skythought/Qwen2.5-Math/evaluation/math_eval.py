@@ -287,7 +287,7 @@ def main(llm, tokenizer, data_name, args):
                 batch_size=16,
                 stop_id_sequences=stop_words,
             )
-
+        print(outputs)
         assert len(outputs) == len(current_prompts)
 
         # process all outputs
