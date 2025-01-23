@@ -14,6 +14,7 @@ eval_to_split = {
   "GSM8K": "test",
   "ARC-C": "test",
   "AMC23": "train",
+  "OlympiadBenchMath": "train",
 }
 
 def parse_arguments():

@@ -14,6 +14,8 @@ from .math.testing_util import strip_answer_string, get_multiple_choice_answer, 
 from .livecodebench.testing_util import unsafe_lcb_runTests, map_to_example, has_test_type, post_process_code, translate_private_test_cases
 from .common import TimeoutException, timeout
 from util.model_utils import *
+import logging
+logging.basicConfig(level=logging.INFO)
 
 def has_code(response):
     pattern = r"```(?:[a-zA-Z]*)\n(.*?)```"
@@ -51,6 +53,10 @@ class TaskHandler:
     
 class MathTaskHandler(TaskHandler):
     @staticmethod
+    def get_question_key():
+        return "problem"
+
+    @staticmethod
     def generate_prompt(prompt):
         return "Return your final response within \\boxed{{}}. " + prompt
     
@@ -71,19 +77,20 @@ class MathTaskHandler(TaskHandler):
             "reason": None,
         }
         curr_res = self.check_correctness(problem, generation=response)
+
         if curr_res:
             response_entry["correctness"] = True
             response_entry["reason"] = ""
         else:
             response_entry["correctness"] = False
             response_entry["reason"] = "Solution is incorrect."
-    
+        
         return response_entry
     
     def make_conversations(self, data, system_prompt, model=None):
         conversations = []
         for problem in data:
-            prompt_text = self.generate_prompt(problem["problem"])
+            prompt_text = self.generate_prompt(problem[self.get_question_key()])
             conversations.append([
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": prompt_text}
@@ -91,7 +98,7 @@ class MathTaskHandler(TaskHandler):
         return conversations
     
     def process_remaining_data(self, train_data, results):
-        return [row.to_dict() for _, row in train_data.iterrows() if str(row["problem"]) not in results]
+        return [row.to_dict() for _, row in train_data.iterrows() if str(row[self.get_question_key()]) not in results]
 
     def load_and_filter_dataset(self, start, end, split="test", source=None, filter_difficulty=False, args=None):
         dataset = load_dataset(self.dataset)
@@ -855,6 +862,27 @@ class AMC23TaskHandler(MathTaskHandler):
         return filtered_data.iloc[start:end] if end > 0 else filtered_data.iloc[start:]
 
 
+class OlympiadBenchMathTaskHandler(MathTaskHandler): 
+    def __init__(self):
+        self.dataset = "Hothan/OlympiadBench"
+        self.source = "OE_TO_maths_en_COMP"
+
+    @staticmethod
+    def get_question_key():
+        return "question"
+    
+    def load_and_filter_dataset(self, start, end, split="train", source=None, filter_difficulty=False, args=None):
+        dataset = load_dataset(self.dataset, self.source)
+        train_data = dataset[split].to_pandas()
+        return train_data.iloc[start:end] if end > 0 else train_data.iloc[start:]
+    
+    def check_correctness(self, problem, generation):
+        # all problems have final answer in a list 
+        answer = strip_answer_string(problem["final_answer"][0])
+        pred = extract_answer(generation)
+        pred = strip_answer_string(pred)
+        return math_equal(pred, answer)
+
 TASK_HANDLERS = {
     "NUMINA": NUMINATaskHandler,
     "APPS": APPSTaskHandler,
@@ -868,4 +896,5 @@ TASK_HANDLERS = {
     "GSM8K": GSM8KTaskHandler,
     "ARC-C": ARCChallengeTaskHandler,
     "AMC23": AMC23TaskHandler,
+    "OlympiadBenchMath": OlympiadBenchMathTaskHandler,
 }
