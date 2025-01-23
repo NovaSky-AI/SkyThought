@@ -51,7 +51,7 @@ Following, we show our evaluation results for the Sky-T1-32B-Preview model acros
 | LiveCodeBench-Medium | 56.8                    | 40.8   | 56.3  | 54.9       |
 | LiveCodeBench-Hard   | 17.9                    | 9.8   | 17.1  | 16.3       |
 | GPQA-Diamond         | 56.8                    | 45.5   | 52.5  | 75.2       |
-
+| OlympiadBench (Math, EN)    | 59.79	           | 46.74	| 62.17	 | -        | 
 
 
 ## Fully Open-source: Driving Progress Together
