@@ -77,14 +77,12 @@ class MathTaskHandler(TaskHandler):
             "reason": None,
         }
         curr_res = self.check_correctness(problem, generation=response)
-
         if curr_res:
             response_entry["correctness"] = True
             response_entry["reason"] = ""
         else:
             response_entry["correctness"] = False
             response_entry["reason"] = "Solution is incorrect."
-        
         return response_entry
     
     def make_conversations(self, data, system_prompt, model=None):
