@@ -64,7 +64,7 @@ We also evaluate on non-reasoning benchmarks (these are benchmarks for instructi
 | MGSM (0 shot; `direct`) | 33 | **42.3** | 19.07 | [lm_eval](https://github.com/EleutherAI/lm-evaluation-harness) |
 | MGSM (8-shot; `direct`) | 58.4 | **61.47** | 58.5 | [lm_eval](https://github.com/EleutherAI/lm-evaluation-harness) |
 | BFCL-v3 | 53.18 | **58.92** | 17.41 | [BFCL](https://github.com/ShishirPatil/gorilla/tree/main/berkeley-function-call-leaderboard) |
-| Arena-Hard | **74.79** | 66.51 | 39.46 | [Arena-Hard-Auto](https://github.com/lmarena/arena-hard-auto) |
+| Arena-Hard | **74.79** | 66.51 | 52.6 | [Arena-Hard-Auto](https://github.com/lmarena/arena-hard-auto) |
 
 For more details, refer [here](./skythought/tools/base_instruct_evals.md). 
 
