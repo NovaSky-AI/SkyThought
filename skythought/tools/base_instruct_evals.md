@@ -154,9 +154,9 @@ Here are some supplementary results for Arena-Hard, compared with o1-mini which 
 
 | model | score | rating_q025 | rating_q975 | CI | avg_tokens | date |
 |-------|--------|------------|-------------|-------|------------|-------|
-| o1-mini-2024-09-12 | 91.98 | 90.71 | 93.03 | (-1.27, +1.05) | 1399.0 | 2025-01-18 |
-| sky-T1-32B-Preview | 74.79 | 72.87 | 76.59 | (-1.92, +1.80) | 847.0 | 2025-01-18 |
-| qwen2.5-32b-instruct | 66.51 | 64.62 | 68.49 | (-1.89, +1.98) | 611.0 | 2025-01-18 |
+| o1-mini-2024-09-12 | 91.98 | 90.88 | 93.12 | (-1.10, +1.14) | 1399.0 | 2025-01-18 |
+| sky-T1-32B-Preview | 74.79 | 72.28 | 76.8 | (-2.51, +2.01) | 847.0 | 2025-01-18 |
+| qwen2.5-32b-instruct | 66.51 | 64.55 | 68.4 | (-1.96, +1.89) | 611.0 | 2025-01-18 |
 | qwq-32b-preview | 52.6 | 50.86 | 54.91 | (-1.74, +2.31) | 1005.0 | 2025-01-23 |
 
 For more details, see: https://github.com/NovaSky-AI/SkyThought/pull/26#issuecomment-2599525551 
