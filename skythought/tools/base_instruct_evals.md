@@ -134,7 +134,7 @@ port=1996
 huggingface-cli download $model
 sudo docker run --gpus 8 -e HUGGING_FACE_HUB_TOKEN=$hf_pat --shm-size 2000g -p $port:80 -v $volume:/data ghcr.io/huggingface/text-generation-inference:2.2.0 --model-id $model --max-input-length 8192 --max-batch-total-tokens 8193 --max-batch-prefill-tokens 8193 --max-total-tokens 8193 --sharded true
 ```
-For running the `gen_answer.py` script, we use the following `config_api` yaml setting
+For running the `gen_answer.py` script, we use the following `config_api` yaml setting. For `qwq-32b-preview`, we explicitly specify the system prompt as `You are a helpful and harmless assistant. You are Qwen developed by Alibaba.` to avoid the CoT prompt.
 ```yaml
 ...
 sky-T1-32B-Preview:
@@ -157,6 +157,6 @@ Here are some supplementary results for Arena-Hard, compared with o1-mini which 
 | o1-mini-2024-09-12 | 91.98 | 90.71 | 93.03 | (-1.27, +1.05) | 1399.0 | 2025-01-18 |
 | sky-T1-32B-Preview | 74.79 | 72.87 | 76.59 | (-1.92, +1.80) | 847.0 | 2025-01-18 |
 | qwen2.5-32b-instruct | 66.51 | 64.62 | 68.49 | (-1.89, +1.98) | 611.0 | 2025-01-18 |
-| qwq-32b-preview | 39.46 | 36.76 | 41.42 | (-2.70, +1.96) | 2401.0 | 2025-01-18 |
+| qwq-32b-preview | 52.6 | 50.86 | 54.91 | (-1.74, +2.31) | 1005.0 | 2025-01-23 |
 
 For more details, see: https://github.com/NovaSky-AI/SkyThought/pull/26#issuecomment-2599525551 
