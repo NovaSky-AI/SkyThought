@@ -8,10 +8,10 @@ import numpy as np
 from datasets import load_dataset
 from typing import Dict, Any
 from multiprocessing import Manager
-from .apps.testing_util import run_test as apps_run_test
-from .taco.testing_util import run_test as taco_run_test
-from .math.testing_util import strip_answer_string, get_multiple_choice_answer, extract_answer, math_equal, mmlu_pro_extract_answer
-from .livecodebench.testing_util import unsafe_lcb_runTests, map_to_example, has_test_type, post_process_code, translate_private_test_cases
+from tasks.apps.apps_util import run_test as apps_run_test
+from tasks.taco.taco_util import run_test as taco_run_test
+from .math_parsing_util import strip_answer_string, get_multiple_choice_answer, extract_answer, math_equal, mmlu_pro_extract_answer
+from tasks.livecodebench.livecodebench_util import unsafe_lcb_runTests, map_to_example, has_test_type, post_process_code, translate_private_test_cases
 from .common import TimeoutException, timeout
 from util.model_utils import *
 

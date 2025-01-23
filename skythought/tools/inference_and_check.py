@@ -48,7 +48,6 @@ def perform_inference_and_check(handler: TaskHandler, temperatures, max_tokens, 
                                                  filter_difficulty=args.filter_difficulty, args=args)
     remaining_data = handler.process_remaining_data(train_data, results)
     conversations = handler.make_conversations(remaining_data, system_prompt, args.model)
-
     for temp in temperatures:
         
         if args.model.startswith("openai"):

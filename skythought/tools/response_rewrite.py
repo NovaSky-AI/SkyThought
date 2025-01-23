@@ -3,7 +3,7 @@ import json
 import os
 import random
 from tqdm import tqdm
-from util.math.testing_util import strip_answer_string
+from skythought.tools.util.math_parsing_util import strip_answer_string
 from util.model_utils import *
 from vllm import LLM, SamplingParams
 
