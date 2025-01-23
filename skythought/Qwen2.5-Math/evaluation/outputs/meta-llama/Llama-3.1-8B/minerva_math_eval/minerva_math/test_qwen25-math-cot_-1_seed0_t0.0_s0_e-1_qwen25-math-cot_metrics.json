@@ -1,0 +1,20 @@
+{
+    "num_samples": 272,
+    "num_scores": 272,
+    "timeout_samples": 0,
+    "empty_samples": 55,
+    "acc": 3.3,
+    "type_acc": {
+        "Differential Equations (18.03 Spring 2010)": 0.0,
+        "Dynamics and Control (2.003 Spring 2005)": 11.5,
+        "Ecology I (1.018J Fall 2009)": 0.0,
+        "Information and Entropy (6.050J Spring 2008)": 0.0,
+        "Introduction to Astronomy (8.282J Spring 2006)": 5.7,
+        "Introduction to Solid State Chemistry (3.091 Fall 2010)": 0.0,
+        "Physical Chemistry (5.61 Fall 2017)": 0.0,
+        "Principles of Microeconomics (14.01 Fall 2011)": 16.7,
+        "Relativity (8.033 Fall 2006)": 0.0
+    },
+    "time_use_in_second": 775.7217237949371,
+    "time_use_in_minite": "12:55"
+}
