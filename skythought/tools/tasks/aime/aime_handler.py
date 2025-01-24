@@ -3,23 +3,20 @@ from util.model_utils import MODEL_TO_NAME
 
 
 class AIMETaskHandler(MathTaskHandler):
-    def __init__(self):
-        self.dataset = "AI-MO/aimo-validation-aime"
-
-    def generate_prompt(self, prompt, model):
+    def generate_prompt(self, problem, model):
         if MODEL_TO_NAME[model] == "Sky-T1-32B-Preview":
             return self.task_config.templating_parameters["sky_template"].format(
-                prompt=prompt
+                **problem
             )
         else:
             return self.task_config.templating_parameters["regular_template"].format(
-                prompt=prompt
+                **problem
             )
 
     def make_conversations(self, data, system_prompt, model=None):
         conversations = []
         for problem in data:
-            prompt_text = self.generate_prompt(problem[self.question_key], model)
+            prompt_text = self.generate_prompt(problem, model)
             conversations.append(
                 [
                     {"role": "system", "content": system_prompt},

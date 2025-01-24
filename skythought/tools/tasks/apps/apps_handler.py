@@ -18,13 +18,13 @@ class APPSTaskHandler(TaskHandler):
                 "with_fn_name_template"
             ].format(
                 prompt=prompt
-            )  # "\nUse Standard Input format"#\n"
+            )  
         else:
             _input = self.task_config.templating_parameters[
                 "without_fn_name_template"
             ].format(
                 prompt=prompt
-            )  # "\nUse Call-Based format"#\n"
+            ) 
         if starter_code is not None:
             _input = self.task_config.templating_parameters[
                 "with_starter_code_template"

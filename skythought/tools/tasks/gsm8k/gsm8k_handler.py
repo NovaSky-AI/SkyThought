@@ -6,9 +6,8 @@ from util.math_parsing_util import extract_answer
 
 
 class GSM8KTaskHandler(TaskHandler):
-    def __init__(self) -> None:
-        super().__init__()
-        self.dataset = "openai/gsm8k"
+    def __init__(self, yaml_file_path: str) -> None:
+        super().__init__(yaml_file_path)
         self.ans_re = re.compile(r"((-?[$0-9.,]{2,})|(-?[0-9]+))")
         self.gt_re = re.compile(r"#### (\-?[0-9\.\,]+)")
         self.invalid_ans = "[invalid]"

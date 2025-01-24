@@ -5,8 +5,6 @@ from util.math_parsing_util import get_multiple_choice_answer
 
 
 class GPQADiamondTaskHandler(TaskHandler):
-    def __init__(self):
-        self.dataset = "Idavidrein/gpqa"
 
     def generate_prompt(self, problem):
         return self.task_config.templating_parameters["template"].format(**problem)
