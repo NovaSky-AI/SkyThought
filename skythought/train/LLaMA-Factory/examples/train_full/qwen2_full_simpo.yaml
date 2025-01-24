@@ -1,0 +1,39 @@
+### model
+model_name_or_path: NovaSky-AI/Sky-T1-32B-Preview
+
+### method
+stage: dpo  # 'dpo' is used for simpo/orpo/dpo
+do_train: true
+finetuning_type: full
+deepspeed: examples/deepspeed/ds_z3_offload_config.json  # choices: [ds_z0_config.json, ds_z2_config.json, ds_z3_config.json]
+pref_beta: 2.0
+simpo_gamma: 0.3
+pref_loss: simpo
+
+### dataset
+dataset: Sky-T1-simpo
+template: qwen25
+cutoff_len: 16384
+max_samples: 10000
+overwrite_cache: true
+preprocessing_num_workers: 16
+
+### output
+output_dir: saves/Sky-T1-32B-Preview/full/original
+logging_steps: 1
+save_steps: 100
+plot_loss: true
+
+### train
+per_device_train_batch_size: 1
+gradient_accumulation_steps: 12
+learning_rate: 5.0e-7
+num_train_epochs: 1.0
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+bf16: true
+ddp_timeout: 180000000
+
+report_to: wandb
+run_name: Sky-T1-simpo
+

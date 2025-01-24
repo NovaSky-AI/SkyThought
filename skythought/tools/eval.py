@@ -6,10 +6,16 @@ import json
 # Define eval to split mapping
 eval_to_split = {
   "MATH500": "test", 
+  "MinvervaMath": "test", 
   "AIME": "train", 
   "GPQADiamond": "train", 
   "MMLU": "test",
-  "LiveCodeBench": "test"
+  "MMLUPro": "test",
+  "LiveCodeBench": "test",
+  "GSM8K": "test",
+  "ARC-C": "test",
+  "AMC23": "train",
+  "OlympiadBenchMath": "train",
 }
 
 def parse_arguments():

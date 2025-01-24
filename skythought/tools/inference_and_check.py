@@ -101,7 +101,8 @@ def perform_inference_and_check(handler: TaskHandler, temperatures, max_tokens, 
                     results[problem_key]["token_usages"] = {}
                     prompt = conversations[idx][1]["content"]
                     results[problem_key]["prompt"] = prompt
-
+                    results[problem_key]["input_conversation"] = conversations[idx]
+                    
                 results[problem_key]["responses"][str(temp)] = response_entry
                 
                 if args.model.startswith("openai"):
@@ -305,7 +306,7 @@ def perform_inference_and_save(handler: TaskHandler, temperatures, max_tokens, r
 
 def main():
     parser = argparse.ArgumentParser(description="Unified inference and checking for different datasets/tasks.")
-    parser.add_argument("--dataset", type=str, required=True, choices=["NUMINA", "APPS", "TACO", "MATH500", "AIME", "GPQADiamond", "MMLU", "LiveCodeBench"], help="Dataset to process.")
+    parser.add_argument("--dataset", type=str, required=True, choices=list(TASK_HANDLERS.keys()), help="Dataset to process.")
     parser.add_argument("--model", type=str, required=True, default="Qwen/QwQ-32B-Preview", help="The model to run.")
     parser.add_argument("--tp", type=int, default=8, help="Tensor Parallelism Degree")
     parser.add_argument("--max_tokens", type=int, default=32768, help="Max tokens for the model.")

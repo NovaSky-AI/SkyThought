@@ -6,14 +6,16 @@ import random
 import re
 import numpy as np
 from datasets import load_dataset
-from typing import Dict
+from typing import Dict, Any
 from multiprocessing import Manager
 from .apps.testing_util import run_test as apps_run_test
 from .taco.testing_util import run_test as taco_run_test
-from .math.testing_util import strip_answer_string, get_multiple_choice_answer, extract_answer, math_equal
+from .math.testing_util import strip_answer_string, get_multiple_choice_answer, extract_answer, math_equal, mmlu_pro_extract_answer
 from .livecodebench.testing_util import unsafe_lcb_runTests, map_to_example, has_test_type, post_process_code, translate_private_test_cases
 from .common import TimeoutException, timeout
 from util.model_utils import *
+import logging
+logging.basicConfig(level=logging.INFO)
 
 def has_code(response):
     pattern = r"```(?:[a-zA-Z]*)\n(.*?)```"
@@ -23,6 +25,10 @@ def has_code(response):
     return matches
 
 class TaskHandler:
+    @staticmethod
+    def get_question_key():
+        raise NotImplementedError("Subclasses should implement this method.")
+
     def check_correctness(self, problem, generation):
         raise NotImplementedError("Subclasses should implement this method.")
     
@@ -46,6 +52,10 @@ class TaskHandler:
         raise NotImplementedError("Subclasses should implement this method.")
     
 class MathTaskHandler(TaskHandler):
+    @staticmethod
+    def get_question_key():
+        return "problem"
+
     @staticmethod
     def generate_prompt(prompt):
         return "Return your final response within \\boxed{{}}. " + prompt
@@ -73,13 +83,12 @@ class MathTaskHandler(TaskHandler):
         else:
             response_entry["correctness"] = False
             response_entry["reason"] = "Solution is incorrect."
-    
         return response_entry
     
     def make_conversations(self, data, system_prompt, model=None):
         conversations = []
         for problem in data:
-            prompt_text = self.generate_prompt(problem["problem"])
+            prompt_text = self.generate_prompt(problem[self.get_question_key()])
             conversations.append([
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": prompt_text}
@@ -87,7 +96,7 @@ class MathTaskHandler(TaskHandler):
         return conversations
     
     def process_remaining_data(self, train_data, results):
-        return [row.to_dict() for _, row in train_data.iterrows() if str(row["problem"]) not in results]
+        return [row.to_dict() for _, row in train_data.iterrows() if str(row[self.get_question_key()]) not in results]
 
     def load_and_filter_dataset(self, start, end, split="test", source=None, filter_difficulty=False, args=None):
         dataset = load_dataset(self.dataset)
@@ -101,6 +110,23 @@ class MATH500TaskHandler(MathTaskHandler):
     @staticmethod
     def get_question_key():
         return "problem"
+
+
+class MinervaMathTaskHandler(MathTaskHandler):
+    def __init__(self):
+        self.dataset = "svc-huggingface/minerva-math"
+    
+    @staticmethod
+    def get_question_key():
+        return "problem"
+
+    def check_correctness(self, problem, generation):
+        answer = extract_answer(problem["solution"])
+        answer = strip_answer_string(answer)
+
+        pred = extract_answer(generation)
+        pred = strip_answer_string(pred)
+        return math_equal(pred, answer)
 
 class AIMETaskHandler(MathTaskHandler):
     def __init__(self):
@@ -269,6 +295,37 @@ class MMLUTaskHandler(TaskHandler):
 
     def load_and_filter_dataset(self, start, end, split="test", source=None, filter_difficulty=False, args=None):
         dataset = load_dataset(self.dataset, "all")
+        train_data = dataset[split].to_pandas()
+        return train_data.iloc[start:end] if end > 0 else train_data.iloc[start:]
+
+class MMLUProTaskHandler(MMLUTaskHandler):
+    def __init__(self):
+        super().__init__()
+        self.dataset = "TIGER-Lab/MMLU-Pro"
+        self.choices = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P"]
+
+    @staticmethod
+    def generate_prompt(prompt):
+        return "Return your final response within \\boxed{{}}. " + prompt
+
+    @staticmethod
+    def get_question_key():
+        return "question"
+
+    def check_correctness(self, problem, generation):
+        pred = mmlu_pro_extract_answer(generation)
+        answer = self.choices[problem["answer_index"]]
+        return answer == pred
+
+    def get_multiple_choice_answers(self, problem):
+        options = problem["options"]
+        for i, (label, option) in enumerate(zip(self.choices[:len(options)], options)):
+            options[i] = f"({label}) {str(option).strip()}"
+        options = " ".join(options)
+        return f"Answer Choices: {options}"
+
+    def load_and_filter_dataset(self, start, end, split="test", source=None, filter_difficulty=False, args=None):
+        dataset = load_dataset(self.dataset, "default")
         train_data = dataset[split].to_pandas()
         return train_data.iloc[start:end] if end > 0 else train_data.iloc[start:]
     
@@ -613,26 +670,249 @@ class LiveCodeBenchTaskHandler(TaskHandler):
         dataset = load_dataset("livecodebench/code_generation_lite", version_tag="release_v2", split=split, trust_remote_code=True)
         if filter_difficulty:
             dataset = dataset.filter(lambda example: example['difficulty'] == source)
+        # We use a lower writer_batch_size to avoid pyarrow issues. JSON entries with LiveCodeBench are large. 
+        # See: https://github.com/NovaSky-AI/SkyThought/pull/45 for details. 
         dataset = dataset.map(
             lambda example: {
                 "private_test_cases": translate_private_test_cases(example["private_test_cases"])
-            }
+            }, writer_batch_size=100
         )
         # Apply the mapping function
-        dataset = dataset.map(map_to_example, remove_columns=dataset.column_names).to_pandas()
+        dataset = dataset.map(map_to_example, remove_columns=dataset.column_names, writer_batch_size=100).to_pandas()
         return dataset.iloc[start:end] if end > 0 else dataset.iloc[start:]
 
     def process_remaining_data(self, train_data, results):
         return [row.to_dict() for _, row in train_data.iterrows() if str(row["task_id"]) not in results]
 
+class GSM8KTaskHandler(TaskHandler):
+    def __init__(self) -> None:
+        super().__init__()
+        self.dataset = "openai/gsm8k"
+        self.ans_re = re.compile(r"((-?[$0-9.,]{2,})|(-?[0-9]+))")
+        self.gt_re =  re.compile(r"#### (\-?[0-9\.\,]+)")
+        self.invalid_ans = "[invalid]"
+
+    @staticmethod
+    def get_question_key():
+        return "question"
+
+    @staticmethod
+    def generate_prompt(problem):
+        question = problem["question"] 
+        full_prompt = f"Given the following problem, reason and give a final answer to the problem.\nProblem: {question}\nYour response should end with \"The final answer is [answer]\" where [answer] is the response to the problem."
+        return full_prompt
+    
+    def check_correctness(self, problem: Dict[str, Any], generation: str) -> bool: 
+        gt_answer = self.extract_gt_answer(problem["answer"])
+        model_answer = extract_answer(generation)
+        model_answer = self.sanitize_answer(model_answer)
+        return model_answer == gt_answer
+    
+    def update_results(self, problem, response):
+        if not isinstance(response, str):
+            response = response.outputs[0].text.strip()
+        # Initialize the response structure
+        response_entry = {
+            "content": response,
+            "correctness": None,
+            "reason": None,
+        }
+        curr_res= self.check_correctness(problem, generation=response)
+        if curr_res:
+            response_entry["correctness"] = True
+            response_entry["reason"] = ""
+        else:
+            response_entry["correctness"] = False
+            response_entry["reason"] = "Solution is incorrect."
+    
+        return response_entry
+
+    def make_conversations(self, data, system_prompt, model=None):
+        conversations = []
+        for problem in data:
+            prompt_text = self.generate_prompt(problem)
+            conversations.append([
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": prompt_text}
+            ])
+        return conversations
+
+    def load_and_filter_dataset(self, start, end, split="train", source=None, filter_difficulty=False, args=None):
+        dataset = load_dataset(self.dataset, "main")
+        train_data = dataset[split].to_pandas()
+        return train_data.iloc[start:end] if end > 0 else train_data.iloc[start:]
+
+    def process_remaining_data(self, train_data, results):
+        return [row.to_dict() for _, row in train_data.iterrows() if str(row["question"]) not in results]
+    
+    def extract_gt_answer(self, completion):
+        match = self.gt_re.search(completion)
+        if match:
+            match_str = match.group(1).strip()
+            match_str = match_str.replace(",", "")
+            return match_str
+        else:
+            return self.invalid_ans
+
+    def sanitize_answer(self, answer):
+        patterns_to_remove = [
+            ',',           # Remove commas
+            r'\$',         # Remove dollar signs
+            r'\.$'         # Remove trailing period
+            r"\*",           # Remove asterisks
+        ]
+        for pattern in patterns_to_remove:
+            answer = re.sub(pattern, '', answer)
+        
+        matches = self.ans_re.findall(answer)
+        if matches:
+            # get the last match (i.e final response) and the first / outer capturing group
+            match_str = matches[-1][0].strip()
+            return match_str
+        else:
+            return self.invalid_ans
+
+class ARCChallengeTaskHandler(TaskHandler): 
+    def __init__(self) -> None:
+        super().__init__()
+        self.dataset = "allenai/ai2_arc"
+        self.ans_re = re.compile(r"[Tt]he best answer is ([A-D])[\.\,]*", re.IGNORECASE)
+        self.letter_re = re.compile(r"([A-D])[\.\,]*") 
+        self.canonical_options = ["A", "B", "C", "D"]
+        self.invalid_ans = "[invalid]"
+
+    @staticmethod
+    def get_question_key():
+        return "question"
+
+    @staticmethod
+    def generate_prompt(problem):
+        question = problem["question"] 
+        choices = problem["choices"]
+        choices_text = '\n'.join([f"{label}.{choice}" for label, choice in zip(["A", "B", "C", "D"], choices["text"])])
+        full_prompt = "Given the following question and four candidate answers (A, B, C and D), choose the best answer. Your response should end with \"The best answer is [the_answer_letter]\" where [the_answer_letter] is one of the four letter choice (A, B, C, or D).\n" + f"{question}\n{choices_text}"
+        return full_prompt
+    
+    def check_correctness(self, problem: Dict[str, Any], generation: str) -> bool: 
+        gt_answer = problem["answerKey"]
+        if gt_answer not in self.canonical_options:
+            gt_answer = self.canonical_options[int(problem["answerKey"]) - 1]
+        model_answer = self.get_answer(generation)
+        return model_answer == gt_answer
+    
+    def update_results(self, problem, response):
+        if not isinstance(response, str):
+            response = response.outputs[0].text.strip()
+        # Initialize the response structure
+        response_entry = {
+            "content": response,
+            "correctness": None,
+            "reason": None,
+        }
+        curr_res = self.check_correctness(problem, generation=response)
+        if curr_res:
+            response_entry["correctness"] = True
+            response_entry["reason"] = ""
+        else:
+            response_entry["correctness"] = False
+            response_entry["reason"] = "Solution is incorrect."
+    
+        return response_entry
+
+    def make_conversations(self, data, system_prompt, model=None):
+        conversations = []
+        for problem in data:
+            prompt_text = self.generate_prompt(problem)
+            conversations.append([
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": prompt_text}
+            ])
+        return conversations
+
+    def load_and_filter_dataset(self, start, end, split="train", source=None, filter_difficulty=False, args=None):
+        dataset = load_dataset(self.dataset, "ARC-Challenge")
+        train_data = dataset[split].to_pandas()
+        return train_data.iloc[start:end] if end > 0 else train_data.iloc[start:]
+
+    def process_remaining_data(self, train_data, results):
+        return [row.to_dict() for _, row in train_data.iterrows() if str(row["question"]) not in results]
+
+    def get_answer(self, completion):
+        # First, we try to extract similar to MATH answers
+        answer = extract_answer(completion)
+        match = None
+        if answer: 
+             # match for the letter answer needed.
+            match = self.letter_re.search(answer)
+            if match: 
+                return match.group(1).strip()
+            
+        if not answer or not match: 
+            # try basic-regex based search 
+            patterns_to_remove = [
+                ',',           # Remove commas
+                r'\$',         # Remove dollar signs
+                r'\.$'         # Remove trailing period
+                r"\\",         # Remove stray backslashes
+                r"\*",           # Remove asterisks
+            ]
+            answer = completion
+            for pattern in patterns_to_remove:
+                answer = re.sub(pattern, '', answer)
+            matches = self.ans_re.findall(answer)
+            if not matches: 
+                return self.invalid_ans
+            return matches[-1].strip()
+
+class AMC23TaskHandler(MathTaskHandler):
+    def __init__(self):
+        self.dataset = "AI-MO/aimo-validation-amc"
+
+    @staticmethod
+    def get_question_key():
+        return "problem"
+    
+    def load_and_filter_dataset(self, start, end, split="train", source=None, filter_difficulty=False, args=None):
+        dataset = load_dataset(self.dataset)
+        train_data = dataset[split].to_pandas()
+        filtered_data = train_data[train_data['url'].str.contains("2023", na=False)]
+        return filtered_data.iloc[start:end] if end > 0 else filtered_data.iloc[start:]
+
+
+class OlympiadBenchMathTaskHandler(MathTaskHandler): 
+    def __init__(self):
+        self.dataset = "Hothan/OlympiadBench"
+        self.source = "OE_TO_maths_en_COMP"
+
+    @staticmethod
+    def get_question_key():
+        return "question"
+    
+    def load_and_filter_dataset(self, start, end, split="train", source=None, filter_difficulty=False, args=None):
+        dataset = load_dataset(self.dataset, self.source)
+        train_data = dataset[split].to_pandas()
+        return train_data.iloc[start:end] if end > 0 else train_data.iloc[start:]
+    
+    def check_correctness(self, problem, generation):
+        # all problems have final answer in a list 
+        answer = strip_answer_string(problem["final_answer"][0])
+        pred = extract_answer(generation)
+        pred = strip_answer_string(pred)
+        return math_equal(pred, answer)
 
 TASK_HANDLERS = {
     "NUMINA": NUMINATaskHandler,
     "APPS": APPSTaskHandler,
     "TACO": TACOTaskHandler,
     "MATH500": MATH500TaskHandler,
+    "MinervaMath": MinervaMathTaskHandler,
     "AIME": AIMETaskHandler,
     "GPQADiamond": GPQADiamondTaskHandler,
     "MMLU": MMLUTaskHandler,
-    "LiveCodeBench": LiveCodeBenchTaskHandler
+    "MMLUPro": MMLUProTaskHandler,
+    "LiveCodeBench": LiveCodeBenchTaskHandler,
+    "GSM8K": GSM8KTaskHandler,
+    "ARC-C": ARCChallengeTaskHandler,
+    "AMC23": AMC23TaskHandler,
+    "OlympiadBenchMath": OlympiadBenchMathTaskHandler,
 }

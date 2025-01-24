@@ -646,5 +646,15 @@
       "user_tag": "user",
       "assistant_tag": "assistant"
     }
+  },
+  "Sky-T1-simpo": {
+    "file_name": "your data path here",
+    "ranking": true,
+    "formatting": "sharegpt",
+    "columns": {
+      "messages": "conversations",
+      "chosen": "chosen",
+      "rejected": "rejected"
+    }
   }
 }

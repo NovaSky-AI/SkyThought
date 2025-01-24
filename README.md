@@ -2,7 +2,8 @@
 
 # SkyThought
 
-[![Github](https://img.shields.io/badge/SkyThought-000000?style=for-the-badge&logo=github&logoColor=000&logoColor=white)](https://github.com/NovaSky-AI/SkyThought)  [![Hugging Face Collection](https://img.shields.io/badge/NovaSky-fcd022?style=for-the-badge&logo=huggingface&logoColor=000&labelColor)](https://huggingface.co/NovaSky-AI) [![Twitter](https://img.shields.io/badge/NovaSky-white?style=for-the-badge&logo=X&logoColor=000&color=000&labelColor=white)](https://x.com/NovaSkyAI)
+[![Github](https://img.shields.io/badge/SkyThought-000000?style=for-the-badge&logo=github&logoColor=000&logoColor=white)](https://github.com/NovaSky-AI/SkyThought) [![Twitter](https://img.shields.io/badge/NovaSky-white?style=for-the-badge&logo=X&logoColor=000&color=000&labelColor=white)](https://x.com/NovaSkyAI) [![Hugging Face Collection](https://img.shields.io/badge/NovaSky-fcd022?style=for-the-badge&logo=huggingface&logoColor=000&labelColor)](https://huggingface.co/NovaSky-AI) [![Discord](https://img.shields.io/badge/NovaSky-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/RBAjeWSA)
+
 
 <div align="center" style="font-family: Arial, sans-serif;">
   <p>
@@ -19,12 +20,14 @@
 
 
 # News
-
+- **[2025/01/23]** ⚡️ We released Sky-T1-32B-Flash ([model](https://huggingface.co/NovaSky-AI/Sky-T1-32B-Flash), [data](https://huggingface.co/datasets/NovaSky-AI/Sky-T1_preference_data_10k)) to tackle overthinking and reduce reasoning sequence lengths while maintaining accuracy.
+- **[2025/01/19]** 🎉 [Chat demo](http://164.152.23.196:3000/) for Sky-T1-32B-Preview is alive! Please check it out!
 - **[2025/01/10]** 🎉 We have released our Sky-T1-32B-Preview [model](https://huggingface.co/NovaSky-AI/Sky-T1-32B-Preview) and [data](https://huggingface.co/datasets/NovaSky-AI/Sky-T1_data_17k) through [HuggingFace](https://huggingface.co/NovaSky-AI)!
 
 
 # Links
 
+- 📜 [Sky-T1-32B-Flash Blog Post](https://novasky-ai.github.io/posts/reduce-overthinking/)
 - 📜 [Sky-T1-32B-Preview model Blog Post](https://novasky-ai.github.io/posts/sky-t1/)
 - 🤗 [Sky-T1-32B-Preview model](https://huggingface.co/NovaSky-AI)
 
@@ -48,6 +51,7 @@ Following, we show our evaluation results for the Sky-T1-32B-Preview model acros
 | LiveCodeBench-Medium | 56.8                    | 40.8   | 56.3  | 54.9       |
 | LiveCodeBench-Hard   | 17.9                    | 9.8   | 17.1  | 16.3       |
 | GPQA-Diamond         | 56.8                    | 45.5   | 52.5  | 75.2       |
+| OlympiadBench (Math, EN)    | 59.79	           | 46.74	| 62.17	 | -        | 
 
 #### Results on non-reasoning benchmarks
 

@@ -222,7 +222,10 @@ def strip_answer_string(string):
     # If the answer is a list of integers (without parenthesis), sort them
     if re.fullmatch(r"(\s*-?\d+\s*,)*\s*-?\d+\s*", string):
         # Split the string into a list of integers
-        integer_list = list(map(int, string.split(',')))
+        try:
+            integer_list = list(map(int, string.split(',')))
+        except:
+            integer_list = list(map(int, "-1,-1".split(',')))
 
         # Sort the list in ascending order
         sorted_list = sorted(integer_list)
@@ -305,6 +308,23 @@ def get_multiple_choice_answer(pred: str):
     pred = pred.rstrip(".").rstrip("/")
 
     return pred
+
+def mmlu_pro_extract_answer(text):
+    pattern = r"answer is \(?([A-J])\)?"
+    match = re.search(pattern, text)
+    if match:
+        return match.group(1)
+    else:
+        # print("1st answer extract failed\n" + text)
+        match = re.search(r'.*[aA]nswer:\s*([A-J])', text)
+        if match:
+            return match.group(1)
+        else:
+            # print("2nd answer extract failed\n" + text)
+            pattern = r"\b[A-J]\b(?!.*\b[A-J]\b)"
+            match = re.search(pattern, text, re.DOTALL)
+            if match:
+                return match.group(0)
 
 def choice_answer_clean(pred: str):
     pred = pred.strip("\n").rstrip(".").rstrip("/").strip(" ").lstrip(":")
