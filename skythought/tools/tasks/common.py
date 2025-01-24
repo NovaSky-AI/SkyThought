@@ -2,8 +2,8 @@ import json
 import os
 from typing import Any, Dict, List, Optional
 
-import pandas as pd
 import yaml
+from datasets import Dataset as HFDataset
 from datasets import load_dataset
 from pydantic import BaseModel, Field
 
@@ -52,15 +52,14 @@ class TaskHandler:
             records = json.load(f)
         return records
 
-    def load_dataset(self, source=None, split=None, **kwargs) -> pd.DataFrame:
+    def load_dataset(self, source=None, split=None, **kwargs) -> HFDataset:
         dataset = load_dataset(
-            self.task_config.dataset_name,
-            source if source else self.task_config.dataset_source,
+            path=self.task_config.dataset_name,
+            name=source if source else self.task_config.dataset_source,
             split=split if split else self.task_config.dataset_split,
             **self.task_config.dataset_kwargs
         )
-        data = dataset.to_pandas()
-        return data
+        return dataset
 
     def load_and_filter_dataset(
         self, start, end, split="train", source=None, filter_difficulty=False, args=None

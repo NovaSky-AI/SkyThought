@@ -1,6 +1,7 @@
 import json
 import multiprocessing
 from multiprocessing import Manager
+from typing import Optional
 
 import numpy as np
 
@@ -11,7 +12,7 @@ from ..common import TaskConfig, TaskHandler
 
 
 class TACOTaskConfig(TaskConfig):
-    difficulty: str = None  # use all by default
+    difficulty: Optional[str] = None  # use all by default
 
 
 class TACOTaskHandler(TaskHandler):
@@ -115,7 +116,7 @@ class TACOTaskHandler(TaskHandler):
     def load_and_filter_dataset(
         self, start, end, split="train", source=None, filter_difficulty=False, args=None
     ):
-        dataset = self.load_dataset(source=source, split=split)
+        dataset = self.load_dataset(source=source, split=split).to_pandas()
         if filter_difficulty or self.task_config.difficulty:
             difficulty = source if filter_difficulty else self.task_config.difficulty
             dataset = dataset.filter(

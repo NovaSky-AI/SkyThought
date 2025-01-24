@@ -85,7 +85,7 @@ class GPQADiamondTaskHandler(TaskHandler):
     def load_and_filter_dataset(
         self, start, end, split=None, source=None, filter_difficulty=False, args=None
     ):
-        train_data = self.load_dataset(source=source, split=split)
+        train_data = self.load_dataset(source=source, split=split).to_pandas()
         return train_data.iloc[start:end] if end > 0 else train_data.iloc[start:]
 
     def process_remaining_data(self, train_data, results):

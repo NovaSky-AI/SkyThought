@@ -1,5 +1,5 @@
 import copy
-from typing import Dict
+from typing import Dict, Optional
 
 from tasks.common import TaskConfig, TaskHandler
 from tasks.livecodebench.livecodebench_util import (
@@ -12,7 +12,7 @@ from util.common import has_code
 
 
 class LiveCodeBenchTaskConfig(TaskConfig):
-    difficulty: str = None  # use all by default
+    difficulty: Optional[str] = None  # use all by default
 
 
 class LiveCodeBenchTaskHandler(TaskHandler):

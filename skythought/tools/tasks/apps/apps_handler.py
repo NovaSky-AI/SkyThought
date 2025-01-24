@@ -15,13 +15,16 @@ class APPSTaskHandler(TaskHandler):
     def generate_prompt(self, test_case, prompt, starter_code=None):
         if not test_case.get("fn_name"):
             _input = self.task_config.templating_parameters[
-                "with_fn_name_instruction"
-            ]  # "\nUse Standard Input format"#\n"
+                "with_fn_name_template"
+            ].format(
+                prompt=prompt
+            )  # "\nUse Standard Input format"#\n"
         else:
             _input = self.task_config.templating_parameters[
-                "without_fn_name_instruction"
-            ]  # "\nUse Call-Based format"#\n"
-        _input += prompt
+                "without_fn_name_template"
+            ].format(
+                prompt=prompt
+            )  # "\nUse Call-Based format"#\n"
         if starter_code is not None:
             _input = self.task_config.templating_parameters[
                 "with_starter_code_template"
@@ -101,7 +104,7 @@ class APPSTaskHandler(TaskHandler):
     def load_and_filter_dataset(
         self, start, end, split=None, source=None, filter_difficulty=False, args=None
     ):
-        train_data = self.load_dataset(source=source, split=split)
+        train_data = self.load_dataset(source=source, split=split).to_pandas()
         if filter_difficulty or self.task_config.difficulty:
             difficulty = (
                 self.task_config.difficulty if not filter_difficulty else source

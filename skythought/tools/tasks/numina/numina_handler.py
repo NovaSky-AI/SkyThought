@@ -1,3 +1,5 @@
+from typing import Optional
+
 from datasets import load_dataset
 
 from tasks.common import TaskConfig, TaskHandler
@@ -6,7 +8,7 @@ from util.math_parsing_util import extract_answer, math_equal, strip_answer_stri
 
 
 class NUMINATaskConfig(TaskConfig):
-    difficulty: str = None  # use all by default
+    difficulty: Optional[str] = None  # use all by default
 
 
 class NUMINATaskHandler(TaskHandler):
@@ -75,7 +77,7 @@ class NUMINATaskHandler(TaskHandler):
     def load_and_filter_dataset(
         self, start, end, split="train", source=None, filter_difficulty=False, args=None
     ):
-        dataset = self.load_dataset(source=source, split=split)
+        dataset = self.load_dataset(source=source, split=split).to_pandas()
         dataset = dataset.iloc[start:end] if end > 0 else dataset.iloc[start:]
         dataset = dataset[dataset["solution"].str.contains("boxed", na=False)]
         if filter_difficulty:
