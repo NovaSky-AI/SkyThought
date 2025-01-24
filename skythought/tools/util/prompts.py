@@ -135,3 +135,46 @@ Now, try to solve the following question through the above guidelines:"
 
 ReasoningFewShot = "Example Question: Find all real numbers $x$ so that the product $(x + i)((x + 1) + i)((x + 2) + i)$ is pure imaginary.  Enter all the solutions, separated by commas. \
 Example response: <|begin_of_thought|>\n\nSo I have this problem: find all real numbers \\( x \\) so that the product \\((x + i)((x + 1) + i)((x + 2) + i)\\) is pure imaginary. I need to find all real \\( x \\) that satisfy this condition.\n\nFirst, I need to understand what it means for a complex number to be pure imaginary. ... But since we're dealing with pure imaginarity, maybe looking at the arguments isn't the best approach here.\n\nAlternatively, perhaps I can consider the product in pairs and see if there's a pattern....(Some calculation) Wait, that seems off. Let me redo that multiplication carefully.\n\nActually, ... (some more calculation), Now, I need to check that for these values, the imaginary part is not zero.\n\n ... **Final Answer**\n\n\... |end_of_thought|>\n\n<|begin_of_solution|>\n\n ... \n<|end_of_solution|>"
+
+tag_solution_prompt = "You will be provided with an unstructured response that includes multiple revisions and reflections. Your task is to: \
+1. **Identify and Tag Each Block of Sentences:** \
+   - **[Target of reflection + Subsequent Reflection]:** Reflections start with transition phrases 'wait', 'let me think again,' 'but,' etc. Use this tag for blocks that contains the contents and its subsequent reflection. \
+   Note: the contents that after the reflection should not be included in this block. \
+   - **[Contents]:** Use this tag for all other content blocks that do not involve reflections. \
+2. **Formatting Guidelines:** \
+   - **Tags:** Enclose each block with the appropriate tag. For example: \
+     ``` \
+     [Target of reflection + Subsequent Reflection] Some potentially wrong contents to be reflected on, 'wait I am wrong' \
+     [Contents] So... \
+     ``` \
+   - **Preserve Headers:** Ensure that the following headers are retained exactly as they are: \
+     - `<|begin_of_thought|>` \
+     - `<|end_of_thought|>` \
+     - `<|begin_of_solution|>` \
+     - `<|end_of_solution|>` \
+3. **Output Instructions:** \
+   - **Copy All Content:** Include all original content in your response. \
+   - **Assign Only Tags:** Do not alter the content; only add the specified tags to each block. \
+4. **Response Format:** \
+   - Follow the tagging format precisely. \
+   - Example structure: \
+     ``` \
+     <|begin_of_thought|> \
+     [Target of reflection + Subsequent Reflection] Some potentially wrong contents to be reflected on, 'wait I am wrong!' \
+     [Contents] ... \
+     <|end_of_thought|> \
+     <|begin_of_solution|> \
+     [Contents] ... \
+     <|end_of_solution|> \
+     ``` \
+**Now, please apply the above instructions to the following content:** \
+{content}"
+
+remove_reflection_prompt = "You will be provided with an unstructured response that includes multiple revisions and reflections. Each revision follows this structure: [Target of reflection, subsequent reflection, corrected content]. \
+Your task is to remove all targets of reflection and their corresponding revisions. \
+Identify the precise sections of the response that are targets of reflection and remove them, ensuring that no content is left behind. \
+Do not include transition phrases such as 'wait,' 'let me think again,' or similar expressions. \
+Copy the entire content verbatim except for the removed portions. \
+Maintain the headers <|begin_of_thought|>, <|end_of_thought|>, <|begin_of_solution|>, and <|end_of_solution|> without any changes. \
+Now, please apply the instructions to the following content: \
+{content}"
