@@ -15,4 +15,4 @@ chmod +x $HOOK_SCRIPT
 
 git config --local core.hooksPath "$TOOLS_DIR/.githooks"
 # pre-commit run --all-files always runs from the root directory. we run this only on tools/ for now. 
-pre-commit run --files $TOOLS_DIR/*
+pre-commit run --files $TOOLS_DIR/* --config $TOOLS_DIR/.pre-commit-config.yaml

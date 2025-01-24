@@ -1,6 +1,8 @@
 set -e 
+
+# Get tools directory path relative to git root
+TOOLS_DIR=$(git rev-parse --show-toplevel)/skythought/tools
 # Only run pre-commit if changes are in tools/
-if git diff --cached --name-only | grep "^tools/"; then
-    cd skythought/tools/
-    pre-commit run --files $(git diff --cached --name-only | grep "^tools/")
+if git diff --cached --name-only | grep "^skythought/tools/"; then
+    pre-commit run --files $(git diff --cached --name-only | grep "^skythought/tools/") --config $TOOLS_DIR/.pre-commit-config.yaml
 fi
