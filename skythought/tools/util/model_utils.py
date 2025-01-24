@@ -64,7 +64,7 @@ MODEL_TO_NAME = {
     "PRIME-RL/Eurus-2-7B-PRIME": "Eurus-2-7B-PRIME",
     "NovaSky-AI/Sky-T1-32B-Preview": "Sky-T1-32B-Preview",
     "openai/o1-mini": "o1-mini",
-    "openai/o1-preview": "o1-preview",  
+    "openai/o1-preview": "o1-preview",
     "openai/gpt-4o-mini": "gpt-4o-mini",
 }
 

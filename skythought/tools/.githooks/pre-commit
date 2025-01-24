@@ -1,0 +1,5 @@
+# Only run pre-commit if changes are in tools/
+if git diff --cached --name-only | grep "^tools/"; then
+    cd skythought/tools/
+    pre-commit run --files $(git diff --cached --name-only | grep "^tools/")
+fi

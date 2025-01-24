@@ -1,19 +1,23 @@
-import json
 import argparse
-from tqdm import tqdm
-import multiprocessing as mp
-import openai
-from itertools import cycle
-import time
-import os
-from datasets import load_dataset
-import re
 import ast
-from util.prompts import grading_prompt, aops_criteria
+import json
+import multiprocessing as mp
+import os
+import re
+import time
+from itertools import cycle
+
+import openai
+from datasets import load_dataset
+from tqdm import tqdm
+
+from util.prompts import aops_criteria, grading_prompt
+
 
 # Function to set the OpenAI API key
 def set_openai_key(api_key):
     openai.api_key = api_key
+
 
 # From FastChat
 def find_difficulty(judgment):
@@ -27,14 +31,15 @@ def find_difficulty(judgment):
         rating = ast.literal_eval(match.groups()[0])
     else:
         rating = -1
-    
+
     return rating
+
 
 # GPT API processing function with retry logic
 def process_content(problem, api_key):
     # Set the OpenAI key for this request
     set_openai_key(api_key)
-    
+
     # GPT prompt
     prompt = grading_prompt.format(problem=problem, aops_criteria=aops_criteria)
     retries = 3
@@ -44,21 +49,25 @@ def process_content(problem, api_key):
             response = openai.chat.completions.create(
                 model="gpt-4o-mini",
                 messages=[
-                    {"role": "system", "content": "You are a math problem difficulty labeler."},
-                    {"role": "user", "content": prompt}
+                    {
+                        "role": "system",
+                        "content": "You are a math problem difficulty labeler.",
+                    },
+                    {"role": "user", "content": prompt},
                 ],
                 max_tokens=2048,
-                temperature=0.7
+                temperature=0.7,
             )
             return response.choices[0].message.content
         except openai.RateLimitError:
             retries -= 1
             if retries == 0:
                 return "Error: Rate limit reached and retries exhausted."
-            print(f"Sleep for 5 seconds for API limit.")
+            print("Sleep for 5 seconds for API limit.")
             time.sleep(5)
         except Exception as e:
             return f"Error processing content: {e}"
+
 
 def process_entry(entry, api_key_cycle):
     # Get the next API key from the cycle
@@ -73,24 +82,28 @@ def process_entry(entry, api_key_cycle):
     entry["gpt_difficulty_parsed"] = find_difficulty(processed)
     return entry
 
+
 # Wrapper function for multiprocessing
 def process_entry_wrapper(args):
     return process_entry(*args)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Label difficulty")
     parser.add_argument("--source", type=str, help="")
     parser.add_argument("--start", type=int, default=0, help="")
     parser.add_argument("--end", type=int, default=-1, help="")
-    parser.add_argument("--keys", type=str, help="File containing OpenAI API keys (one per line).")
+    parser.add_argument(
+        "--keys", type=str, help="File containing OpenAI API keys (one per line)."
+    )
     args = parser.parse_args()
 
     dataset = load_dataset("AI-MO/NuminaMath-CoT")
     data = (
         dataset["train"]
         .to_pandas()
-        .query('source == @args.source')
-        .iloc[args.start:args.end]
+        .query("source == @args.source")
+        .iloc[args.start : args.end]
     )
 
     data = data.to_dict(orient="records")

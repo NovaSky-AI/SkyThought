@@ -9,7 +9,8 @@ import argparse
 import tempfile
 
 import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
 
 def upload_hub(model_path, hub_repo_id, component, private):
     if component == "all":

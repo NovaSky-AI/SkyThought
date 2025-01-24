@@ -1,5 +1,6 @@
 import json
 import random
+
 from util.prompts import system_prompt
 
 still2_jsonl_file = "../../data/public_long_form_thought_data_5k.jsonl"
@@ -25,14 +26,11 @@ for entry in still2_data:
         # Create the conversation format
         conversations = [
             {"from": "user", "value": question},
-            {"from": "assistant", "value": combined_text}
+            {"from": "assistant", "value": combined_text},
         ]
-        
+
         # Prepare the final structure
-        cur_data = {
-            "system": system_prompt,
-            "conversations": conversations
-        }
+        cur_data = {"system": system_prompt, "conversations": conversations}
         all_data.append(cur_data)
     else:
         code_num += 1
@@ -43,14 +41,19 @@ with open(code_json_file, "r") as f:
 # print(code_data[0])
 
 all_data.extend(code_data)
-print(f"First item slice before shuffle: {all_data[0]['conversations'][-1]['value'][-50:-1]}")
+print(
+    f"First item slice before shuffle: {all_data[0]['conversations'][-1]['value'][-50:-1]}"
+)
 random.shuffle(all_data)
-print(f"First item slice after shuffle: {all_data[0]['conversations'][-1]['value'][-50:-1]}")
+print(
+    f"First item slice after shuffle: {all_data[0]['conversations'][-1]['value'][-50:-1]}"
+)
 print(len(all_data))
 
 # Save the converted data to the output file
 with open(output_file, "w") as f:
     json.dump(all_data, f, indent=4)
 
-print(f"Conversion completed. The data has been saved to {output_file} with {len(all_data)} data.")
-
+print(
+    f"Conversion completed. The data has been saved to {output_file} with {len(all_data)} data."
+)

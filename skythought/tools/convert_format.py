@@ -1,23 +1,28 @@
-import json
 import argparse
-from tqdm import tqdm
+import json
 import multiprocessing as mp
-import openai
-from itertools import cycle
-import time
 import os
+import time
+from itertools import cycle
+
+import openai
+from tqdm import tqdm
+
 from util.prompts import convert_prompt, convert_prompt_example
 
 global args
+
+
 # Function to set the OpenAI API key
 def set_openai_key(api_key):
     openai.api_key = api_key
+
 
 # GPT API processing function with retry logic
 def process_content(content, api_key):
     # Set the OpenAI key for this request
     set_openai_key(api_key)
-    
+
     # GPT prompt
     prompt = convert_prompt.format(example=convert_prompt_example, content=content)
 
@@ -28,44 +33,54 @@ def process_content(content, api_key):
             response = openai.chat.completions.create(
                 model="gpt-4o-mini",
                 messages=[
-                    {"role": "system", "content": "You are a solution format convertor."},
-                    {"role": "user", "content": prompt}
+                    {
+                        "role": "system",
+                        "content": "You are a solution format convertor.",
+                    },
+                    {"role": "user", "content": prompt},
                 ],
                 max_tokens=16384,
-                temperature=0.7
+                temperature=0.7,
             )
             return response.choices[0].message.content
         except openai.RateLimitError:
             retries -= 1
             if retries == 0:
                 return "Error: Rate limit reached and retries exhausted."
-            print(f"Sleep for 5 seconds for API limit.")
+            print("Sleep for 5 seconds for API limit.")
             time.sleep(5)
         except Exception as e:
             return f"Error processing content: {e}"
+
 
 # Function for multiprocessing
 def process_entry(entry, api_key_cycle):
     key, values = entry
     content = values["responses"]["0.7"]["content"]
-    
+
     # Get the next API key from the cycle
     api_key = next(api_key_cycle)
-    
+
     processed = process_content(content, api_key)
     values["responses"]["0.7"]["processed_content"] = processed
-    
+
     return key, values
+
 
 # Wrapper function for multiprocessing
 def process_entry_wrapper(args):
     return process_entry(*args)
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Process content and save results.")
-    parser.add_argument("--input_dir", type=str, help="Input directory containing JSON files.")
-    parser.add_argument("--keys", type=str, help="File containing OpenAI API keys (one per line).")
-    
+    parser.add_argument(
+        "--input_dir", type=str, help="Input directory containing JSON files."
+    )
+    parser.add_argument(
+        "--keys", type=str, help="File containing OpenAI API keys (one per line)."
+    )
+
     global args
     args = parser.parse_args()
 
@@ -90,7 +105,9 @@ if __name__ == "__main__":
             results = []
             with mp.Pool(os.cpu_count()) as pool:
                 tasks = [(entry, api_key_cycle) for entry in data.items()]
-                for result in tqdm(pool.imap(process_entry_wrapper, tasks), total=len(data)):
+                for result in tqdm(
+                    pool.imap(process_entry_wrapper, tasks), total=len(data)
+                ):
                     results.append(result)
 
             # Aggregate and write results in the main process

@@ -3,15 +3,15 @@ The logic in this file largely borrows from Qwen2.5-Math codebase at https://git
 """
 
 import re
-import regex
-from word2number import w2n
 from math import isclose
-from collections import defaultdict
 
-from sympy import simplify, N
-from sympy.parsing.sympy_parser import parse_expr
-from sympy.parsing.latex import parse_latex
+import regex
 from latex2sympy2 import latex2sympy
+from sympy import N, simplify
+from sympy.parsing.latex import parse_latex
+from sympy.parsing.sympy_parser import parse_expr
+from word2number import w2n
+
 
 def convert_word_number(text: str) -> str:
     try:
@@ -19,6 +19,7 @@ def convert_word_number(text: str) -> str:
     except:
         pass
     return text
+
 
 def _fix_fracs(string):
     substrs = string.split("\\frac")
@@ -73,6 +74,7 @@ def _fix_sqrt(string):
     _string = re.sub(r"\\sqrt(\w+)", r"\\sqrt{\1}", string)
     return _string
 
+
 def strip_answer_string(string):
     string = str(string).strip()
     # linebreaks
@@ -111,9 +113,10 @@ def strip_answer_string(string):
     def replace_match(match):
         word = match.group(1).lower()
         if convert_word_number(word) == word:
-          return match.group(0)
+            return match.group(0)
         else:
-          return convert_word_number(word)
+            return convert_word_number(word)
+
     string = re.sub(r"\\text\{([a-zA-Z]+)\}", replace_match, string)
 
     # Before removing unit, check if the unit is squared (for surface area)
@@ -223,17 +226,18 @@ def strip_answer_string(string):
     if re.fullmatch(r"(\s*-?\d+\s*,)*\s*-?\d+\s*", string):
         # Split the string into a list of integers
         try:
-            integer_list = list(map(int, string.split(',')))
+            integer_list = list(map(int, string.split(",")))
         except:
-            integer_list = list(map(int, "-1,-1".split(',')))
+            integer_list = list(map(int, "-1,-1".split(",")))
 
         # Sort the list in ascending order
         sorted_list = sorted(integer_list)
 
         # Join the sorted list back into a comma-separated string
-        string = ','.join(map(str, sorted_list))
+        string = ",".join(map(str, sorted_list))
 
     return string
+
 
 def extract_answer(pred_str, use_last_number=True):
     pred_str = pred_str.replace("\u043a\u0438", "")
@@ -292,6 +296,7 @@ def extract_answer(pred_str, use_last_number=True):
     pred = strip_answer_string(pred)
     return pred
 
+
 def get_multiple_choice_answer(pred: str):
     tmp = re.findall(r"\b(A|B|C|D)\b", pred.upper())
     if tmp:
@@ -302,12 +307,13 @@ def get_multiple_choice_answer(pred: str):
     if len(pred) == 0:
         pred = ""
     else:
-      pred = pred[-1]
+        pred = pred[-1]
 
     # Remove the period at the end, again!
     pred = pred.rstrip(".").rstrip("/")
 
     return pred
+
 
 def mmlu_pro_extract_answer(text):
     pattern = r"answer is \(?([A-J])\)?"
@@ -316,7 +322,7 @@ def mmlu_pro_extract_answer(text):
         return match.group(1)
     else:
         # print("1st answer extract failed\n" + text)
-        match = re.search(r'.*[aA]nswer:\s*([A-J])', text)
+        match = re.search(r".*[aA]nswer:\s*([A-J])", text)
         if match:
             return match.group(1)
         else:
@@ -325,6 +331,7 @@ def mmlu_pro_extract_answer(text):
             match = re.search(pattern, text, re.DOTALL)
             if match:
                 return match.group(0)
+
 
 def choice_answer_clean(pred: str):
     pred = pred.strip("\n").rstrip(".").rstrip("/").strip(" ").lstrip(":")
@@ -427,7 +434,7 @@ def math_equal(
     prediction = str(prediction).strip()
 
     ## pmatrix (amps)
-    if "pmatrix" in prediction and not "pmatrix" in reference:
+    if "pmatrix" in prediction and "pmatrix" not in reference:
         reference = str_to_pmatrix(reference)
 
     ## deal with [], (), {}

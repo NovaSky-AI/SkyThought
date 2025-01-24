@@ -56,7 +56,8 @@ convert_prompt = "Another solution is written in an unstructured way. Your job i
     Make sure you include: <|begin_of_slow_thought|>, <|end_of_slow_thought|>,  <|begin_of_solution|>,<|end_of_solution|>  These four headers explicitly.  \
     Content to be converted: {content}"
 
-convert_prompt_example = ("<|begin_of_thought|>\n\n"
+convert_prompt_example = (
+    "<|begin_of_thought|>\n\n"
     "Okay, so I've got this problem here. Mr. Wang leaves home at 6 AM, riding his bike at 12 km/h, "
     "and he stops to rest for 6 minutes after every 30 minutes of riding. Then, when he arrives at a park "
     "that's 16.8 km away, I need to find out the angle between the hour and minute hands on his watch.\n\n"
@@ -106,7 +107,8 @@ convert_prompt_example = ("<|begin_of_thought|>\n\n"
     "$$\\text{Angle} = |30H - 5.5M|$$\n\n"
     "  - At 7:36, $H = 7$ and $M = 36$:\n\n"
     "$$\\text{Angle} = |30 \\times 7 - 5.5 \\times 36| = |210 - 198| = 12 \\text{ degrees}$$\n\n"
-    "Thus, the angle between the hour and minute hands on his watch is $\\boxed{12}$.<|end_of_solution|>\n")
+    "Thus, the angle between the hour and minute hands on his watch is $\\boxed{12}$.<|end_of_solution|>\n"
+)
 
 # From https://arxiv.org/pdf/2412.09413
 system_prompt = "Your role as an assistant involves thoroughly exploring questions through a systematic long \
@@ -127,4 +129,4 @@ conclusion, formatted as follows: \
 <|begin_of_solution|> \
 {final formatted, precise, and clear solution} \
 <|end_of_solution|> \
-Now, try to solve the following question through the above guidelines:" 
+Now, try to solve the following question through the above guidelines:"

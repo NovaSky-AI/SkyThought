@@ -1,26 +1,23 @@
-
-from typing import Optional, Callable, Dict
-import ast
-import copy
+import base64
+import builtins
 import contextlib
+import copy
 import faulthandler
 import io
-from io import StringIO
-import os
-import multiprocessing
-import platform
-import signal
-import tempfile
 import json
-import sys
-import builtins
-import shutil
-import subprocess
-import time
-import base64
-import zlib
+import multiprocessing
+import os
 import pickle
-import scipy.stats as stats
+import shutil
+import signal
+import subprocess
+import sys
+import tempfile
+import time
+import zlib
+from io import StringIO
+from typing import Optional
+
 
 def post_process_code(code):
     code = code.split("</code>")[0]
@@ -29,11 +26,12 @@ def post_process_code(code):
     code = code.replace("<code>", "")
     # print(f"postprocessed code: {code}")
     return code
-    
+
+
 def post_process_tests_inputs(raw_text, is_stdin):
     # raw_text = raw_text.strip().strip("```json").strip("```").strip() # raw_text.strip()
     # print(raw_text)
-    if is_stdin: 
+    if is_stdin:
         blocks = raw_text.split("Input:")
 
         formatted_tests = []
@@ -55,7 +53,7 @@ def post_process_tests_inputs(raw_text, is_stdin):
                         "testtype": "stdin",
                     }
                 )
-        return formatted_tests 
+        return formatted_tests
     else:
         # Step 1: Clean the input string by removing surrounding markdown syntax and extra spaces
         cleaned_string = raw_text.strip().strip("```json").strip("```").strip()
@@ -102,6 +100,7 @@ def post_process_tests_inputs(raw_text, is_stdin):
                     continue
 
             return test_cases
+
 
 def prepare_test_input_output_functional(test_case, is_extracted):
     if not is_extracted:
@@ -177,6 +176,7 @@ def prepare_test_input_output_functional(test_case, is_extracted):
             expected_output = expected_output.strip()
         return inputs, expected_output
 
+
 def prepare_test_input_output_std(test_case):
     test_input = test_case["input"]
     test_output = test_case["output"].strip()
@@ -185,6 +185,7 @@ def prepare_test_input_output_std(test_case):
             : test_output.rfind("-")
         ].rstrip()  # Remove '-' if present and trailing
     return test_input, test_output
+
 
 def run_test_func(completion, is_extracted, test_input, test_output):
     # print(f"inside: {completion}")
@@ -261,6 +262,7 @@ def run_test_func(completion, is_extracted, test_input, test_output):
 
         return True, result_output
 
+
 def run_test_std(completion, test_input, test_output):
     sys.stdin = StringIO(test_input)
 
@@ -269,30 +271,39 @@ def run_test_std(completion, test_input, test_output):
 
     if '__name__ == "__main__"' in completion:
         # Simulate that the code is being run as the main script
-        completion = f'__name__ = "__main__"\n' + completion
-    
+        completion = '__name__ = "__main__"\n' + completion
+
     namespace = {}
     exec(completion, namespace)
 
     output_value = output.getvalue().strip()
     return output_value == test_output, output_value
 
+
 def unsafe_lcb_runTests(problem, completion, timeout, runtime_debug, is_extracted):
     test_cases = problem["test"]
     manager = multiprocessing.Manager()
     result = manager.list()
-    p = multiprocessing.Process(target=run_tests_for_one_example, args=(test_cases, completion, result, runtime_debug, is_extracted))
+    p = multiprocessing.Process(
+        target=run_tests_for_one_example,
+        args=(test_cases, completion, result, runtime_debug, is_extracted),
+    )
     p.start()
-    p.join(timeout = (timeout+1) * len(test_cases) + 5) # TODO Alex: Check whether number of task cases is correct
+    p.join(
+        timeout=(timeout + 1) * len(test_cases) + 5
+    )  # TODO Alex: Check whether number of task cases is correct
     if p.is_alive():
         p.kill()
-    
+
     # if len(result) < len(test_cases): ## This is supposed to be the case where not all test passed in the given timeout
     for i in range(len(test_cases) - len(result)):
-        result.append((False, f"Time out!.", "Error: Time out!", float("inf")))            
+        result.append((False, "Time out!.", "Error: Time out!", float("inf")))
     return result
 
-def run_tests_for_one_example(test_cases, completion, result_list, runtime_debug, is_extracted):
+
+def run_tests_for_one_example(
+    test_cases, completion, result_list, runtime_debug, is_extracted
+):
     time_elapsed = float("inf")
     test_type = test_cases[0]["testtype"]
     reliability_guard()
@@ -302,13 +313,20 @@ def run_tests_for_one_example(test_cases, completion, result_list, runtime_debug
         try:
             time_start = time.time()
             if test_type == "functional":
-                test_input, test_output = prepare_test_input_output_functional(test_case, is_extracted)
+                test_input, test_output = prepare_test_input_output_functional(
+                    test_case, is_extracted
+                )
                 passed, output_value = run_test_func(
-                    completion, is_extracted, copy.deepcopy(test_input), copy.deepcopy(test_output)
+                    completion,
+                    is_extracted,
+                    copy.deepcopy(test_input),
+                    copy.deepcopy(test_output),
                 )
             else:
                 test_input, test_output = prepare_test_input_output_std(test_case)
-                passed, output_value = run_test_std(completion, copy.deepcopy(test_input), copy.deepcopy(test_output))
+                passed, output_value = run_test_std(
+                    completion, copy.deepcopy(test_input), copy.deepcopy(test_output)
+                )
             # print(test_input, test_output, output_value)
             if not passed:
                 output_error = f"For test input: {test_input}. Expected output is: {test_output}, but got: {output_value}."
@@ -322,10 +340,11 @@ def run_tests_for_one_example(test_cases, completion, result_list, runtime_debug
             output_value = f"Error: {e}."
         if output_error == "":
             output_error = f"For test input: {test_input}. Expected output is: {test_output}, your solution correctly passes this test with output {output_value}."
-        
+
         result_list.append((passed, output_error, output_value, time_elapsed))
         if not passed:
             return
+
 
 @contextlib.contextmanager
 def time_limit(seconds: float):
@@ -338,6 +357,7 @@ def time_limit(seconds: float):
         yield
     finally:
         signal.setitimer(signal.ITIMER_REAL, 0)
+
 
 @contextlib.contextmanager
 def swallow_io(redirect_input=True):
@@ -354,14 +374,17 @@ def swallow_io(redirect_input=True):
         else:
             yield stream  # Do not redirect stdin
 
+
 @contextlib.contextmanager
 def create_tempdir():
     with tempfile.TemporaryDirectory() as dirname:
         with chdir(dirname):
             yield dirname
 
+
 class TimeoutException(Exception):
     pass
+
 
 class WriteOnlyStringIO(io.StringIO):
     """StringIO that throws an exception when it's read from"""
@@ -379,8 +402,10 @@ class WriteOnlyStringIO(io.StringIO):
         """Returns True if the IO object can be read."""
         return False
 
+
 class redirect_stdin(contextlib._RedirectStream):  # type: ignore
     _stream = "stdin"
+
 
 @contextlib.contextmanager
 def chdir(root):
@@ -539,7 +564,8 @@ def restore_original_references():
     for module_name, original_module in originals["sys_modules"].items():
         if original_module is not None:
             sys.modules[module_name] = original_module
-    
+
+
 def has_test_type(tests, type):  ## helper to select specific type of problems
     """
     Check if any test in the test list has 'testtype' set to 'type'.
@@ -550,11 +576,13 @@ def has_test_type(tests, type):  ## helper to select specific type of problems
             return True
     return False
 
+
 def translate_private_test_cases(encoded_data):
     decoded_data = base64.b64decode(encoded_data)
     decompressed_data = zlib.decompress(decoded_data)
     original_data = pickle.loads(decompressed_data)
     return json.loads(original_data)
+
 
 """
 def update_dataset_in_place(
@@ -574,6 +602,7 @@ def update_dataset_in_place(
         # break
 """
 
+
 def map_to_example(row):
     return {
         "prompt": row["question_content"],
@@ -583,5 +612,5 @@ def map_to_example(row):
         "task_id": row["question_id"],
         "is_stdin": has_test_type(row["public_test_cases"], "stdin"),
         "public_test_cases": row["public_test_cases"],
-        "difficulty": row["difficulty"]
+        "difficulty": row["difficulty"],
     }
