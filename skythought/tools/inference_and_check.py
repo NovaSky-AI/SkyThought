@@ -10,8 +10,8 @@ from openai import OpenAI
 from tqdm import tqdm
 from vllm import LLM, SamplingParams
 
+from tasks import TASK_HANDLERS, NUMINATaskHandler, TaskHandler
 from util.model_utils import MODEL_TO_NAME, SYSTEM_PROMPT
-from util.task_handlers import TASK_HANDLERS, NUMINATaskHandler, TaskHandler
 
 
 class NumpyEncoder(json.JSONEncoder):
