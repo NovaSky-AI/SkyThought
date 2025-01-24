@@ -1,37 +1,29 @@
 import re
 from typing import Any, Dict
 
-from datasets import load_dataset
-
 from tasks.common import TaskHandler
 from util.math_parsing_util import extract_answer
 
 
 class ARCChallengeTaskHandler(TaskHandler):
-    def __init__(self) -> None:
-        super().__init__()
-        self.dataset = "allenai/ai2_arc"
+    def __init__(self, yaml_file_path) -> None:
+        super().__init__(yaml_file_path)
         self.ans_re = re.compile(r"[Tt]he best answer is ([A-D])[\.\,]*", re.IGNORECASE)
         self.letter_re = re.compile(r"([A-D])[\.\,]*")
         self.canonical_options = ["A", "B", "C", "D"]
         self.invalid_ans = "[invalid]"
 
-    @staticmethod
-    def get_question_key():
-        return "question"
-
     def generate_prompt(self, problem):
-        question = problem["question"]
         choices = problem["choices"]
         choices_text = "\n".join(
             [
                 f"{label}.{choice}"
-                for label, choice in zip(["A", "B", "C", "D"], choices["text"])
+                for label, choice in zip(self.canonical_options, choices["text"])
             ]
         )
-        full_prompt = (
-            'Given the following question and four candidate answers (A, B, C and D), choose the best answer. Your response should end with "The best answer is [the_answer_letter]" where [the_answer_letter] is one of the four letter choice (A, B, C, or D).\n'
-            + f"{question}\n{choices_text}"
+        problem["choices_text"] = choices_text
+        full_prompt = self.task_config.templating_parameters["template"].format(
+            **problem
         )
         return full_prompt
 
@@ -74,17 +66,16 @@ class ARCChallengeTaskHandler(TaskHandler):
         return conversations
 
     def load_and_filter_dataset(
-        self, start, end, split="train", source=None, filter_difficulty=False, args=None
+        self, start, end, split=None, source=None, filter_difficulty=False, args=None
     ):
-        dataset = load_dataset(self.dataset, "ARC-Challenge")
-        train_data = dataset[split].to_pandas()
+        train_data = self.load_dataset(source=source, split=split)
         return train_data.iloc[start:end] if end > 0 else train_data.iloc[start:]
 
     def process_remaining_data(self, train_data, results):
         return [
             row.to_dict()
             for _, row in train_data.iterrows()
-            if str(row["question"]) not in results
+            if str(row[self.question_key]) not in results
         ]
 
     def get_answer(self, completion):

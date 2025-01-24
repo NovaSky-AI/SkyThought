@@ -6,15 +6,8 @@ from ..common import TaskHandler
 
 
 class MMLUTaskHandler(TaskHandler):
-    def __init__(self):
-        self.dataset = "cais/mmlu"
-
     def generate_prompt(self, prompt):
-        return "Return your final response within \\boxed{{}}. " + prompt
-
-    @staticmethod
-    def get_question_key():
-        return "question"
+        return self.task_config.templating_parameters["template"].format(prompt=prompt)
 
     def check_correctness(self, problem, generation):
         pred = get_multiple_choice_answer(generation)
@@ -78,9 +71,8 @@ class MMLUTaskHandler(TaskHandler):
 
 
 class MMLUProTaskHandler(MMLUTaskHandler):
-    def __init__(self):
-        super().__init__()
-        self.dataset = "TIGER-Lab/MMLU-Pro"
+    def __init__(self, yaml_file_path):
+        super().__init__(yaml_file_path)
         self.choices = [
             "A",
             "B",
@@ -100,13 +92,8 @@ class MMLUProTaskHandler(MMLUTaskHandler):
             "P",
         ]
 
-    @staticmethod
-    def generate_prompt(prompt):
-        return "Return your final response within \\boxed{{}}. " + prompt
-
-    @staticmethod
-    def get_question_key():
-        return "question"
+    def generate_prompt(self, prompt):
+        return self.task_config.templating_parameters["template"].format(prompt=prompt)
 
     def check_correctness(self, problem, generation):
         pred = mmlu_pro_extract_answer(generation)
@@ -123,6 +110,5 @@ class MMLUProTaskHandler(MMLUTaskHandler):
     def load_and_filter_dataset(
         self, start, end, split="test", source=None, filter_difficulty=False, args=None
     ):
-        dataset = load_dataset(self.dataset, "default")
-        train_data = dataset[split].to_pandas()
-        return train_data.iloc[start:end] if end > 0 else train_data.iloc[start:]
+        dataset = self.load_dataset(source=source, split=split)
+        return dataset.iloc[start:end] if end > 0 else dataset.iloc[start:]

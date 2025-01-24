@@ -1,0 +1,7 @@
+
+dataset_source: AI-MO/aimo-validation-aime
+dataset_split: train
+question_key: problem
+templating_parameters:
+  regular_template:  "Return your final response within \\boxed{{}}. {prompt}"
+  sky_template: "{prompt}\nReturn your final response within \\boxed{{}}" 

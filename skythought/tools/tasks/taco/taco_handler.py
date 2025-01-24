@@ -3,31 +3,41 @@ import multiprocessing
 from multiprocessing import Manager
 
 import numpy as np
-from datasets import load_dataset
 
 from tasks.taco.taco_util import run_test as taco_run_test
 from util.common import has_code
 
-from ..common import TaskHandler
+from ..common import TaskConfig, TaskHandler
+
+
+class TACOTaskConfig(TaskConfig):
+    difficulty: str = None  # use all by default
 
 
 class TACOTaskHandler(TaskHandler):
-    @staticmethod
-    def get_question_key():
-        return "question"
+    task_config_cls = TACOTaskConfig
 
     def generate_prompt(self, prompt, starter_code=None, fn_name=None):
-        _input = "\nQUESTION:\n"
-        _input += prompt
+        _input = self.task_config.templating_parameters["initial_template"].format(
+            prompt=prompt
+        )
+
         if starter_code:
-            _input += starter_code
-        if (not fn_name) and (not starter_code):
-            call_format = "\nUse Standard Input format"
-            _input += call_format
+            _input = self.task_config.templating_parameters[
+                "starter_code_template"
+            ].format(input=_input, starter_code=starter_code)
         else:
-            call_format = "\nUse Call-Based format"
-            _input += call_format
-        _input += "\nANSWER:\n"
+            _input = self.task_config.templating_parameters["initial_template"].format(
+                prompt=prompt
+            )
+        if (not fn_name) and (not starter_code):
+            _input = self.task_config.templating_parameters["stdin_template"].format(
+                input=_input
+            )
+        else:
+            _input = self.task_config.templating_parameters["call_template"].format(
+                input=_input
+            )
 
         return _input
 
@@ -105,15 +115,14 @@ class TACOTaskHandler(TaskHandler):
     def load_and_filter_dataset(
         self, start, end, split="train", source=None, filter_difficulty=False, args=None
     ):
-        dataset = load_dataset("BAAI/TACO", "ALL", trust_remote_code=True)
-        train_data = dataset[split].to_pandas()
-        if not filter_difficulty:
-            return train_data.iloc[start:end] if end > 0 else train_data.iloc[start:]
-        return (
-            train_data.query("difficulty == @source").iloc[start:end]
-            if end > 0
-            else train_data.query("difficulty == @source").iloc[start:]
-        )
+        dataset = self.load_dataset(source=source, split=split)
+        if filter_difficulty or self.task_config.difficulty:
+            difficulty = source if filter_difficulty else self.task_config.difficulty
+            dataset = dataset.filter(
+                lambda example: example["difficulty"] == difficulty
+            )
+
+        return dataset.iloc[start:end] if end > 0 else dataset.iloc[start:]
 
     def process_remaining_data(self, train_data, results):
         return [

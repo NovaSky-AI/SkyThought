@@ -1,0 +1,11 @@
+dataset_name: "livecodebench/code_generation_lite"  # repo ID in huggingface
+dataset_source: null 
+dataset_split: test
+dataset_kwargs:
+  version_tag: release_v2
+  trust_remote_code: true
+question_key: task_id
+templating_parameters: 
+  stdin_template: "Generate an executable Python function generated from the given prompt. The function should take stdin as input and print the output. Simply call the function after the definition. {prompt}"
+  non_stdin_template: "Generate an executable Python function generated from the given prompt. Return the function body without invoking it at the final solution. {prompt}"
+difficulty: null # use all by default

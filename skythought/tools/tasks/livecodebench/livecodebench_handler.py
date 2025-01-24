@@ -1,9 +1,7 @@
 import copy
 from typing import Dict
 
-from datasets import load_dataset
-
-from tasks.common import TaskHandler
+from tasks.common import TaskConfig, TaskHandler
 from tasks.livecodebench.livecodebench_util import (
     map_to_example,
     post_process_code,
@@ -13,24 +11,22 @@ from tasks.livecodebench.livecodebench_util import (
 from util.common import has_code
 
 
+class LiveCodeBenchTaskConfig(TaskConfig):
+    difficulty: str = None  # use all by default
+
+
 class LiveCodeBenchTaskHandler(TaskHandler):
+    task_config_cls = LiveCodeBenchTaskConfig
+
     def generate_prompt(self, problem):
-        # print(problem)
-        prompt = problem["prompt"]
         if problem["is_stdin"]:
-            return (
-                "Generate an executable Python function generated from the given prompt. The function should take stdin as input and print the output. Simply call the function after the definition."
-                + prompt
+            return self.task_config.templating_parameters["stdin_template"].format(
+                **problem
             )
         else:
-            return (
-                "Generate an executable Python function generated from the given prompt. Return the function body without invoking it at the final solution."
-                + prompt
+            return self.task_config.templating_parameters["non_stdin_template"].format(
+                **problem
             )
-
-    @staticmethod
-    def get_question_key():
-        return "task_id"
 
     def check_correctness(
         self,
@@ -105,26 +101,26 @@ class LiveCodeBenchTaskHandler(TaskHandler):
         return conversations
 
     def load_and_filter_dataset(
-        self, start, end, split="test", source=None, filter_difficulty=False, args=None
+        self, start, end, split=None, source=None, filter_difficulty=False, args=None
     ):
-        dataset = load_dataset(
-            "livecodebench/code_generation_lite",
-            version_tag="release_v2",
-            split=split,
-            trust_remote_code=True,
-        )
-        if filter_difficulty:
-            dataset = dataset.filter(lambda example: example["difficulty"] == source)
+        dataset = self.load_dataset(source=source, split=split)
+        # Filter by CLI or config
+        if filter_difficulty or self.task_config.difficulty:
+            difficulty = source if filter_difficulty else self.task_config.difficulty
+            dataset = dataset.filter(
+                lambda example: example["difficulty"] == difficulty
+            )
         dataset = dataset.map(
             lambda example: {
                 "private_test_cases": translate_private_test_cases(
                     example["private_test_cases"]
                 )
-            }
+            },
+            writer_batch_size=100,
         )
         # Apply the mapping function
         dataset = dataset.map(
-            map_to_example, remove_columns=dataset.column_names
+            map_to_example, remove_columns=dataset.column_names, writer_batch_size=100
         ).to_pandas()
         return dataset.iloc[start:end] if end > 0 else dataset.iloc[start:]
 
@@ -132,5 +128,5 @@ class LiveCodeBenchTaskHandler(TaskHandler):
         return [
             row.to_dict()
             for _, row in train_data.iterrows()
-            if str(row["task_id"]) not in results
+            if str(row[self.question_key]) not in results
         ]

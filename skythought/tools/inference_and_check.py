@@ -124,7 +124,7 @@ def perform_inference_and_check(
                 total_correct += response_entry["correctness"]
                 total_finish += 1
 
-                problem_key = remaining_data[idx][handler.get_question_key()]
+                problem_key = remaining_data[idx][handler.question_key]
                 if problem_key not in results:
                     results[problem_key] = remaining_data[idx]
                     if isinstance(handler, NUMINATaskHandler):
@@ -211,7 +211,7 @@ def perform_check(handler: TaskHandler, temperatures, result_file, args):
 
     tasks = []
     for item in remaining_data:
-        problem_key = item[handler.get_question_key()]
+        problem_key = item[handler.question_key]
         # If this item exists in the results file, check each temperature
         if problem_key in results and "responses" in results[problem_key]:
             for temp in temperatures:
@@ -359,7 +359,7 @@ def perform_inference_and_save(
             completion_tokens.append(completion_token)
 
             problem_key = remaining_data[idx][
-                handler.get_question_key()
+                handler.question_key
             ]  # can you use this idx
             if problem_key not in results:
                 results[problem_key] = remaining_data[idx]

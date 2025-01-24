@@ -1,0 +1,10 @@
+dataset_name: codeparrot/apps
+dataset_kwargs:
+  trust_remote_code: true
+dataset_split: train
+question_key: question
+difficulty: null
+templating_parameters:
+  with_fn_name_instruction: "Generate an executable Python function generated from the given prompt. The function should take stdin as input and print the output. Simply call the function after the definition." 
+  without_fn_name_instruction: "Generate an executable Python function generated from the given prompt. Return the function body without invoking it at the final solution."
+  with_starter_code_template: "{input}\n{starter_code}"

@@ -1,0 +1,6 @@
+dataset_name: "AI-MO/NuminaMath-CoT"
+dataset_source: default
+dataset_split: train
+question_key: problem
+templating_parameters:
+  template: "Return your final response within \\boxed{{}}. {prompt}"

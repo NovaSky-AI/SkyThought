@@ -1,28 +1,15 @@
-import copy
-import json
-import multiprocessing
-import os
 import random
-import re
-import numpy as np
-from datasets import load_dataset
-from typing import Dict, Any
-from multiprocessing import Manager
-from util.model_utils import SYSTEM_PROMPT, MODEL_TO_NAME
+
 from tasks.common import TaskHandler
-from util.math_parsing_util import get_multiple_choice_answer, extract_answer, math_equal, mmlu_pro_extract_answer
+from util.math_parsing_util import get_multiple_choice_answer
+
 
 class GPQADiamondTaskHandler(TaskHandler):
     def __init__(self):
         self.dataset = "Idavidrein/gpqa"
 
-    @staticmethod
-    def generate_prompt(prompt):
-        return "Return your final response within \\boxed{{}} and only include the letter choice (A, B, C, or D) as your final response. " + prompt
-
-    @staticmethod
-    def get_question_key():
-        return "Question"
+    def generate_prompt(self, problem):
+        return self.task_config.templating_parameters["template"].format(**problem)
 
     def update_results(self, problem, response):
         if not isinstance(response, str):
@@ -40,51 +27,70 @@ class GPQADiamondTaskHandler(TaskHandler):
         else:
             response_entry["correctness"] = False
             response_entry["reason"] = "Solution is incorrect."
-    
+
         return response_entry
-    
+
     def check_correctness(self, problem, generation):
         pred = get_multiple_choice_answer(generation)
         answer = problem["Answer"]
         return answer == pred
-    
+
     def get_multiple_choice_answers(self, data):
         answers = [
             data["Correct Answer"],
             data["Incorrect Answer 1"],
             data["Incorrect Answer 2"],
-            data["Incorrect Answer 3"]
+            data["Incorrect Answer 3"],
         ]
         random.shuffle(answers)
 
         # Map options to letters
         options = ["A", "B", "C", "D"]
-        options_to_answers = {letter: answer for letter, answer in zip(options, answers)}
+        options_to_answers = {
+            letter: answer for letter, answer in zip(options, answers)
+        }
 
         # Format the options into the string
-        multiple_choice_string = ", ".join(f"{letter}) {options_to_answers[letter]}" for letter in options)
+        multiple_choice_string = ", ".join(
+            f"{letter}) {options_to_answers[letter]}" for letter in options
+        )
 
         # Save the letter corresponding to the correct answer
-        correct_answer_letter = next(letter for letter, answer in options_to_answers.items() if answer == data["Correct Answer"])
+        correct_answer_letter = next(
+            letter
+            for letter, answer in options_to_answers.items()
+            if answer == data["Correct Answer"]
+        )
 
         return multiple_choice_string, correct_answer_letter
-    
+
     def make_conversations(self, data, system_prompt, model=None):
         conversations = []
         for problem in data:
-            multiple_choice_string, correct_answer_letter = self.get_multiple_choice_answers(problem)
+            (
+                multiple_choice_string,
+                correct_answer_letter,
+            ) = self.get_multiple_choice_answers(problem)
             problem["Answer"] = correct_answer_letter
-            prompt_text = self.generate_prompt(problem["Question"] + "\n" + multiple_choice_string)
-            conversations.append([
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": prompt_text}
-            ])
+            problem["prompt"] = problem["Question"] + "\n" + multiple_choice_string
+            prompt_text = self.generate_prompt(problem)
+            conversations.append(
+                [
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": prompt_text},
+                ]
+            )
         return conversations
 
-    def load_and_filter_dataset(self, start, end, split="train", source=None, filter_difficulty=False, args=None):
-        dataset = load_dataset(self.dataset, "gpqa_diamond")
-        train_data = dataset[split].to_pandas()
+    def load_and_filter_dataset(
+        self, start, end, split=None, source=None, filter_difficulty=False, args=None
+    ):
+        train_data = self.load_dataset(source=source, split=split)
         return train_data.iloc[start:end] if end > 0 else train_data.iloc[start:]
 
     def process_remaining_data(self, train_data, results):
-        return [row.to_dict() for _, row in train_data.iterrows() if str(row["Question"]) not in results]
+        return [
+            row.to_dict()
+            for _, row in train_data.iterrows()
+            if str(row["Question"]) not in results
+        ]

@@ -4,7 +4,6 @@ import multiprocessing
 from multiprocessing import Manager
 
 import numpy as np
-from datasets import load_dataset
 
 from tasks.apps.apps_util import run_test as apps_run_test
 from util.common import has_code
@@ -13,27 +12,20 @@ from ..common import TaskHandler
 
 
 class APPSTaskHandler(TaskHandler):
-    @staticmethod
-    def get_question_key():
-        return "question"
-
     def generate_prompt(self, test_case, prompt, starter_code=None):
-        _input = ""
-        data = test_case
-        if not data.get("fn_name"):
-            _input += "Generate an executable Python function generated from the given prompt. The function should take stdin as input and print the output. Simply call the function after the definition."  # "\nUse Standard Input format"#\n"
+        if not test_case.get("fn_name"):
+            _input = self.task_config.templating_parameters[
+                "with_fn_name_instruction"
+            ]  # "\nUse Standard Input format"#\n"
         else:
-            _input += "Generate an executable Python function generated from the given prompt. Return the function body without invoking it at the final solution."  # "\nUse Call-Based format"#\n"
-        data = prompt
-        _input += data
+            _input = self.task_config.templating_parameters[
+                "without_fn_name_instruction"
+            ]  # "\nUse Call-Based format"#\n"
+        _input += prompt
         if starter_code is not None:
-            data = starter_code
-            data = "\n" + data  # + "\n"
-            _input += data
-        else:
-            # _input += "\n\n"
-            pass
-
+            _input = self.task_config.templating_parameters[
+                "with_starter_code_template"
+            ].format(input=_input, starter_code=starter_code)
         return _input
 
     def check_correctness(self, problem, generation):
@@ -107,21 +99,20 @@ class APPSTaskHandler(TaskHandler):
         return conversations
 
     def load_and_filter_dataset(
-        self, start, end, split="train", source=None, filter_difficulty=False, args=None
+        self, start, end, split=None, source=None, filter_difficulty=False, args=None
     ):
-        dataset = load_dataset("codeparrot/apps", trust_remote_code=True)
-        train_data = dataset[split].to_pandas()
-        if not filter_difficulty:
-            return train_data.iloc[start:end] if end > 0 else train_data.iloc[start:]
-        return (
-            train_data.query("difficulty == @source").iloc[start:end]
-            if end > 0
-            else train_data.query("difficulty == @source").iloc[start:]
-        )
+        train_data = self.load_dataset(source=source, split=split)
+        if filter_difficulty or self.task_config.difficulty:
+            difficulty = (
+                self.task_config.difficulty if not filter_difficulty else source
+            )
+            train_data = train_data.filter(lambda x: x["difficulty"] == difficulty)
+
+        return train_data.iloc[start:end] if end > 0 else train_data.iloc[start:]
 
     def process_remaining_data(self, train_data, results):
         return [
             row.to_dict()
             for _, row in train_data.iterrows()
-            if str(row["question"]) not in results
+            if str(row[self.question_key]) not in results
         ]

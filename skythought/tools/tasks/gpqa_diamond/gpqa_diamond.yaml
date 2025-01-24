@@ -1,0 +1,7 @@
+dataset_name: Idavidrein/gpqa
+dataset_source: gpqa_diamond
+dataset_split: train
+question_key: Question
+templating_parameters:
+  # For GPQA, we combine the Question key and the multiple choice answers into a single `prompt` entry
+  template:  "Return your final response within \\boxed{{}} and only include the letter choice (A, B, C, or D) as your final response. {prompt}" 

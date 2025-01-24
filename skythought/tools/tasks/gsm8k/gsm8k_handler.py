@@ -1,8 +1,6 @@
 import re
 from typing import Any, Dict
 
-from datasets import load_dataset
-
 from tasks.common import TaskHandler
 from util.math_parsing_util import extract_answer
 
@@ -15,14 +13,8 @@ class GSM8KTaskHandler(TaskHandler):
         self.gt_re = re.compile(r"#### (\-?[0-9\.\,]+)")
         self.invalid_ans = "[invalid]"
 
-    @staticmethod
-    def get_question_key():
-        return "question"
-
     def generate_prompt(self, problem):
-        question = problem["question"]
-        full_prompt = f'Given the following problem, reason and give a final answer to the problem.\nProblem: {question}\nYour response should end with "The final answer is [answer]" where [answer] is the response to the problem.'
-        return full_prompt
+        return self.task_config.templating_parameters["template"].format(**problem)
 
     def check_correctness(self, problem: Dict[str, Any], generation: str) -> bool:
         gt_answer = self.extract_gt_answer(problem["answer"])
@@ -62,10 +54,9 @@ class GSM8KTaskHandler(TaskHandler):
         return conversations
 
     def load_and_filter_dataset(
-        self, start, end, split="train", source=None, filter_difficulty=False, args=None
+        self, start, end, split=None, source=None, filter_difficulty=False, args=None
     ):
-        dataset = load_dataset(self.dataset, "main")
-        train_data = dataset[split].to_pandas()
+        train_data = self.load_dataset(source=source, split=split)
         return train_data.iloc[start:end] if end > 0 else train_data.iloc[start:]
 
     def process_remaining_data(self, train_data, results):

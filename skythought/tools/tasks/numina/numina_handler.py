@@ -1,17 +1,19 @@
 from datasets import load_dataset
 
-from tasks.common import TaskHandler
+from tasks.common import TaskConfig, TaskHandler
 from util.common import TimeoutException, timeout
 from util.math_parsing_util import extract_answer, math_equal, strip_answer_string
 
 
+class NUMINATaskConfig(TaskConfig):
+    difficulty: str = None  # use all by default
+
+
 class NUMINATaskHandler(TaskHandler):
-    @staticmethod
-    def get_question_key():
-        return "problem"
+    task_config_cls = NUMINATaskConfig
 
     def generate_prompt(self, prompt):
-        return "Return your final response within \\boxed{{}}. " + prompt
+        return self.task_config.templating_parameters["template"].format(prompt=prompt)
 
     @timeout(5)  # Add timeout of 5 seconds
     def check_correctness(self, problem, generation):
@@ -73,25 +75,20 @@ class NUMINATaskHandler(TaskHandler):
     def load_and_filter_dataset(
         self, start, end, split="train", source=None, filter_difficulty=False, args=None
     ):
-        dataset = load_dataset("AI-MO/NuminaMath-CoT")
-        train_data = dataset[split].to_pandas()
-        train_data = (
-            train_data.query("source == @source").iloc[start:end]
-            if end > 0
-            else train_data.query("source == @source").iloc[start:]
-        )
-        train_data = train_data[train_data["solution"].str.contains("boxed", na=False)]
+        dataset = self.load_dataset(source=source, split=split)
+        dataset = dataset.iloc[start:end] if end > 0 else dataset.iloc[start:]
+        dataset = dataset[dataset["solution"].str.contains("boxed", na=False)]
         if filter_difficulty:
             diff_dict = self.get_difficulty_dict(source, start, end)
-            train_data = train_data[
-                train_data["problem"]
+            dataset = dataset[
+                dataset["problem"]
                 .map(diff_dict)
                 .apply(
                     lambda x: x >= args.math_difficulty_lower_bound
                     and x <= args.math_difficulty_upper_bound
                 )
             ]
-        return train_data
+        return dataset
 
     def process_remaining_data(self, train_data, results):
         return [
