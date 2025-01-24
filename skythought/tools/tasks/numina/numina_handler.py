@@ -13,7 +13,7 @@ class NUMINATaskConfig(TaskConfig):
 
 class NUMINATaskHandler(TaskHandler):
     task_config_cls = NUMINATaskConfig
-
+    
     def generate_prompt(self, prompt):
         return self.task_config.templating_parameters["template"].format(prompt=prompt)
 

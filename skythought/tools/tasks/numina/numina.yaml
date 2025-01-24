@@ -1,4 +1,5 @@
-dataset_name: "AI-MO/NuminaMath-CoT"
+handler: numina
+dataset_path: "AI-MO/NuminaMath-CoT"
 dataset_source: default
 dataset_split: train
 question_key: problem

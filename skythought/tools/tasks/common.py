@@ -9,7 +9,8 @@ from pydantic import BaseModel, Field
 
 
 class TaskConfig(BaseModel):
-    dataset_name: str
+    handler: str
+    dataset_path: str
     dataset_source: Optional[str] = None
     dataset_split: str
     dataset_kwargs: Optional[Dict[str, Any]] = None
@@ -19,18 +20,30 @@ class TaskConfig(BaseModel):
     fewshot_config: List[Dict[str, Any]] = Field(default_factory=list)
     num_fewshot: int = 0
 
+    @property
+    def handler_cls(self):
+        from tasks import TASK_HANDLER_MAP
+
+        return TASK_HANDLER_MAP[self.handler]
+
+    @classmethod
+    def from_yaml(cls, yaml_file_path) -> "TaskConfig":
+        with open(yaml_file_path, "r", encoding="utf-8") as f:
+            config_dict = yaml.safe_load(f)
+        return cls(**config_dict)
+
+
 
 class TaskHandler:
     task_config_cls = TaskConfig
 
-    def __init__(self, yaml_file_path):
-        self.yaml_file_path = yaml_file_path
-        self.task_config = self.task_config_cls(**self.load_yaml(yaml_file_path))
-
-    @staticmethod
-    def load_yaml(yaml_file_path):
-        with open(yaml_file_path, "r", encoding="utf-8") as f:
-            return yaml.safe_load(f)
+    def __init__(self, task_config: TaskConfig):
+        self.task_config = task_config
+    
+    @classmethod
+    def from_config_path(cls, config_path: str) -> "TaskHandler":
+        task_config = cls.task_config_cls.from_yaml(config_path)
+        return cls(task_config)
 
     @property
     def question_key(self):
@@ -54,7 +67,7 @@ class TaskHandler:
 
     def load_dataset(self, source=None, split=None, **kwargs) -> HFDataset:
         dataset = load_dataset(
-            path=self.task_config.dataset_name,
+            path=self.task_config.dataset_path,
             name=source if source else self.task_config.dataset_source,
             split=split if split else self.task_config.dataset_split,
             **self.task_config.dataset_kwargs

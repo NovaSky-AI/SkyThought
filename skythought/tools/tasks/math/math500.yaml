@@ -1,4 +1,5 @@
-dataset_name: "qq8933/MATH500"  # repo ID in huggingface
+handler: math500
+dataset_path: "qq8933/MATH500"  # repo ID in huggingface
 dataset_source: null # which subset on huggingface
 question_key: problem
 dataset_split: test

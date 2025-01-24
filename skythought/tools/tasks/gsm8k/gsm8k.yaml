@@ -1,4 +1,5 @@
-dataset_name: "openai/gsm8k"
+handler: gsm8k
+dataset_path: "openai/gsm8k"
 dataset_source: main 
 dataset_split: test
 question_key: question

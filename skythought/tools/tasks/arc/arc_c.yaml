@@ -1,4 +1,5 @@
-dataset_name: allenai/ai2_arc
+handler: arc_c
+dataset_path: allenai/ai2_arc
 dataset_source: ARC-Challenge
 dataset_split: train
 question_key: question

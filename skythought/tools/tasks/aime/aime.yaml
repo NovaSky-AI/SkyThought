@@ -1,5 +1,5 @@
-
-dataset_source: AI-MO/aimo-validation-aime
+handler: aime
+dataset_path: AI-MO/aimo-validation-aime
 dataset_split: train
 question_key: problem
 templating_parameters:

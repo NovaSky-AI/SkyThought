@@ -1,4 +1,5 @@
-dataset_name: "BAAI/TACO"
+handler: taco
+dataset_path: "BAAI/TACO"
 dataset_source: default
 dataset_split: ALL
 dataset_kwargs:

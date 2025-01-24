@@ -1,4 +1,5 @@
-dataset_name: TIGER-Lab/MMLU-Pro
+handler: mmlu_pro
+dataset_path: TIGER-Lab/MMLU-Pro
 dataset_source: default
 dataset_split: test
 templating_parameters:

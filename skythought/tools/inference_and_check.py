@@ -10,9 +10,12 @@ from openai import OpenAI
 from tqdm import tqdm
 from vllm import LLM, SamplingParams
 
-from tasks import TASK_HANDLERS, NUMINATaskHandler, TaskHandler
+from tasks import TASK_HANDLER_MAP, NUMINATaskHandler, TaskHandler
+from tasks.task_util import get_tasks
 from util.model_utils import MODEL_TO_NAME, SYSTEM_PROMPT
 
+module_dir = os.path.dirname(os.path.abspath(__file__))
+TASK_NAMES_TO_YAML = get_tasks(os.path.join(module_dir, "tasks"))
 
 class NumpyEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -417,26 +420,12 @@ def main():
         description="Unified inference and checking for different datasets/tasks."
     )
     parser.add_argument(
-        "--dataset",
+        "--task",
         type=str,
         required=True,
-        choices=[
-            "NUMINA",
-            "APPS",
-            "TACO",
-            "MATH500",
-            "AIME",
-            "GPQADiamond",
-            "MMLU",
-            "MMLUPro",
-            "LiveCodeBench",
-            "GSM8K",
-            "ARC-C",
-            "AMC23",
-        ],
-        help="Dataset to process.",
+        choices=TASK_NAMES_TO_YAML.keys(),
+        help="Task to process.",
     )
-    parser.add_argument("--config", type=str, help="Path to the config file.")
     parser.add_argument(
         "--model",
         type=str,
@@ -451,7 +440,7 @@ def main():
     parser.add_argument(
         "--split",
         type=str,
-        default="train",
+        default=None,
         help="Split to use for apps (e.g., train, test).",
     )
     parser.add_argument("--source", type=str, help="Source for the dataset.")
@@ -493,7 +482,10 @@ def main():
     )
     args = parser.parse_args()
 
-    handler: TaskHandler = TASK_HANDLERS[args.dataset](args.config)
+    handler_cls: TaskHandler = TASK_HANDLER_MAP[args.task]
+    config_path = TASK_NAMES_TO_YAML[args.task]
+    handler = handler_cls.from_config_path(config_path)
+
     temperatures = [1] if args.model.startswith("openai/o1") else args.temperatures
 
     print(f"Temperature: {temperatures}")
@@ -501,6 +493,11 @@ def main():
     if temperatures == [0] and args.n > 1:
         args.n = 1
         print("Warning: Temperature 0 does not support multiple samples. Setting n=1.")
+
+    # TODO: this can be cleaned up by allowing user override for any task_config with optional task_args
+    # Currently kept here for consistency with old code
+    args.split = args.split if args.split else handler.task_config.dataset_split
+    args.source = args.source if args.source else handler.task_config.dataset_source
 
     # create result dir if not exists
     if args.result_dir and not os.path.exists(args.result_dir):
@@ -511,12 +508,12 @@ def main():
     ):
         result_file = os.path.join(
             args.result_dir,
-            f"{MODEL_TO_NAME[args.model]}_{args.dataset}_{args.split}_{args.source}_{args.start}_{args.end}_{args.math_difficulty_lower_bound}_{args.math_difficulty_upper_bound}.json",
+            f"{MODEL_TO_NAME[args.model]}_{args.task}_{args.split}_{args.source}_{args.start}_{args.end}_{args.math_difficulty_lower_bound}_{args.math_difficulty_upper_bound}.json",
         )
     else:
         result_file = os.path.join(
             args.result_dir,
-            f"{MODEL_TO_NAME[args.model]}_{args.dataset}_{args.split}_{args.source}_{args.start}_{args.end}.json",
+            f"{MODEL_TO_NAME[args.model]}_{args.task}_{args.split}_{args.source}_{args.start}_{args.end}.json",
         )
 
     if args.check:
@@ -525,9 +522,9 @@ def main():
             args.math_difficulty_lower_bound is not None
             or args.math_difficulty_upper_bound is not None
         ):
-            converted_file = f"{args.result_dir}/converted_{MODEL_TO_NAME[args.model]}_{args.dataset}_{args.split}_{args.source}_{args.start}_{args.end}_{args.math_difficulty_lower_bound}_{args.math_difficulty_upper_bound}.json"
+            converted_file = f"{args.result_dir}/converted_{MODEL_TO_NAME[args.model]}_{args.task}_{args.split}_{args.source}_{args.start}_{args.end}_{args.math_difficulty_lower_bound}_{args.math_difficulty_upper_bound}.json"
         else:
-            converted_file = f"{args.result_dir}/converted_{MODEL_TO_NAME[args.model]}_{args.dataset}_{args.split}_{args.source}_{args.start}_{args.end}.json"
+            converted_file = f"{args.result_dir}/converted_{MODEL_TO_NAME[args.model]}_{args.task}_{args.split}_{args.source}_{args.start}_{args.end}.json"
         if os.path.exists(converted_file):
             result_file = converted_file
         perform_check(handler, temperatures, result_file, args)

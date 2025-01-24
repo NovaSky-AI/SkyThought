@@ -1,13 +1,13 @@
 import re
 from typing import Any, Dict
 
-from tasks.common import TaskHandler
+from tasks.common import TaskHandler, TaskConfig
 from util.math_parsing_util import extract_answer
 
 
 class GSM8KTaskHandler(TaskHandler):
-    def __init__(self, yaml_file_path: str) -> None:
-        super().__init__(yaml_file_path)
+    def __init__(self, task_config: TaskConfig) -> None:
+        super().__init__(task_config)
         self.ans_re = re.compile(r"((-?[$0-9.,]{2,})|(-?[0-9]+))")
         self.gt_re = re.compile(r"#### (\-?[0-9\.\,]+)")
         self.invalid_ans = "[invalid]"

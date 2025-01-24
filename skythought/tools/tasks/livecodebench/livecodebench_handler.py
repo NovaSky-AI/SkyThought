@@ -17,7 +17,7 @@ class LiveCodeBenchTaskConfig(TaskConfig):
 
 class LiveCodeBenchTaskHandler(TaskHandler):
     task_config_cls = LiveCodeBenchTaskConfig
-
+    
     def generate_prompt(self, problem):
         if problem["is_stdin"]:
             return self.task_config.templating_parameters["stdin_template"].format(

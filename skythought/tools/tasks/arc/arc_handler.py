@@ -1,13 +1,13 @@
 import re
 from typing import Any, Dict
 
-from tasks.common import TaskHandler
+from tasks.common import TaskHandler, TaskConfig
 from util.math_parsing_util import extract_answer
 
 
 class ARCChallengeTaskHandler(TaskHandler):
-    def __init__(self, yaml_file_path) -> None:
-        super().__init__(yaml_file_path)
+    def __init__(self, task_config: TaskConfig) -> None:
+        super().__init__(task_config)
         self.ans_re = re.compile(r"[Tt]he best answer is ([A-D])[\.\,]*", re.IGNORECASE)
         self.letter_re = re.compile(r"([A-D])[\.\,]*")
         self.canonical_options = ["A", "B", "C", "D"]

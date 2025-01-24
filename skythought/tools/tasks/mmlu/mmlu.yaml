@@ -1,4 +1,5 @@
-dataset_name: "cais/mmlu"
+handler: mmlu
+dataset_path: "cais/mmlu"
 dataset_source: default
 dataset_split: test
 templating_parameters:

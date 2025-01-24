@@ -16,7 +16,6 @@ class TACOTaskConfig(TaskConfig):
 
 
 class TACOTaskHandler(TaskHandler):
-    task_config_cls = TACOTaskConfig
 
     def generate_prompt(self, prompt, starter_code=None, fn_name=None):
         _input = self.task_config.templating_parameters["initial_template"].format(

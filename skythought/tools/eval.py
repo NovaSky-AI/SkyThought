@@ -1,20 +1,12 @@
 import argparse
 import json
 import subprocess
+import os
 
-# Define eval to split mapping
-eval_to_split = {
-    "MATH500": "test",
-    "AIME": "train",
-    "GPQADiamond": "train",
-    "MMLU": "test",
-    "MMLUPro": "test",
-    "LiveCodeBench": "test",
-    "GSM8K": "test",
-    "ARC-C": "test",
-    "AMC23": "train",
-}
+from skythought.tools.tasks.task_util import get_tasks
 
+module_dir = os.path.dirname(os.path.abspath(__file__))
+TASK_NAMES_TO_YAML = get_tasks(os.path.join(module_dir, "tasks"))
 
 def parse_arguments():
     parser = argparse.ArgumentParser(
@@ -89,6 +81,7 @@ def main():
 
     # Run the Python command for each eval and collect logs
     for eval_name in evals:
+        eval_name = eval_name.lower()
         command = [
             "python",
             script_path,
@@ -96,8 +89,6 @@ def main():
             model_path,
             "--dataset",
             eval_name,
-            "--split",
-            eval_to_split[eval_name],
             "--tp",
             str(tp),
             "--temperatures",

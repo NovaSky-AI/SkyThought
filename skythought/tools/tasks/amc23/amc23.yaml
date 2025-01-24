@@ -1,4 +1,5 @@
-dataset_name: AI-MO/aimo-validation-amc
+handler: amc23
+dataset_path: AI-MO/aimo-validation-amc
 dataset_kwargs:
   trust_remote_code: true
 dataset_split: train

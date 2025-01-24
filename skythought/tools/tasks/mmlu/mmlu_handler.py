@@ -2,7 +2,7 @@ from datasets import load_dataset
 
 from util.math_parsing_util import get_multiple_choice_answer, mmlu_pro_extract_answer
 
-from ..common import TaskHandler
+from ..common import TaskHandler, TaskConfig
 
 
 class MMLUTaskHandler(TaskHandler):
@@ -71,8 +71,8 @@ class MMLUTaskHandler(TaskHandler):
 
 
 class MMLUProTaskHandler(MMLUTaskHandler):
-    def __init__(self, yaml_file_path):
-        super().__init__(yaml_file_path)
+    def __init__(self, task_config: TaskConfig):
+        super().__init__(task_config)
         self.choices = [
             "A",
             "B",
