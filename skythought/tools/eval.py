@@ -21,7 +21,10 @@ def parse_arguments():
     )
     parser.add_argument("--tp", type=int, default=8, help="Tensor Parallelism Degree")
     parser.add_argument(
-        "--filter-difficulty", action="store_true", help="Filter difficulty."
+        "--filter-difficulty",
+        type=str,
+        default=None,
+        help="Optional filter difficulty. Options: 'easy', 'medium', 'hard'.",
     )
     parser.add_argument("--source", type=str, help="Source for the dataset.")
     parser.add_argument(
@@ -96,10 +99,9 @@ def main():
         command.extend(temperatures)  # Add temperatures as separate arguments
 
         if args.filter_difficulty:
-            assert args.source != "", "No source passed for filtering difficulty."
             command.append("--filter-difficulty")
-            command.append("--source")
-            command.append(args.source)
+            command.append(args.filter_difficulty)
+
         print(f"Running eval {eval_name} with command {command}")
         all_logs += f"\nRunning eval: {eval_name} with command {command}\n"
         try:

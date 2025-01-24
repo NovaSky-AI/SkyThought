@@ -447,7 +447,10 @@ def main():
     parser.add_argument("--start", type=int, default=0, help="Start index.")
     parser.add_argument("--end", type=int, default=-1, help="End index.")
     parser.add_argument(
-        "--filter-difficulty", action="store_true", help="Filter difficulty."
+        "--filter-difficulty",
+        type=str,
+        default=None,
+        help="Optional filter difficulty. Options: 'easy', 'medium', 'hard'.",
     )
     parser.add_argument(
         "--result-dir", type=str, default="./", help="Result dir to save files."

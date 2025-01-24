@@ -102,12 +102,12 @@ class APPSTaskHandler(TaskHandler):
         return conversations
 
     def load_and_filter_dataset(
-        self, start, end, split=None, source=None, filter_difficulty=False, args=None
+        self, start, end, split=None, source=None, filter_difficulty=None, args=None
     ):
         train_data = self.load_dataset(source=source, split=split).to_pandas()
         if filter_difficulty or self.task_config.difficulty:
             difficulty = (
-                self.task_config.difficulty if not filter_difficulty else source
+                self.task_config.difficulty if not filter_difficulty else filter_difficulty
             )
             train_data = train_data.filter(lambda x: x["difficulty"] == difficulty)
 

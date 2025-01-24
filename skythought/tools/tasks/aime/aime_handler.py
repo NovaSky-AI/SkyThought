@@ -26,7 +26,7 @@ class AIMETaskHandler(MathTaskHandler):
         return conversations
 
     def load_and_filter_dataset(
-        self, start, end, split=None, source=None, filter_difficulty=False, args=None
+        self, start, end, split=None, source=None, filter_difficulty=None, args=None
     ):
         train_data = self.load_dataset(source=source, split=split).to_pandas()
         filtered_data = train_data[train_data["url"].str.contains("2024", na=False)]

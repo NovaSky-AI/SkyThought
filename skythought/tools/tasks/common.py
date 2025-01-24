@@ -75,7 +75,7 @@ class TaskHandler:
         return dataset
 
     def load_and_filter_dataset(
-        self, start, end, split="train", source=None, filter_difficulty=False, args=None
+        self, start, end, split="train", source=None, filter_difficulty=None, args=None
     ):
         raise NotImplementedError("Subclasses should implement this method.")
 

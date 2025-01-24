@@ -51,7 +51,7 @@ class MathTaskHandler(TaskHandler):
         ]
 
     def load_and_filter_dataset(
-        self, start, end, split=None, source=None, filter_difficulty=False, args=None
+        self, start, end, split=None, source=None, filter_difficulty=None, args=None
     ):
         dataset = self.load_dataset(source=source, split=split)
         return dataset.iloc[start:end] if end > 0 else dataset.iloc[start:]

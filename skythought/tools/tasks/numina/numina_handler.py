@@ -13,7 +13,7 @@ class NUMINATaskConfig(TaskConfig):
 
 class NUMINATaskHandler(TaskHandler):
     task_config_cls = NUMINATaskConfig
-    
+
     def generate_prompt(self, prompt):
         return self.task_config.templating_parameters["template"].format(prompt=prompt)
 
@@ -75,7 +75,7 @@ class NUMINATaskHandler(TaskHandler):
         return conversations
 
     def load_and_filter_dataset(
-        self, start, end, split="train", source=None, filter_difficulty=False, args=None
+        self, start, end, split="train", source=None, filter_difficulty=None, args=None
     ):
         dataset = self.load_dataset(source=source, split=split).to_pandas()
         dataset = dataset.iloc[start:end] if end > 0 else dataset.iloc[start:]
