@@ -3,6 +3,8 @@ set -e
 # Get tools directory path relative to git root
 TOOLS_DIR=$(git rev-parse --show-toplevel)/skythought/tools
 # Only run pre-commit if changes are in tools/
+# Run pre-commit from tools/ directory to use linting rules in this directory
 if git diff --cached --name-only | grep "^skythought/tools/"; then
-    pre-commit run --files $(git diff --cached --name-only | grep "^skythought/tools/") --config $TOOLS_DIR/.pre-commit-config.yaml
+    cd $TOOLS_DIR;
+    pre-commit run --files $(git diff --cached --name-only | grep "^skythought/tools/") --config .pre-commit-config.yaml
 fi
