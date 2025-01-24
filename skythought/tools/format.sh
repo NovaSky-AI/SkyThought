@@ -9,6 +9,10 @@ else
     pip install -q pre-commit
 fi
 
+# Hook file should be executable
+HOOK_SCRIPT=$TOOLS_DIR/.githooks/pre-commit
+chmod +x $HOOK_SCRIPT
+
 git config --local core.hooksPath "$TOOLS_DIR/.githooks"
 # pre-commit run --all-files always runs from the root directory. we run this only on tools/ for now. 
 pre-commit run --files $TOOLS_DIR/*
