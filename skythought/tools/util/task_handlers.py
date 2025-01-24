@@ -648,6 +648,8 @@ class LiveCodeBenchTaskHandler(TaskHandler):
         dataset = load_dataset("livecodebench/code_generation_lite", version_tag="release_v2", split=split, trust_remote_code=True)
         if filter_difficulty:
             dataset = dataset.filter(lambda example: example['difficulty'] == source)
+        # We use a lower writer_batch_size to avoid pandas issues. JSON entries with LiveCodeBench are large. 
+        # See: https://github.com/NovaSky-AI/SkyThought/pull/45 for details. 
         dataset = dataset.map(
             lambda example: {
                 "private_test_cases": translate_private_test_cases(example["private_test_cases"])
