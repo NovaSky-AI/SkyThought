@@ -16,8 +16,7 @@ class TACOTaskHandler(TaskHandler):
     def get_question_key():
         return "question"
 
-    @staticmethod
-    def generate_prompt(prompt, starter_code=None, fn_name=None):
+    def generate_prompt(self, prompt, starter_code=None, fn_name=None):
         _input = "\nQUESTION:\n"
         _input += prompt
         if starter_code:
@@ -79,7 +78,7 @@ class TACOTaskHandler(TaskHandler):
 
     def make_conversations(self, data, system_prompt, model=None):
         conversations = []
-        for idx, problem in enumerate(data):
+        for _, problem in enumerate(data):
             starter_code = (
                 None if len(problem["starter_code"]) == 0 else problem["starter_code"]
             )

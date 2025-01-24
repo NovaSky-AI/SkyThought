@@ -1,0 +1,11 @@
+dataset_name: "qq8933/MATH500"  # repo ID in huggingface
+dataset_source: null # which subset on huggingface
+question_key: problem
+split: test
+templating_parameters: 
+	- instruction: "Return your final response within \\boxed{{}}. "
+	# optional. Not supported yet. 
+fewshot_config:
+  - question: ...
+  - target:  ...
+num_fewshot: 0

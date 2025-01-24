@@ -14,8 +14,7 @@ from util.common import has_code
 
 
 class LiveCodeBenchTaskHandler(TaskHandler):
-    @staticmethod
-    def generate_prompt(problem):
+    def generate_prompt(self, problem):
         # print(problem)
         prompt = problem["prompt"]
         if problem["is_stdin"]:

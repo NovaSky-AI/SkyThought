@@ -1,4 +1,5 @@
 import multiprocessing
+import re
 
 
 class TimeoutException(Exception):
@@ -44,3 +45,11 @@ def timeout(seconds):
         return wrapper
 
     return decorator
+
+
+def has_code(response):
+    pattern = r"```(?:[a-zA-Z]*)\n(.*?)```"
+    # Use re.DOTALL to match multiline content inside backticks
+    matches = re.findall(pattern, response, re.DOTALL)
+    # print(matches)
+    return matches

@@ -17,8 +17,7 @@ class APPSTaskHandler(TaskHandler):
     def get_question_key():
         return "question"
 
-    @staticmethod
-    def generate_prompt(test_case, prompt, starter_code=None):
+    def generate_prompt(self, test_case, prompt, starter_code=None):
         _input = ""
         data = test_case
         if not data.get("fn_name"):
@@ -27,7 +26,7 @@ class APPSTaskHandler(TaskHandler):
             _input += "Generate an executable Python function generated from the given prompt. Return the function body without invoking it at the final solution."  # "\nUse Call-Based format"#\n"
         data = prompt
         _input += data
-        if starter_code != None:
+        if starter_code is not None:
             data = starter_code
             data = "\n" + data  # + "\n"
             _input += data
@@ -78,7 +77,7 @@ class APPSTaskHandler(TaskHandler):
             problem_to_check["input_output"] = json.loads(problem["input_output"])
             try:
                 problem_to_check["solutions"] = json.loads(problem["solutions"])
-            except:
+            except Exception:
                 problem_to_check["solutions"] = ""
                 print("Empty solution from the dataset")
             curr_res = self.check_correctness(problem_to_check, generation=last_code)

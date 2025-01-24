@@ -6,7 +6,7 @@ from .common import TaskHandler
 from .gpqa_diamond.gpqa_diamond_handler import GPQADiamondTaskHandler
 from .gsm8k.gsm8k_handler import GSM8KTaskHandler
 from .livecodebench.livecodebench_handler import LiveCodeBenchTaskHandler
-from .math.math_handler import MATH500TaskHandler, MathTaskHandler
+from .math.math_handler import MathTaskHandler
 from .mmlu.mmlu_handler import MMLUProTaskHandler, MMLUTaskHandler
 from .numina.numina_handler import NUMINATaskHandler
 from .taco.taco_handler import TACOTaskHandler
@@ -15,7 +15,7 @@ TASK_HANDLERS = {
     "NUMINA": NUMINATaskHandler,
     "APPS": APPSTaskHandler,
     "TACO": TACOTaskHandler,
-    "MATH500": MATH500TaskHandler,
+    "MATH500": MathTaskHandler,
     "AIME": AIMETaskHandler,
     "GPQADiamond": GPQADiamondTaskHandler,
     "MMLU": MMLUTaskHandler,
@@ -31,7 +31,7 @@ __all__ = [
     AIMETaskHandler,
     APPSTaskHandler,
     TACOTaskHandler,
-    MATH500TaskHandler,
+    MathTaskHandler,
     AMC23TaskHandler,
     NUMINATaskHandler,
     GPQADiamondTaskHandler,

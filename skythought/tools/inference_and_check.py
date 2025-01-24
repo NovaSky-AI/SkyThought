@@ -436,6 +436,7 @@ def main():
         ],
         help="Dataset to process.",
     )
+    parser.add_argument("--config", type=str, help="Path to the config file.")
     parser.add_argument(
         "--model",
         type=str,
@@ -492,7 +493,7 @@ def main():
     )
     args = parser.parse_args()
 
-    handler: TaskHandler = TASK_HANDLERS[args.dataset]()
+    handler: TaskHandler = TASK_HANDLERS[args.dataset](args.config)
     temperatures = [1] if args.model.startswith("openai/o1") else args.temperatures
 
     print(f"Temperature: {temperatures}")

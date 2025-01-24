@@ -1,17 +1,30 @@
 import json
 import os
-import re
+from typing import Any, Dict, List, Optional
+
+import yaml
+from pydantic import BaseModel, Field
 
 
-def has_code(response):
-    pattern = r"```(?:[a-zA-Z]*)\n(.*?)```"
-    # Use re.DOTALL to match multiline content inside backticks
-    matches = re.findall(pattern, response, re.DOTALL)
-    # print(matches)
-    return matches
+class TaskConfig(BaseModel):
+    dataset_name: str
+    dataset_source: Optional[str] = None
+    question_key: str
+    templating_parameters: Dict[str, str] = Field(default_factory=dict)
+    fewshot_config: List[Dict[str, Any]] = Field(default_factory=list)
+    num_fewshot: int = 0
 
 
 class TaskHandler:
+    def __init__(self, yaml_file_path):
+        self.yaml_file_path = yaml_file_path
+        self.task_config = TaskConfig(**self.load_yaml(yaml_file_path))
+
+    @staticmethod
+    def load_yaml(yaml_file_path):
+        with open(yaml_file_path, "r", encoding="utf-8") as f:
+            return yaml.safe_load(f)
+
     @staticmethod
     def get_question_key():
         raise NotImplementedError("Subclasses should implement this method.")

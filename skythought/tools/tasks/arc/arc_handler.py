@@ -20,8 +20,7 @@ class ARCChallengeTaskHandler(TaskHandler):
     def get_question_key():
         return "question"
 
-    @staticmethod
-    def generate_prompt(problem):
+    def generate_prompt(self, problem):
         question = problem["question"]
         choices = problem["choices"]
         choices_text = "\n".join(
