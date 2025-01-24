@@ -38,3 +38,7 @@ class AIMETaskHandler(MathTaskHandler):
         train_data = dataset[split].to_pandas()
         filtered_data = train_data[train_data["url"].str.contains("2024", na=False)]
         return filtered_data.iloc[start:end] if end > 0 else filtered_data.iloc[start:]
+
+    def dummy():
+        raise NotImplementedError()
+
