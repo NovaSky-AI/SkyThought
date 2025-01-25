@@ -28,9 +28,9 @@ class ARCChallengeTaskHandler(TaskHandler):
         return full_prompt
 
     def check_correctness(self, problem: Dict[str, Any], generation: str) -> bool:
-        gt_answer = problem["answerKey"]
+        gt_answer = problem[self.task_config.answer_key]
         if gt_answer not in self.canonical_options:
-            gt_answer = self.canonical_options[int(problem["answerKey"]) - 1]
+            gt_answer = self.canonical_options[int(problem[self.task_config.answer_key]) - 1]
         model_answer = self.get_answer(generation)
         return model_answer == gt_answer
 

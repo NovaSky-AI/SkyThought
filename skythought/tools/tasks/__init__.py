@@ -10,6 +10,8 @@ from .math.math_handler import MathTaskHandler
 from .mmlu.mmlu_handler import MMLUProTaskHandler, MMLUTaskHandler
 from .numina.numina_handler import NUMINATaskHandler
 from .taco.taco_handler import TACOTaskHandler
+from .minervamath.minervamath_handler import MinervaMathTaskHandler
+from .olympiadbench.olympiadbench_handler import OlympiadBenchMathTaskHandler
 
 TASK_HANDLER_MAP = {
     "numina": NUMINATaskHandler,
@@ -24,6 +26,8 @@ TASK_HANDLER_MAP = {
     "gsm8k": GSM8KTaskHandler,
     "arc_c": ARCChallengeTaskHandler,
     "amc23": AMC23TaskHandler,
+    "minervamath": MinervaMathTaskHandler,
+    "olympiadbench_math": OlympiadBenchMathTaskHandler,
 }
 
 __all__ = [
@@ -41,5 +45,8 @@ __all__ = [
     ARCChallengeTaskHandler,
     TaskHandler,
     MathTaskHandler,
+    OlympiadBenchMathTaskHandler,
+    MinervaMathTaskHandler,
+    TaskConfig,
     TASK_HANDLER_MAP,
 ]

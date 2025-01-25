@@ -16,7 +16,7 @@ class GSM8KTaskHandler(TaskHandler):
         return self.task_config.templating_parameters["template"].format(**problem)
 
     def check_correctness(self, problem: Dict[str, Any], generation: str) -> bool:
-        gt_answer = self.extract_gt_answer(problem["answer"])
+        gt_answer = self.extract_gt_answer(problem[self.task_config.answer_key])
         model_answer = extract_answer(generation)
         model_answer = self.sanitize_answer(model_answer)
         return model_answer == gt_answer

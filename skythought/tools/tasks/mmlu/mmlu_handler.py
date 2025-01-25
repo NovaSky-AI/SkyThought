@@ -12,7 +12,7 @@ class MMLUTaskHandler(TaskHandler):
     def check_correctness(self, problem, generation):
         pred = get_multiple_choice_answer(generation)
         abcd = "ABCD"
-        answer = abcd[problem["answer"]]
+        answer = abcd[problem[self.task_config.answer_key]]
         return answer == pred
 
     def update_results(self, problem, response):

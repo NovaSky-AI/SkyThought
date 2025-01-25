@@ -15,6 +15,8 @@ class TaskConfig(BaseModel):
     dataset_split: str
     dataset_kwargs: Dict[str, Any] = Field(default_factory=dict)
     question_key: str
+    # Optional answer key for datasets with a single correct answer
+    answer_key: Optional[str] = None 
     templating_parameters: Dict[str, str] = Field(default_factory=dict)
     # Optional, unused for now
     fewshot_config: List[Dict[str, Any]] = Field(default_factory=list)

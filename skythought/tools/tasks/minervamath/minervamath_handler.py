@@ -3,15 +3,9 @@ from util.math_parsing_util import extract_answer, math_equal, strip_answer_stri
 from tasks.math.math_handler import MathTaskHandler
 
 class MinervaMathTaskHandler(MathTaskHandler):
-    def __init__(self):
-        self.dataset = "svc-huggingface/minerva-math"
-    
-    @staticmethod
-    def get_question_key():
-        return "problem"
 
     def check_correctness(self, problem, generation):
-        answer = extract_answer(problem["solution"])
+        answer = extract_answer(problem[self.task_config.answer_key])
         answer = strip_answer_string(answer)
 
         pred = extract_answer(generation)

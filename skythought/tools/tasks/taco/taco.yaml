@@ -1,9 +1,11 @@
 handler: taco
 dataset_path: "BAAI/TACO"
-dataset_source: default
-dataset_split: ALL
+dataset_source: ALL
+dataset_split: train
 dataset_kwargs:
   trust_remote_code: true
+question_key: question
+answer_key: null
 templating_parameters:
   initial_template: "\nQUESTION:\n{prompt}"
   # Add starter code to initial template

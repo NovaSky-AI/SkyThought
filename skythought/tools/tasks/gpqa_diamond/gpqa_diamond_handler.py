@@ -30,7 +30,7 @@ class GPQADiamondTaskHandler(TaskHandler):
 
     def check_correctness(self, problem, generation):
         pred = get_multiple_choice_answer(generation)
-        answer = problem["Answer"]
+        answer = problem[self.task_config.answer_key]
         return answer == pred
 
     def get_multiple_choice_answers(self, data):

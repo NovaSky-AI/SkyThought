@@ -1,6 +1,8 @@
 handler: mmlu
-dataset_path: "cais/mmlu"
-dataset_source: default
+dataset_path: cais/mmlu
+dataset_source: all
 dataset_split: test
+question_key: question
+answer_key: answer
 templating_parameters:
   template: "Return your final response within \\boxed{{}}. {prompt}"

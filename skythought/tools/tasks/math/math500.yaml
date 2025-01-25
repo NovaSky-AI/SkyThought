@@ -1,7 +1,8 @@
-handler: math500
+handler: math
 dataset_path: "qq8933/MATH500"  # repo ID in huggingface
 dataset_source: null # which subset on huggingface
 question_key: problem
+answer_key: answer
 dataset_split: test
 templating_parameters: 
   template: "Return your final response within \\boxed{{}}. {problem}"
