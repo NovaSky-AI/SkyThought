@@ -9,6 +9,7 @@ from tasks.livecodebench.livecodebench_util import (
     unsafe_lcb_runTests,
 )
 from util.common import has_code
+from datasets import Dataset as HFDataset
 
 
 class LiveCodeBenchTaskConfig(TaskConfig):
@@ -103,13 +104,15 @@ class LiveCodeBenchTaskHandler(TaskHandler):
     def load_and_filter_dataset(
         self, start, end, split=None, source=None, filter_difficulty=None, args=None
     ):
-        dataset = self.load_dataset(source=source, split=split)
+        dataset: HFDataset = self.load_dataset(source=source, split=split)
         # Filter by CLI or config
         if filter_difficulty or self.task_config.difficulty:
             difficulty = source if filter_difficulty else self.task_config.difficulty
             dataset = dataset.filter(
                 lambda example: example["difficulty"] == difficulty
             )
+        # We use a lower writer_batch_size to avoid pyarrow issues. JSON entries with LiveCodeBench are large. 
+        # See: https://github.com/NovaSky-AI/SkyThought/pull/45 for details. 
         dataset = dataset.map(
             lambda example: {
                 "private_test_cases": translate_private_test_cases(

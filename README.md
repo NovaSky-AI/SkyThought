@@ -51,8 +51,26 @@ Following, we show our evaluation results for the Sky-T1-32B-Preview model acros
 | LiveCodeBench-Medium | 56.8                    | 40.8   | 56.3  | 54.9       |
 | LiveCodeBench-Hard   | 17.9                    | 9.8   | 17.1  | 16.3       |
 | GPQA-Diamond         | 56.8                    | 45.5   | 52.5  | 75.2       |
+| OlympiadBench (Math, EN)    | 59.79	           | 46.74	| 62.17	 | -        | 
+
+#### Results on non-reasoning benchmarks
+
+We also evaluate on non-reasoning benchmarks (these are benchmarks for instruction-following, QA, etc) to test whether the model has traded-off capability in other domains for better performance in reasoning-related benchmarks. 
 
 
+| Metric | Sky-T1-32B-Preview | Qwen-2.5-32B-Instruct | QwQ-32B-Preview | Eval Implementation |
+|---------|-------------------|---------------------|-----------------|-------------------|
+| MMLU (0 shot; no CoT) | **78.36** | 74.14 | 71.23 | [lm_eval](https://github.com/EleutherAI/lm-evaluation-harness) |
+| MMLU (5 shot; no CoT) | 82.46 | **82.62** | 82.32 | [lm_eval](https://github.com/EleutherAI/lm-evaluation-harness) |
+| ARC-C (0 shot; no CoT) | **49.49** | 49.4 | 49.66 | [lm_eval](https://github.com/EleutherAI/lm-evaluation-harness) |
+| IFEval | 75.79 | **78.74** | 42.51 | [lm_eval](https://github.com/EleutherAI/lm-evaluation-harness) |
+| LLM-as-a-Judge | 9.12	| **9.19** | 8.30 | [fastchat](https://github.com/lm-sys/FastChat/tree/main/fastchat/llm_judge) |
+| MGSM (0 shot; `direct`) | 33 | **42.3** | 19.07 | [lm_eval](https://github.com/EleutherAI/lm-evaluation-harness) |
+| MGSM (8-shot; `direct`) | 58.4 | **61.47** | 58.5 | [lm_eval](https://github.com/EleutherAI/lm-evaluation-harness) |
+| BFCL-v3 | 53.18 | **58.92** | 17.41 | [BFCL](https://github.com/ShishirPatil/gorilla/tree/main/berkeley-function-call-leaderboard) |
+| Arena-Hard | **74.79** | 66.51 | 52.6 | [Arena-Hard-Auto](https://github.com/lmarena/arena-hard-auto) |
+
+For more details, refer [here](./skythought/tools/base_instruct_evals.md). 
 
 ## Fully Open-source: Driving Progress Together
 We believe that open-source collaboration drives progress, and with Sky-T1-32B-Preview, we are fully committed to empowering the community. We open-source all details (i.e., data, codes, model weights) to enable the community to replicate and improve on our results *easily*:
