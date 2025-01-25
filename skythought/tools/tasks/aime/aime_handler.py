@@ -1,16 +1,17 @@
+from typing import Dict 
 from tasks.math.math_handler import MathTaskHandler
 from util.model_utils import MODEL_TO_NAME
 
 
 class AIMETaskHandler(MathTaskHandler):
-    def generate_prompt(self, problem, model):
+    def generate_prompt(self, problem: Dict, model):
         if MODEL_TO_NAME[model] == "Sky-T1-32B-Preview":
             return self.task_config.templating_parameters["sky_template"].format(
-                **problem
+                prompt=problem["problem"]
             )
         else:
             return self.task_config.templating_parameters["regular_template"].format(
-                **problem
+               prompt=problem["problem"]
             )
 
     def make_conversations(self, data, system_prompt, model=None):

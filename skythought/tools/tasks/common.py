@@ -13,7 +13,7 @@ class TaskConfig(BaseModel):
     dataset_path: str
     dataset_source: Optional[str] = None
     dataset_split: str
-    dataset_kwargs: Optional[Dict[str, Any]] = None
+    dataset_kwargs: Dict[str, Any] = Field(default_factory=dict)
     question_key: str
     templating_parameters: Dict[str, str] = Field(default_factory=dict)
     # Optional, unused for now

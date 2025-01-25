@@ -4,9 +4,9 @@ dataset_source: null # which subset on huggingface
 question_key: problem
 dataset_split: test
 templating_parameters: 
-	template: "Return your final response within \\boxed{{}}. {problem}"
-	# optional. Not supported yet. 
-fewshot_config:
-  - question: ...
-  - target:  ...
-num_fewshot: 0
+  template: "Return your final response within \\boxed{{}}. {problem}"
+# optional. Not supported yet. 
+# fewshot_config:
+#   - question: ...
+#   - target:  ...
+# num_fewshot: 0

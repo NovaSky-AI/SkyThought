@@ -3,7 +3,7 @@ import json
 import subprocess
 import os
 
-from skythought.tools.tasks.task_util import get_tasks
+from tasks.task_util import get_tasks
 
 module_dir = os.path.dirname(os.path.abspath(__file__))
 TASK_NAMES_TO_YAML = get_tasks(os.path.join(module_dir, "tasks"))
@@ -85,12 +85,13 @@ def main():
     # Run the Python command for each eval and collect logs
     for eval_name in evals:
         eval_name = eval_name.lower()
+        assert eval_name in TASK_NAMES_TO_YAML.keys(), f"Task {eval_name} not found, should be one of {TASK_NAMES_TO_YAML.keys()}"
         command = [
             "python",
             script_path,
             "--model",
             model_path,
-            "--dataset",
+            "--task",
             eval_name,
             "--tp",
             str(tp),
