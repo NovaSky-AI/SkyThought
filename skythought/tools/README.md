@@ -21,7 +21,7 @@ Put one or multiple OPENAI_API_KEY in a file, e.g. keys.txt (one per line). If t
 ```
 python label_math_difficulty.py --source [amc_aime, math, olympiads] --keys keys.txt
 ```
-The expected output is labeled_source_0_-1.json. We also provide instructions to download these files under the labeled_numina_difficulty folder (Download from HuggingFace).
+The expected output is labeled_source_0_-1.json. We also include data of labeled difficulty from NUMINA, in the following files: `labeled_amc_aime_0_-1.json`, `labeled_math_0_-1.json`, `labeled_olympiads_0_-1.json`. These files can be found and downloaded from [HuggingFace](https://huggingface.co/datasets/NovaSky-AI/labeled_numina_difficulty). 
 
 ### Step 1: Data Inference
 Inference the results from QwQ on several datasets. In preview version, we use data from the following dataset.
