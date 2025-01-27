@@ -1,4 +1,4 @@
-from tasks.common import TaskHandler
+from tasks.base import TaskHandler
 from util.math_parsing_util import extract_answer, math_equal, strip_answer_string
 
 

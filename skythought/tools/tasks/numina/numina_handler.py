@@ -2,7 +2,7 @@ from typing import Optional
 
 from datasets import load_dataset
 
-from tasks.common import TaskConfig, TaskHandler
+from tasks.base import TaskConfig, TaskHandler
 from util.common import TimeoutException, timeout
 from util.math_parsing_util import extract_answer, math_equal, strip_answer_string
 

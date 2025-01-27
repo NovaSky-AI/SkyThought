@@ -1,7 +1,7 @@
 import re
 from typing import Any, Dict
 
-from tasks.common import TaskHandler, TaskConfig
+from tasks.base import TaskHandler, TaskConfig
 from util.math_parsing_util import extract_answer
 
 

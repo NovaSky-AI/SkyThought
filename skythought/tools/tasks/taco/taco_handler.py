@@ -8,7 +8,7 @@ import numpy as np
 from tasks.taco.taco_util import run_test as taco_run_test
 from util.common import has_code
 
-from ..common import TaskConfig, TaskHandler
+from ..base import TaskConfig, TaskHandler
 
 
 class TACOTaskConfig(TaskConfig):
@@ -16,6 +16,7 @@ class TACOTaskConfig(TaskConfig):
 
 
 class TACOTaskHandler(TaskHandler):
+    task_config_cls = TACOTaskConfig
 
     def generate_prompt(self, prompt, starter_code=None, fn_name=None):
         _input = self.task_config.templating_parameters["initial_template"].format(
@@ -113,7 +114,7 @@ class TACOTaskHandler(TaskHandler):
         return conversations
 
     def load_and_filter_dataset(
-        self, start, end, split="train", source=None, filter_difficulty=None, args=None
+        self, start, end, split=None, source=None, filter_difficulty=None, args=None
     ):
         dataset = self.load_dataset(source=source, split=split).to_pandas()
         if filter_difficulty or self.task_config.difficulty:

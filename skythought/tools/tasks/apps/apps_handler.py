@@ -2,16 +2,23 @@ import copy
 import json
 import multiprocessing
 from multiprocessing import Manager
+from typing import Optional
 
 import numpy as np
 
 from tasks.apps.apps_util import run_test as apps_run_test
 from util.common import has_code
 
-from ..common import TaskHandler
+from ..base import TaskHandler, TaskConfig
 
+
+class APPSTaskConfig(TaskConfig):
+    # by default, no filter on difficulty
+    difficulty: Optional[str] = None
 
 class APPSTaskHandler(TaskHandler):
+    task_config_cls = APPSTaskConfig
+
     def generate_prompt(self, test_case, prompt, starter_code=None):
         if not test_case.get("fn_name"):
             _input = self.task_config.templating_parameters[

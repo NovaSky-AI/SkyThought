@@ -6,6 +6,7 @@ dataset_kwargs:
   trust_remote_code: true
 question_key: question
 answer_key: null
+difficulty: null
 templating_parameters:
   initial_template: "\nQUESTION:\n{prompt}"
   # Add starter code to initial template

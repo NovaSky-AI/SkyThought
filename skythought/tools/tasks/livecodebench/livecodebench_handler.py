@@ -1,7 +1,7 @@
 import copy
 from typing import Dict, Optional
 
-from tasks.common import TaskConfig, TaskHandler
+from tasks.base import TaskConfig, TaskHandler
 from tasks.livecodebench.livecodebench_util import (
     map_to_example,
     post_process_code,

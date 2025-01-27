@@ -1,8 +1,7 @@
 from datasets import load_dataset
 
 from util.math_parsing_util import get_multiple_choice_answer, mmlu_pro_extract_answer
-
-from ..common import TaskHandler, TaskConfig
+from tasks.base import TaskHandler, TaskConfig
 
 
 class MMLUTaskHandler(TaskHandler):
@@ -63,11 +62,10 @@ class MMLUTaskHandler(TaskHandler):
         ]
 
     def load_and_filter_dataset(
-        self, start, end, split="test", source=None, filter_difficulty=None, args=None
+        self, start, end, split=None, source=None, filter_difficulty=None, args=None
     ):
-        dataset = load_dataset(self.dataset, "all")
-        train_data = dataset[split].to_pandas()
-        return train_data.iloc[start:end] if end > 0 else train_data.iloc[start:]
+        dataset = self.load_dataset(source=source, split=split).to_pandas()
+        return dataset.iloc[start:end] if end > 0 else dataset.iloc[start:]
 
 
 class MMLUProTaskHandler(MMLUTaskHandler):
@@ -108,7 +106,7 @@ class MMLUProTaskHandler(MMLUTaskHandler):
         return f"Answer Choices: {options}"
 
     def load_and_filter_dataset(
-        self, start, end, split="test", source=None, filter_difficulty=None, args=None
+        self, start, end, split=None, source=None, filter_difficulty=None, args=None
     ):
-        dataset = self.load_dataset(source=source, split=split)
+        dataset = self.load_dataset(source=source, split=split).to_pandas()
         return dataset.iloc[start:end] if end > 0 else dataset.iloc[start:]

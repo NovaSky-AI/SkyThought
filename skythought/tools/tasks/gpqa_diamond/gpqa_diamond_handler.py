@@ -1,6 +1,6 @@
 import random
 
-from tasks.common import TaskHandler
+from tasks.base import TaskHandler
 from util.math_parsing_util import get_multiple_choice_answer
 
 

@@ -6,3 +6,5 @@ dataset_split: train
 question_key: problem
 answer_key: answer
 difficulty: null
+templating_parameters: 
+  template: "Return your final response within \\boxed{{}}. {problem}"
