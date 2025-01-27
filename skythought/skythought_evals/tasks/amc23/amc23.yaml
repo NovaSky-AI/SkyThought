@@ -5,7 +5,8 @@ dataset_kwargs:
 dataset_split: train
 question_key: problem
 answer_key: answer
-preprocess_config:
-  difficulty: null
+# Optionally, you can filter the dataset by difficulty
+# preprocess_config:
+#   difficulty: easy
 templating_parameters: 
   template: "Return your final response within \\boxed{{}}. {problem}"

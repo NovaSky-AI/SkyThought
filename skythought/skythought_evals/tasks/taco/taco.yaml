@@ -14,6 +14,7 @@ templating_parameters:
   stdin_template: "{input}\nUse Standard Input format\nANSWER:\n"
   # call template is used when there is starter code or fn_name
   call_template: "{input}\nUse Call-Based format\nANSWER:\n"
+# Optionally, you can filter the dataset by difficulty
 # preprocess_config:
-#   difficulty: null
+#   difficulty: easy
 

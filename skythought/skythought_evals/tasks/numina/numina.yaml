@@ -6,5 +6,6 @@ question_key: problem
 answer_key: solution
 templating_parameters:
   template: "Return your final response within \\boxed{{}}. {prompt}"
+# Optionally, you can filter the dataset by difficulty
 # preprocess_config:
-#   difficulty: null
+#   difficulty: easy
