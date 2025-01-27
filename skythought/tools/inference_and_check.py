@@ -17,6 +17,7 @@ from util.model_utils import MODEL_TO_NAME, SYSTEM_PROMPT
 module_dir = os.path.dirname(os.path.abspath(__file__))
 TASK_NAMES_TO_YAML = get_tasks(os.path.join(module_dir, "tasks"))
 
+
 class NumpyEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, np.ndarray):
@@ -137,7 +138,7 @@ def perform_inference_and_check(
                     prompt = conversations[idx][1]["content"]
                     results[problem_key]["prompt"] = prompt
                     results[problem_key]["input_conversation"] = conversations[idx]
-                    
+
                 results[problem_key]["responses"][str(temp)] = response_entry
 
                 if args.model.startswith("openai"):
