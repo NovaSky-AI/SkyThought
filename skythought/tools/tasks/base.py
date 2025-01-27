@@ -8,6 +8,10 @@ from datasets import load_dataset
 from pydantic import BaseModel, Field
 
 
+class PreprocessConfig(BaseModel):
+    difficulty: str
+
+
 class TaskConfig(BaseModel):
     handler: str
     dataset_path: str
@@ -16,17 +20,13 @@ class TaskConfig(BaseModel):
     dataset_kwargs: Dict[str, Any] = Field(default_factory=dict)
     question_key: str
     # Optional answer key for datasets with a single correct answer
-    answer_key: Optional[str] = None 
+    answer_key: Optional[str] = None
     templating_parameters: Dict[str, str] = Field(default_factory=dict)
     # Optional, unused for now
     fewshot_config: List[Dict[str, Any]] = Field(default_factory=list)
     num_fewshot: int = 0
 
-    @property
-    def handler_cls(self):
-        from tasks import TASK_HANDLER_MAP
-
-        return TASK_HANDLER_MAP[self.handler]
+    preprocess_config: Optional[PreprocessConfig] = None
 
     @classmethod
     def from_yaml(cls, yaml_file_path) -> "TaskConfig":
@@ -35,16 +35,14 @@ class TaskConfig(BaseModel):
         return cls(**config_dict)
 
 
-
 class TaskHandler:
-    task_config_cls = TaskConfig
 
     def __init__(self, task_config: TaskConfig):
         self.task_config = task_config
-    
+
     @classmethod
     def from_config_path(cls, config_path: str) -> "TaskHandler":
-        task_config = cls.task_config_cls.from_yaml(config_path)
+        task_config = TaskConfig.from_yaml(config_path)
         return cls(task_config)
 
     @property

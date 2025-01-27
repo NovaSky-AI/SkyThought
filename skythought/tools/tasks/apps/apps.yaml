@@ -11,3 +11,5 @@ templating_parameters:
   without_fn_name_template: "Generate an executable Python function generated from the given prompt. Return the function body without invoking it at the final solution. {prompt}"
   # Add starter code on top of the initial template
   with_starter_code_template: "{input}\n{starter_code}"
+# preprocess_config;
+#   difficulty: easy # optional filter config

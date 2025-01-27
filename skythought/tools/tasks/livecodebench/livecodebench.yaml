@@ -10,4 +10,5 @@ answer_key: null
 templating_parameters: 
   stdin_template: "Generate an executable Python function generated from the given prompt. The function should take stdin as input and print the output. Simply call the function after the definition. {prompt}"
   non_stdin_template: "Generate an executable Python function generated from the given prompt. Return the function body without invoking it at the final solution. {prompt}"
-difficulty: null # use all by default
+preprocess_config: null 
+#   difficulty: easy # use all by default

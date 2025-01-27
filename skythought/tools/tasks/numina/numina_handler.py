@@ -1,18 +1,10 @@
-from typing import Optional
-
 from datasets import load_dataset
-
-from tasks.base import TaskConfig, TaskHandler
+from tasks.base import TaskHandler
 from util.common import TimeoutException, timeout
 from util.math_parsing_util import extract_answer, math_equal, strip_answer_string
 
 
-class NUMINATaskConfig(TaskConfig):
-    difficulty: Optional[str] = None  # use all by default
-
-
 class NUMINATaskHandler(TaskHandler):
-    task_config_cls = NUMINATaskConfig
 
     def generate_prompt(self, prompt):
         return self.task_config.templating_parameters["template"].format(prompt=prompt)

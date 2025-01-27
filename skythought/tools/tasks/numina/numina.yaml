@@ -6,3 +6,5 @@ question_key: problem
 answer_key: solution
 templating_parameters:
   template: "Return your final response within \\boxed{{}}. {prompt}"
+preprocess_config:
+  difficulty: null

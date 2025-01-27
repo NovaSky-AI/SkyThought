@@ -2,36 +2,25 @@ import copy
 import json
 import multiprocessing
 from multiprocessing import Manager
-from typing import Optional
 
 import numpy as np
-
 from tasks.apps.apps_util import run_test as apps_run_test
 from util.common import has_code
 
-from ..base import TaskHandler, TaskConfig
+from ..base import TaskHandler
 
-
-class APPSTaskConfig(TaskConfig):
-    # by default, no filter on difficulty
-    difficulty: Optional[str] = None
 
 class APPSTaskHandler(TaskHandler):
-    task_config_cls = APPSTaskConfig
 
     def generate_prompt(self, test_case, prompt, starter_code=None):
         if not test_case.get("fn_name"):
             _input = self.task_config.templating_parameters[
                 "with_fn_name_template"
-            ].format(
-                prompt=prompt
-            )  
+            ].format(prompt=prompt)
         else:
             _input = self.task_config.templating_parameters[
                 "without_fn_name_template"
-            ].format(
-                prompt=prompt
-            ) 
+            ].format(prompt=prompt)
         if starter_code is not None:
             _input = self.task_config.templating_parameters[
                 "with_starter_code_template"
@@ -112,9 +101,11 @@ class APPSTaskHandler(TaskHandler):
         self, start, end, split=None, source=None, filter_difficulty=None, args=None
     ):
         train_data = self.load_dataset(source=source, split=split).to_pandas()
-        if filter_difficulty or self.task_config.difficulty:
+        if filter_difficulty or self.task_config.preprocess_config.difficulty:
             difficulty = (
-                self.task_config.difficulty if not filter_difficulty else filter_difficulty
+                self.task_config.preprocess_config.difficulty
+                if not filter_difficulty
+                else filter_difficulty
             )
             train_data = train_data.filter(lambda x: x["difficulty"] == difficulty)
 

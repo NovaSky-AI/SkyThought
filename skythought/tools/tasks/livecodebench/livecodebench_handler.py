@@ -1,7 +1,8 @@
 import copy
-from typing import Dict, Optional
+from typing import Dict
 
-from tasks.base import TaskConfig, TaskHandler
+from datasets import Dataset as HFDataset
+from tasks.base import TaskHandler
 from tasks.livecodebench.livecodebench_util import (
     map_to_example,
     post_process_code,
@@ -9,15 +10,9 @@ from tasks.livecodebench.livecodebench_util import (
     unsafe_lcb_runTests,
 )
 from util.common import has_code
-from datasets import Dataset as HFDataset
-
-
-class LiveCodeBenchTaskConfig(TaskConfig):
-    difficulty: Optional[str] = None  # use all by default
 
 
 class LiveCodeBenchTaskHandler(TaskHandler):
-    task_config_cls = LiveCodeBenchTaskConfig
 
     def generate_prompt(self, problem):
         if problem["is_stdin"]:
@@ -106,13 +101,17 @@ class LiveCodeBenchTaskHandler(TaskHandler):
     ):
         dataset: HFDataset = self.load_dataset(source=source, split=split)
         # Filter by CLI or config
-        if filter_difficulty or self.task_config.difficulty:
-            difficulty = source if filter_difficulty else self.task_config.difficulty
+        if filter_difficulty or self.task_config.preprocess_config.difficulty:
+            difficulty = (
+                source
+                if filter_difficulty
+                else self.task_config.preprocess_config.difficulty
+            )
             dataset = dataset.filter(
                 lambda example: example["difficulty"] == difficulty
             )
-        # We use a lower writer_batch_size to avoid pyarrow issues. JSON entries with LiveCodeBench are large. 
-        # See: https://github.com/NovaSky-AI/SkyThought/pull/45 for details. 
+        # We use a lower writer_batch_size to avoid pyarrow issues. JSON entries with LiveCodeBench are large.
+        # See: https://github.com/NovaSky-AI/SkyThought/pull/45 for details.
         dataset = dataset.map(
             lambda example: {
                 "private_test_cases": translate_private_test_cases(

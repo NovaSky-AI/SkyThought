@@ -1,22 +1,15 @@
 import json
 import multiprocessing
 from multiprocessing import Manager
-from typing import Optional
 
 import numpy as np
-
 from tasks.taco.taco_util import run_test as taco_run_test
 from util.common import has_code
 
-from ..base import TaskConfig, TaskHandler
-
-
-class TACOTaskConfig(TaskConfig):
-    difficulty: Optional[str] = None  # use all by default
+from ..base import TaskHandler
 
 
 class TACOTaskHandler(TaskHandler):
-    task_config_cls = TACOTaskConfig
 
     def generate_prompt(self, prompt, starter_code=None, fn_name=None):
         _input = self.task_config.templating_parameters["initial_template"].format(
@@ -117,8 +110,12 @@ class TACOTaskHandler(TaskHandler):
         self, start, end, split=None, source=None, filter_difficulty=None, args=None
     ):
         dataset = self.load_dataset(source=source, split=split).to_pandas()
-        if filter_difficulty or self.task_config.difficulty:
-            difficulty = source if filter_difficulty else self.task_config.difficulty
+        if filter_difficulty or self.task_config.preprocess_config.difficulty:
+            difficulty = (
+                source
+                if filter_difficulty
+                else self.task_config.preprocess_config.difficulty
+            )
             dataset = dataset.filter(
                 lambda example: example["difficulty"] == difficulty
             )
