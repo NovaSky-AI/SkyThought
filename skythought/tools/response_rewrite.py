@@ -3,11 +3,11 @@ import json
 import os
 import random
 
-from skythought.tools.util.math_parsing_util import strip_answer_string
 from tqdm import tqdm
 from vllm import LLM, SamplingParams
 
-from util.model_utils import (
+from .util.math_parsing_util import strip_answer_string
+from .util.model_utils import (
     SUBPROBLEM_SPLIT_PROMPT,
     SUBSOLUTION_EXTRACTION_PROMPT,
     SYSTEM_PROMPT,

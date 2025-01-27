@@ -1,8 +1,8 @@
 import re
 from typing import Any, Dict
 
-from tasks.base import TaskHandler, TaskConfig
-from util.math_parsing_util import extract_answer
+from ...util.math_parsing_util import extract_answer
+from ..base import TaskConfig, TaskHandler
 
 
 class ARCChallengeTaskHandler(TaskHandler):
@@ -30,7 +30,9 @@ class ARCChallengeTaskHandler(TaskHandler):
     def check_correctness(self, problem: Dict[str, Any], generation: str) -> bool:
         gt_answer = problem[self.task_config.answer_key]
         if gt_answer not in self.canonical_options:
-            gt_answer = self.canonical_options[int(problem[self.task_config.answer_key]) - 1]
+            gt_answer = self.canonical_options[
+                int(problem[self.task_config.answer_key]) - 1
+            ]
         model_answer = self.get_answer(generation)
         return model_answer == gt_answer
 

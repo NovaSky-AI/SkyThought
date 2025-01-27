@@ -1,7 +1,8 @@
-from datasets import load_dataset
-
-from util.math_parsing_util import get_multiple_choice_answer, mmlu_pro_extract_answer
-from tasks.base import TaskHandler, TaskConfig
+from ...util.math_parsing_util import (
+    get_multiple_choice_answer,
+    mmlu_pro_extract_answer,
+)
+from ..base import TaskConfig, TaskHandler
 
 
 class MMLUTaskHandler(TaskHandler):
@@ -34,10 +35,11 @@ class MMLUTaskHandler(TaskHandler):
 
     def get_multiple_choice_answers(self, problem):
         options = problem["choices"]
-        for i, (label, option) in enumerate(zip("ABCD", options)):
-            options[i] = f"({label}) {str(option).strip()}"
-        options = " ".join(options)
-        return f"Answer Choices: {options}"
+        options_str = ""
+        for _, (label, option) in enumerate(zip("ABCD", options)):
+            options_str += f"({label}) {str(option).strip()} "
+        options_str = options_str[:-1]  # remove the last space
+        return f"Answer Choices: {options_str}"
 
     def make_conversations(self, data, system_prompt, model=None):
         conversations = []

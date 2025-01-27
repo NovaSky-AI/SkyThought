@@ -1,0 +1,14 @@
+set -e 
+
+GIT_ROOT=$(git rev-parse --show-toplevel)
+
+tools_relative=skythought/tools
+# Only run pre-commit if changes are in tools/
+# Run pre-commit from tools/ directory to use linting rules in this directory
+tools_files=$(git diff --cached --name-only --relative="./"  -- $tools_relative)
+
+if [ -n $tools_files ]; then
+    cd $TOOLS_DIR;
+    # only get the diffs in tools/ and run pre-commit
+    pre-commit run --files $tools_files --config .pre-commit-config.yaml
+fi

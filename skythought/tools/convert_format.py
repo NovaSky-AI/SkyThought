@@ -8,7 +8,7 @@ from itertools import cycle
 import openai
 from tqdm import tqdm
 
-from util.prompts import convert_prompt, convert_prompt_example
+from .util.prompts import convert_prompt, convert_prompt_example
 
 global args
 

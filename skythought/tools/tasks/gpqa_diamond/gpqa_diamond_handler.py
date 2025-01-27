@@ -1,7 +1,7 @@
 import random
 
-from tasks.base import TaskHandler
-from util.math_parsing_util import get_multiple_choice_answer
+from ...util.math_parsing_util import get_multiple_choice_answer
+from ..base import TaskHandler
 
 
 class GPQADiamondTaskHandler(TaskHandler):

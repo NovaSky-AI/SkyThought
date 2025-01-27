@@ -1,4 +1,4 @@
-from tasks.math.math_handler import MathTaskHandler
+from ..math.math_handler import MathTaskHandler
 
 
 class AMC23TaskHandler(MathTaskHandler):

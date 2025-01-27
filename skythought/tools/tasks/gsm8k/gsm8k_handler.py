@@ -1,8 +1,8 @@
 import re
 from typing import Any, Dict
 
-from tasks.base import TaskHandler, TaskConfig
-from util.math_parsing_util import extract_answer
+from ...util.math_parsing_util import extract_answer
+from ..base import TaskConfig, TaskHandler
 
 
 class GSM8KTaskHandler(TaskHandler):

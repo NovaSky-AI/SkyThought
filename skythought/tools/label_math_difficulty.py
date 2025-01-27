@@ -11,7 +11,7 @@ import openai
 from datasets import load_dataset
 from tqdm import tqdm
 
-from util.prompts import aops_criteria, grading_prompt
+from .util.prompts import aops_criteria, grading_prompt
 
 
 # Function to set the OpenAI API key

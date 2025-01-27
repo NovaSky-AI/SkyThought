@@ -2,14 +2,15 @@ import copy
 from typing import Dict
 
 from datasets import Dataset as HFDataset
-from tasks.base import TaskHandler
-from tasks.livecodebench.livecodebench_util import (
+
+from ...util.common import has_code
+from ..base import TaskHandler
+from .livecodebench_util import (
     map_to_example,
     post_process_code,
     translate_private_test_cases,
     unsafe_lcb_runTests,
 )
-from util.common import has_code
 
 
 class LiveCodeBenchTaskHandler(TaskHandler):

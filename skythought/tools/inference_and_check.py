@@ -10,8 +10,9 @@ from openai import OpenAI
 from tasks import TASK_HANDLER_MAP, NUMINATaskHandler, TaskHandler
 from tasks.task_util import get_tasks
 from tqdm import tqdm
-from util.model_utils import MODEL_TO_NAME, SYSTEM_PROMPT
 from vllm import LLM, SamplingParams
+
+from .util.model_utils import MODEL_TO_NAME, SYSTEM_PROMPT
 
 module_dir = os.path.dirname(os.path.abspath(__file__))
 TASK_NAMES_TO_YAML = get_tasks(os.path.join(module_dir, "tasks"))

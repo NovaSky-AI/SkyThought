@@ -1,6 +1,7 @@
-from typing import Dict 
-from tasks.math.math_handler import MathTaskHandler
-from util.model_utils import MODEL_TO_NAME
+from typing import Dict
+
+from ...util.model_utils import MODEL_TO_NAME
+from ..math.math_handler import MathTaskHandler
 
 
 class AIMETaskHandler(MathTaskHandler):
@@ -11,7 +12,7 @@ class AIMETaskHandler(MathTaskHandler):
             )
         else:
             return self.task_config.templating_parameters["regular_template"].format(
-               prompt=problem["problem"]
+                prompt=problem["problem"]
             )
 
     def make_conversations(self, data, system_prompt, model=None):

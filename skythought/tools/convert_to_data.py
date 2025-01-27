@@ -2,7 +2,7 @@ import argparse
 import json
 import os
 
-from util.prompts import system_prompt
+from .util.prompts import system_prompt
 
 
 def main():
