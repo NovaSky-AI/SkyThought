@@ -42,9 +42,7 @@ __all__ = [
     "run_main",
 ]
 
-import inspect  # noqa: E402
-import sys  # noqa: E402
-import types  # noqa: E402
+import sys, inspect, types
 
 
 def __targspec(func, specs, attr="__orig_arg__"):
@@ -379,9 +377,7 @@ RuntimeModule = _RuntimeModule()
 
 
 class CaseObject(object):
-    """The object returned by a switch statement. When called, it will return True if the given argument equals its value, else False.
-    It can be called with multiple parameters, in which case it checks if its value equals any of the arguments.
-    """
+    "The object returned by a switch statement. When called, it will return True if the given argument equals its value, else False. It can be called with multiple parameters, in which case it checks if its value equals any of the arguments."
 
     def __init__(self, value):
         self.value = value
@@ -393,7 +389,7 @@ class CaseObject(object):
             "res", not self.did_pass and any([self.value == rhs for rhs in args])
         ):
             self.did_match = True
-        return res  # noqa: F821
+        return res
 
     def quit(self):
         "Forces all other calls to return False. Equilavent of a ``break`` statement."
@@ -434,8 +430,7 @@ def switch(value):
 def tail_recurse(spec=None):
     """Remove tail recursion from a function.
 
-    :param spec: A function that, when given the arguments, returns a bool indicating whether or not to exit.
-    If ``None``, tail recursion is always called unless the function returns a value.
+    :param spec: A function that, when given the arguments, returns a bool indicating whether or not to exit. If ``None,`` tail recursion is always called unless the function returns a value.
 
     .. note::
 
@@ -489,7 +484,8 @@ def annotate(*args, **kwargs):
     :param kwargs: This is a mapping of argument names to annotations. Note that these are applied *after* the argument list, so any args set that way will be overriden by this mapping. If there is a key named `ret`, that will be the annotation for the function's return value.
 
     .. deprecated:: 0.5
-      Use :func:`fannotate` instead."""
+      Use :func:`fannotate` instead.
+    """
 
     def _wrap(f):
         if not hasattr(f, "__annotations__"):
@@ -530,8 +526,7 @@ def fannotate(*args, **kwargs):
 
 
 def safe_unpack(seq, ln, fill=None):
-    """Safely unpack a sequence to length `ln`, without raising ValueError. Based on Lua's method of unpacking.
-    Empty values will be filled in with `fill`, while any extra values will be cut off.
+    """Safely unpack a sequence to length `ln`, without raising ValueError. Based on Lua's method of unpacking. Empty values will be filled in with `fill`, while any extra values will be cut off.
 
     :param seq: The sequence to unpack.
 
