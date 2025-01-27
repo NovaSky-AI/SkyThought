@@ -180,14 +180,14 @@ def perform_inference_and_check(
     token_dict = {
         "completion_tokens": sum(completion_tokens),
         "prompt_tokens": sum(prompt_tokens),
-        "avg_completion_tokens": round(
-            sum(completion_tokens) / len(completion_tokens), 3
-        )
-        if completion_tokens
-        else 0,
-        "avg_prompt_tokens": round(sum(prompt_tokens) / len(prompt_tokens), 3)
-        if prompt_tokens
-        else 0,
+        "avg_completion_tokens": (
+            round(sum(completion_tokens) / len(completion_tokens), 3)
+            if completion_tokens
+            else 0
+        ),
+        "avg_prompt_tokens": (
+            round(sum(prompt_tokens) / len(prompt_tokens), 3) if prompt_tokens else 0
+        ),
     }
 
     # Save the token usage dictionary to the result file
@@ -231,9 +231,11 @@ def perform_check(handler: TaskHandler, temperatures, result_file, args):
                                 (
                                     item,
                                     temp,
-                                    response_entry["processed_content"]
-                                    if processed
-                                    else response_entry["content"],
+                                    (
+                                        response_entry["processed_content"]
+                                        if processed
+                                        else response_entry["content"]
+                                    ),
                                     sample_id,
                                 )
                             )
@@ -341,9 +343,11 @@ def perform_inference_and_save(
             completion_token = 0
             for sample_idx in range(args.n):
                 response_entry = {
-                    "content": response.choices[0].message.content.strip()
-                    if args.model.startswith("openai")
-                    else response.outputs[sample_idx].text.strip(),
+                    "content": (
+                        response.choices[0].message.content.strip()
+                        if args.model.startswith("openai")
+                        else response.outputs[sample_idx].text.strip()
+                    ),
                     "correctness": None,
                     "reason": None,
                 }
@@ -397,14 +401,14 @@ def perform_inference_and_save(
     token_dict = {
         "completion_tokens": sum(completion_tokens),
         "prompt_tokens": sum(prompt_tokens),
-        "avg_completion_tokens": round(
-            sum(completion_tokens) / len(completion_tokens), 3
-        )
-        if completion_tokens
-        else 0,
-        "avg_prompt_tokens": round(sum(prompt_tokens) / len(prompt_tokens), 3)
-        if prompt_tokens
-        else 0,
+        "avg_completion_tokens": (
+            round(sum(completion_tokens) / len(completion_tokens), 3)
+            if completion_tokens
+            else 0
+        ),
+        "avg_prompt_tokens": (
+            round(sum(prompt_tokens) / len(prompt_tokens), 3) if prompt_tokens else 0
+        ),
     }
 
     # Save the token usage dictionary to the result file
@@ -527,7 +531,10 @@ def main():
             args.math_difficulty_lower_bound is not None
             or args.math_difficulty_upper_bound is not None
         ):
-            converted_file = f"{args.result_dir}/converted_{MODEL_TO_NAME[args.model]}_{args.task}_{args.split}_{args.source}_{args.start}_{args.end}_{args.math_difficulty_lower_bound}_{args.math_difficulty_upper_bound}.json"
+            converted_file = (
+                f"{args.result_dir}/converted_{MODEL_TO_NAME[args.model]}_{args.task}_{args.split}_{args.source}_{args.start}_{args.end}"
+                + f"_{args.math_difficulty_lower_bound}_{args.math_difficulty_upper_bound}.json"
+            )
         else:
             converted_file = f"{args.result_dir}/converted_{MODEL_TO_NAME[args.model]}_{args.task}_{args.split}_{args.source}_{args.start}_{args.end}.json"
         if os.path.exists(converted_file):
@@ -552,8 +559,15 @@ def main():
         else LLM(model=args.model, tensor_parallel_size=args.tp)
     )
     system_prompt = SYSTEM_PROMPT[args.model]
+
     perform_inference_and_check(
-        handler, temperatures, max_tokens, result_file, llm, system_prompt, args
+        handler,
+        temperatures,
+        max_tokens,
+        result_file,
+        llm,
+        system_prompt,
+        args,
     )
 
 

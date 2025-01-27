@@ -5,6 +5,7 @@ Upload weights to huggingface.
 Usage:
 python upload_hub.py --model-path ~/model_weights/Sky-T1 --hub-repo-id NovaSky-AI/Sky-T1 --private
 """
+
 import argparse
 import tempfile
 
