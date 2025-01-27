@@ -3,3 +3,4 @@ line-length = 160
 
 [tool.ruff.lint]
 extend-select = ["E", "F", "I", "ASYNC", "B"]
+ignore = ["F811", "B006"]

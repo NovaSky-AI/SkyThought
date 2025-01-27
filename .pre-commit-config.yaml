@@ -4,7 +4,8 @@ repos:
     hooks:
       - id: ruff
         args: [ --fix, --exit-non-zero-on-fix ]
-        exclude: ^skythought/train
+        exclude: (^skythought/train|skythought_evals/tasks/taco/pyext2\.py|skythought_evals/tasks/taco/taco_util\.py|skythought_evals/tasks/apps/apps_util\.py|skythought_evals/util/prompts\.py|skythought_evals/util/model_utils\.py)$
+
 
   # Black needs to be ran after ruff with --fix
   - repo: https://github.com/psf/black

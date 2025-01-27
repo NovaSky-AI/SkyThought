@@ -12,9 +12,5 @@ else
     pip install -q pre-commit
 fi
 
-# Hook file should be executable
-HOOK_SCRIPT=$GIT_ROOT/.githooks/pre-commit
-chmod +x $HOOK_SCRIPT
-
 # pre-commit run --all-files always runs from the root directory. we run this only on tools/ for now. 
-pre-commit run --files $GIT_ROOT/skythought/tools --config .pre-commit-config.yaml
+pre-commit run --all-files --config .pre-commit-config.yaml
