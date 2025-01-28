@@ -41,8 +41,6 @@ def test_make_conversations(row, config, handler_cls, expected_conversation):
     # Initialize the handler
     handler = handler_cls(config)
 
-    # Expected conversation format
-    # expected input
     # Call make_conversations
     conversations = handler.make_conversations([row], system_prompt)
     # Assert the conversation is as expected
