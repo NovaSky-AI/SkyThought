@@ -1,6 +1,16 @@
 name: Skythought evals
 
-on: [push]
+on:
+  push:
+    branches:
+      - main  # or your default branch
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  checks: write   # for status checks to appear
+  contents: read
 
 # Cancel runs for previous commits on the same branch
 concurrency:
