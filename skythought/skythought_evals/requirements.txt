@@ -4,3 +4,4 @@ word2number
 scipy
 datasets
 latex2sympy2
+pydantic
