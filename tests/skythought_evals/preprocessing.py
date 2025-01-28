@@ -1,10 +1,11 @@
 import pytest
-from skyevals.tasks import MMLUTaskHandler, TaskConfig
+from skythought_evals.tasks import MMLUTaskHandler, TaskConfig
+
+SYSTEM_PROMPT = "Please answer the following question:"
 
 inputs = [
     (
         {
-            "is_stdin": False,
             "question": "What is the capital of France?",
             "choices": ["Paris", "London", "Berlin", "Madrid"],
             "answer": "0",
@@ -21,7 +22,7 @@ inputs = [
         ),
         MMLUTaskHandler,
         [
-            {"role": "system", "content": "Please answer the following question:"},
+            {"role": "system", "content": SYSTEM_PROMPT},
             {
                 "role": "user",
                 "content": "Return your final response within \\boxed{}. What is the capital of France?\nAnswer Choices: (A) Paris (B) London (C) Berlin (D) Madrid",  # noqa: E501

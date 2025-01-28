@@ -1,6 +1,6 @@
 handler: taco
 dataset_path: "BAAI/TACO"
-dataset_source: ALL
+dataset_source: MEDIUM
 dataset_split: train
 dataset_kwargs:
   trust_remote_code: true

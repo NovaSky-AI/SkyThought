@@ -104,7 +104,7 @@ class LiveCodeBenchTaskHandler(TaskHandler):
         # Filter by CLI or config
         if filter_difficulty or self.task_config.preprocess_config.difficulty:
             difficulty = (
-                source
+                filter_difficulty
                 if filter_difficulty
                 else self.task_config.preprocess_config.difficulty
             )
