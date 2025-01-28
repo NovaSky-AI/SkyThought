@@ -29,6 +29,6 @@ jobs:
       - name: Install skythought_evals
         run: python -m pip install -e .
       - name: Run pre-commit hooks
-        run: pre-commit run --all-files
+        run: pre-commit run --all-files --config .pre-commit-config.yaml
       - name: Run tests
         run: python -m pytest tests/
