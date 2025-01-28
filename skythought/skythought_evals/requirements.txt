@@ -1,4 +1,4 @@
-vllm==0.6.2
+vllm==0.7.0
 pyext
 word2number
 scipy
