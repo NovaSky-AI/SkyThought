@@ -167,6 +167,5 @@ cython_debug/
 
 .json
 token_usage/
-test_*
 
 run_all.sh
