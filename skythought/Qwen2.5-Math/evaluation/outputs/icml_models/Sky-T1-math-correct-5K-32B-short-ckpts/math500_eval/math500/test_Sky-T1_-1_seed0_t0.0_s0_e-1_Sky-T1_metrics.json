@@ -3,7 +3,7 @@
     "num_scores": 500,
     "timeout_samples": 0,
     "empty_samples": 1,
-    "acc": 71.6,
-    "time_use_in_second": 721.6275916099548,
-    "time_use_in_minite": "12:01"
+    "acc": 70.4,
+    "time_use_in_second": 673.9755213260651,
+    "time_use_in_minite": "11:13"
 }
