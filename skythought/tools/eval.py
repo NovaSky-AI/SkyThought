@@ -73,6 +73,7 @@ def main():
             "--model", model_path, 
             "--dataset", eval_name, 
             "--split", eval_to_split[eval_name], 
+            "--max_tokens", "8192" if model_path.startswith("deepseek") else "16384",
             "--tp", str(tp),
             "--temperatures"
         ]
