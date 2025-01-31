@@ -27,7 +27,7 @@ TASK_HANDLER_MAP = {
     "arc_c": ARCChallengeTaskHandler,
     "amc23": AMC23TaskHandler,
     "minervamath": MinervaMathTaskHandler,
-    "olympiadbench_math_en": OlympiadBenchMathTaskHandler,
+    "olympiadbench_math": OlympiadBenchMathTaskHandler,
 }
 
 __all__ = [

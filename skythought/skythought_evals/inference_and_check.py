@@ -7,7 +7,12 @@ from functools import partial
 
 import numpy as np
 from openai import OpenAI
-from skythought_evals.tasks import TASK_HANDLER_MAP, NUMINATaskHandler, TaskHandler
+from skythought_evals.tasks import (
+    TASK_HANDLER_MAP,
+    NUMINATaskHandler,
+    TaskConfig,
+    TaskHandler,
+)
 from skythought_evals.tasks.task_util import get_tasks
 from skythought_evals.util.model_utils import MODEL_TO_NAME, SYSTEM_PROMPT
 from tqdm import tqdm
@@ -490,9 +495,15 @@ def main():
     )
     args = parser.parse_args()
 
-    handler_cls: TaskHandler = TASK_HANDLER_MAP[args.task]
-    config_path = TASK_NAMES_TO_YAML[args.task]
-    handler = handler_cls.from_config_path(config_path)
+    if args.task not in TASK_NAMES_TO_YAML:
+        raise ValueError(
+            f"Task {args.task} not found. Should be one of {TASK_NAMES_TO_YAML.keys()}"
+        )
+
+    task_config = TaskConfig.from_yaml(TASK_NAMES_TO_YAML[args.task])
+    handler_name = task_config.handler
+    handler_cls = TASK_HANDLER_MAP[handler_name]
+    handler = handler_cls(task_config)
 
     temperatures = [1] if args.model.startswith("openai/o1") else args.temperatures
 
