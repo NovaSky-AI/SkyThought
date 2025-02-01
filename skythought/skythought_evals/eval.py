@@ -22,10 +22,10 @@ def parse_arguments():
     )
     parser.add_argument("--tp", type=int, default=8, help="Tensor Parallelism Degree")
     parser.add_argument(
-        "--filter-difficulty",
+        "--difficulty",
         type=str,
         default=None,
-        help="Optional filter difficulty. Options: 'easy', 'medium', 'hard'.",
+        help="Difficulty for the dataset. Options: 'easy', 'medium', 'hard'",
     )
     parser.add_argument("--subset", type=str, help="Subset for the dataset.")
     parser.add_argument(
