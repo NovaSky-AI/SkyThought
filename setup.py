@@ -13,14 +13,11 @@ def get_requirements():
 setuptools.setup(
     name="skythought_evals",
     version="0.0.1",
-    package_dir={
-        "skythought_evals": "skythought/skythought_evals"
-    },  # map skythought_evals to skythought/skythought_evals
-    packages=["skythought_evals"]
-    + [
-        f"skythought_evals.{pkg}"
-        for pkg in setuptools.find_packages(where="skythought/skythought_evals")
-    ],
+    package_dir={"": "skythought"},
+    packages=setuptools.find_packages(
+        where="skythought",
+        include=["skythought_evals*"],  # Only pick up skythought_evals, skip 'train'
+    ),
     install_requires=get_requirements(),
     python_requires=">=3.9,<3.12",  # pyext doesn't work with python 3.12
 )
