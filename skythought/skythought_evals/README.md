@@ -27,13 +27,13 @@ The expected output is labeled_source_0_-1.json. We also provide instructions to
 Inference the results from QwQ on several datasets. In preview version, we use data from the following dataset.
 
 ```shell
-python inference_and_check.py --task apps --model Qwen/QwQ-32B-Preview --tp 8 --max_tokens 16384 --split test --source all --result-dir $SKYT_HOME/data --inference
+python inference_and_check.py --task apps --model Qwen/QwQ-32B-Preview --tp 8 --max_tokens 16384 --split test --difficulty all --result-dir $SKYT_HOME/data --inference
 
-python inference_and_check.py --task taco --model Qwen/QwQ-32B-Preview --tp 8 --max_tokens 16384 --split train --source MEDIUM --filter-difficulty --result-dir $SKYT_HOME/data --inference
+python inference_and_check.py --task taco --model Qwen/QwQ-32B-Preview --tp 8 --max_tokens 16384 --split train --difficulty MEDIUM--result-dir $SKYT_HOME/data --inference
 
-python inference_and_check.py --task taco --model Qwen/QwQ-32B-Preview --tp 8 --max_tokens 16384 --split test --source all --result-dir $SKYT_HOME/data --inference
+python inference_and_check.py --task taco --model Qwen/QwQ-32B-Preview --tp 8 --max_tokens 16384 --split test --difficulty all --result-dir $SKYT_HOME/data --inference
 
-python inference_and_check.py --task numina --model Qwen/QwQ-32B-Preview --tp 8 --max_tokens 16384 --split train --source math --filter-difficulty math --result-dir $SKYT_HOME/data --inference
+python inference_and_check.py --task numina --model Qwen/QwQ-32B-Preview --tp 8 --max_tokens 16384 --split train --source math --filter-difficulty --result-dir $SKYT_HOME/data --inference
 
 python inference_and_check.py --task numina --model Qwen/QwQ-32B-Preview --tp 8 --max_tokens 16384 --split train --source amc_aime --filter-difficulty --result-dir $SKYT_HOME/data --inference
 
@@ -48,7 +48,7 @@ python convert_format.py --input_dir $SKYT_HOME/data --keys keys.txt
 
 ### Step 3: Reject Sampling on the formatted data (Example Usage with previous script)
 ```shell 
-python inference_and_check.py --task apps --model Qwen/QwQ-32B-Preview --tp 8 --max_tokens 16384 --split test --source all --result-dir $SKYT_HOME/data --check
+python inference_and_check.py --task apps --model Qwen/QwQ-32B-Preview --tp 8 --max_tokens 16384 --split test --subset all --result-dir $SKYT_HOME/data --check
 ```
 Similar for other datasets.
 
@@ -67,17 +67,17 @@ Currently we support distill and reject sampling from various self-hosted models
 #### Example Usage
 
 ```shell
-python inference_and_check.py --task apps --model Qwen/QwQ-32B-Preview --tp 8 --max_tokens 16384 --split test --source all --result-dir $SKYT_HOME/data
+python inference_and_check.py --task apps --model Qwen/QwQ-32B-Preview --tp 8 --max_tokens 16384 --split test --difficulty all --result-dir $SKYT_HOME/data
 
-python inference_and_check.py --task taco --model Qwen/QwQ-32B-Preview --tp 8 --max_tokens 16384 --split train --filter-difficulty MEDIUM --result-dir $SKYT_HOME/data
+python inference_and_check.py --task taco --model Qwen/QwQ-32B-Preview --tp 8 --max_tokens 16384 --split train --difficulty MEDIUM --result-dir $SKYT_HOME/data
 
-python inference_and_check.py --task taco --model Qwen/QwQ-32B-Preview --tp 8 --max_tokens 16384 --split test --source all --result-dir $SKYT_HOME/data
+python inference_and_check.py --task taco --model Qwen/QwQ-32B-Preview --tp 8 --max_tokens 16384 --split test --difficulty all --result-dir $SKYT_HOME/data
 
-python inference_and_check.py --task numina --model Qwen/QwQ-32B-Preview --tp 8 --max_tokens 16384 --split train --source math --filter-difficulty true --result-dir $SKYT_HOME/data --math-difficulty-lower-bound 4 --math-difficulty-upper-bound 9
+python inference_and_check.py --task numina --model Qwen/QwQ-32B-Preview --tp 8 --max_tokens 16384 --split train --source math --filter-difficulty --result-dir $SKYT_HOME/data --math-difficulty-lower-bound 4 --math-difficulty-upper-bound 9
 
-python inference_and_check.py --task numina --model Qwen/QwQ-32B-Preview --tp 8 --max_tokens 16384 --split train --source amc_aime --filter-difficulty true --result-dir $SKYT_HOME/data --math-difficulty-lower-bound 1 --math-difficulty-upper-bound 9
+python inference_and_check.py --task numina --model Qwen/QwQ-32B-Preview --tp 8 --max_tokens 16384 --split train --source amc_aime --filter-difficulty --result-dir $SKYT_HOME/data --math-difficulty-lower-bound 1 --math-difficulty-upper-bound 9
 
-python inference_and_check.py --task numina --model Qwen/QwQ-32B-Preview --tp 8 --max_tokens 16384 --split train --end 20000 --filter-difficulty olympiads --result-dir $SKYT_HOME/data --math-difficulty-lower-bound 9 --math-difficulty-upper-bound 9
+python inference_and_check.py --task numina --model Qwen/QwQ-32B-Preview --tp 8 --max_tokens 16384 --split train --end 20000--source olympiads --filter-difficulty --result-dir $SKYT_HOME/data --math-difficulty-lower-bound 9 --math-difficulty-upper-bound 9
 ```
 
 #### Best-of-N Inference and Check

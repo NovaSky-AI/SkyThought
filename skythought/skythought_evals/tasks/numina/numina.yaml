@@ -7,8 +7,8 @@ answer_key: solution
 templating_parameters:
   template: "Return your final response within \\boxed{{}}. {prompt}"
 # Optionally, you can filter the dataset by difficulty
-preprocess_config:
-  filter_difficulty: true
-  math_difficulty_lower_bound: 4
-  math_difficulty_upper_bound: 9
-  source: math
+# preprocess_config:
+#   filter_difficulty: true
+#   math_difficulty_lower_bound: 4
+#   math_difficulty_upper_bound: 9
+#   source: math

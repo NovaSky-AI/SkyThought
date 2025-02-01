@@ -27,7 +27,7 @@ def parse_arguments():
         default=None,
         help="Optional filter difficulty. Options: 'easy', 'medium', 'hard'.",
     )
-    parser.add_argument("--source", type=str, help="Source for the dataset.")
+    parser.add_argument("--subset", type=str, help="Subset for the dataset.")
     parser.add_argument(
         "--output_file",
         required=True,
