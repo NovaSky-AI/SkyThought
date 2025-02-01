@@ -2,12 +2,8 @@
 This document describes the steps to training data curation and evaluation scripts for Sky-T1. 
 
 ## Requirements 
-First create the environment as follows.
-```shell
-conda create -n eval python==3.10
-conda activate eval 
-pip install -r requirements.txt
-```
+
+Make sure you have installed the `skythought-evals` package as outlined in the [README.md](../README.md).
 
 For running OpenAI model, export the OpenAI key. 
 ```shell

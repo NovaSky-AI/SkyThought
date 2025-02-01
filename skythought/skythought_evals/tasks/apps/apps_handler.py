@@ -101,7 +101,7 @@ class APPSTaskHandler(TaskHandler):
     def load_and_filter_dataset(
         self, start, end, split=None, subset=None, difficulty=None, args=None
     ):
-        train_data = self.load_dataset(subset=subset, split=split).to_pandas()
+        train_data = self.load_dataset(subset=subset, split=split)
         if difficulty or "difficulty" in self.task_config.preprocess_config:
             difficulty = (
                 self.task_config.preprocess_config["difficulty"]
@@ -109,6 +109,8 @@ class APPSTaskHandler(TaskHandler):
                 else difficulty
             )
             train_data = train_data.filter(lambda x: x["difficulty"] == difficulty)
+
+        train_data = train_data.to_pandas()
 
         return train_data.iloc[start:end] if end > 0 else train_data.iloc[start:]
 
