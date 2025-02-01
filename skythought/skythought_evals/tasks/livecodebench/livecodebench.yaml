@@ -1,6 +1,6 @@
 handler: livecodebench
 dataset_path: "livecodebench/code_generation_lite"  # repo ID in huggingface
-dataset_source: null 
+dataset_subset: null 
 dataset_split: test
 dataset_kwargs:
   version_tag: release_v2

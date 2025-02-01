@@ -102,9 +102,9 @@ def main():
         ]
         command.extend(temperatures)  # Add temperatures as separate arguments
 
-        if args.filter_difficulty:
-            command.append("--filter-difficulty")
-            command.append(args.filter_difficulty)
+        if args.difficulty:
+            command.append("--difficulty")
+            command.append(args.difficulty)
 
         print(f"Running eval {eval_name} with command {command}")
         all_logs += f"\nRunning eval: {eval_name} with command {command}\n"

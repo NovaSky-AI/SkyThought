@@ -14,6 +14,7 @@ from skythought_evals.tasks import (
     TaskHandler,
 )
 from skythought_evals.tasks.task_util import get_tasks
+from skythought_evals.util.common import set_seed
 from skythought_evals.util.model_utils import MODEL_TO_NAME, SYSTEM_PROMPT
 from tqdm import tqdm
 from vllm import LLM, SamplingParams
@@ -70,8 +71,8 @@ def perform_inference_and_check(
         args.start,
         args.end,
         split=args.split,
-        source=args.source,
-        filter_difficulty=args.filter_difficulty,
+        subset=args.subset,
+        difficulty=args.difficulty,
         args=args,
     )
     remaining_data = handler.process_remaining_data(train_data, results)
@@ -212,8 +213,8 @@ def perform_check(handler: TaskHandler, temperatures, result_file, args):
         args.start,
         args.end,
         split=args.split,
-        source=args.source,
-        filter_difficulty=args.filter_difficulty,
+        subset=args.subset,
+        difficulty=args.difficulty,
         args=args,
     )
     remaining_data = handler.process_remaining_data(train_data, {})
@@ -313,8 +314,8 @@ def perform_inference_and_save(
         args.start,
         args.end,
         split=args.split,
-        source=args.source,
-        filter_difficulty=args.filter_difficulty,
+        subset=args.subset,
+        difficulty=args.difficulty,
         args=args,
     )
     remaining_data = handler.process_remaining_data(train_data, results)
@@ -453,14 +454,24 @@ def main():
         default=None,
         help="Split to use for the dataset (e.g., train, test).",
     )
-    parser.add_argument("--source", type=str, help="Source for the dataset.")
+    parser.add_argument("--subset", type=str, help="Subset for the dataset.")
     parser.add_argument("--start", type=int, default=0, help="Start index.")
     parser.add_argument("--end", type=int, default=-1, help="End index.")
     parser.add_argument(
-        "--filter-difficulty",
+        "--difficulty",
         type=str,
         default=None,
-        help="Optional filter difficulty. Options: 'easy', 'medium', 'hard'.",
+        help="Difficulty level. Example: 'easy', 'medium', 'hard'.",
+    )
+    parser.add_argument(
+        "--filter-difficulty",
+        action="store_true",
+        help="Optional filter difficulty, used for NUMINA.",
+    )
+    parser.add_argument(
+        "--source",
+        type=str,
+        help="Source column filter for the dataset, used for NUMINA.",
     )
     parser.add_argument(
         "--result-dir", type=str, default="./", help="Result dir to save files."
@@ -493,7 +504,10 @@ def main():
     parser.add_argument(
         "--n", type=int, default=1, help="Number of samples generated per problem."
     )
+    parser.add_argument("--seed", type=int, default=41, help="Random seed.")
+
     args = parser.parse_args()
+    set_seed(args.seed)
 
     if args.task not in TASK_NAMES_TO_YAML:
         raise ValueError(
@@ -516,9 +530,10 @@ def main():
     # TODO: this can be cleaned up by allowing user override for any task_config with optional task_args
     # Currently kept here for consistency with old code
     args.split = args.split if args.split else handler.task_config.dataset_split
-    args.source = args.source if args.source else handler.task_config.dataset_source
-    if not args.filter_difficulty and handler.task_config.preprocess_config:
-        args.filter_difficulty = handler.task_config.preprocess_config.difficulty
+    args.subset = args.subset if args.subset else handler.task_config.dataset_subset
+    if not args.difficulty and "difficulty" in handler.task_config.preprocess_config:
+        args.difficulty = handler.task_config.preprocess_config["difficulty"]
+
     # create result dir if not exists
     if args.result_dir and not os.path.exists(args.result_dir):
         os.makedirs(args.result_dir)
@@ -528,12 +543,12 @@ def main():
     ):
         result_file = os.path.join(
             args.result_dir,
-            f"{MODEL_TO_NAME[args.model]}_{args.task}_{args.split}_{args.source}_{args.filter_difficulty}_{args.start}_{args.end}_{args.math_difficulty_lower_bound}_{args.math_difficulty_upper_bound}.json",
+            f"{MODEL_TO_NAME[args.model]}_{args.task}_{args.split}_{args.subset}_{args.filter_difficulty}_{args.start}_{args.end}_{args.math_difficulty_lower_bound}_{args.math_difficulty_upper_bound}.json",
         )
     else:
         result_file = os.path.join(
             args.result_dir,
-            f"{MODEL_TO_NAME[args.model]}_{args.task}_{args.split}_{args.source}_{args.filter_difficulty}_{args.start}_{args.end}.json",
+            f"{MODEL_TO_NAME[args.model]}_{args.task}_{args.split}_{args.subset}_{args.filter_difficulty}_{args.start}_{args.end}.json",
         )
 
     if args.check:
@@ -543,11 +558,11 @@ def main():
             or args.math_difficulty_upper_bound is not None
         ):
             converted_file = (
-                f"{args.result_dir}/converted_{MODEL_TO_NAME[args.model]}_{args.task}_{args.split}_{args.source}_{args.filter_difficulty}_{args.start}_{args.end}"
+                f"{args.result_dir}/converted_{MODEL_TO_NAME[args.model]}_{args.task}_{args.split}_{args.subset}_{args.filter_difficulty}_{args.start}_{args.end}"
                 + f"_{args.math_difficulty_lower_bound}_{args.math_difficulty_upper_bound}.json"
             )
         else:
-            converted_file = f"{args.result_dir}/converted_{MODEL_TO_NAME[args.model]}_{args.task}_{args.split}_{args.source}_{args.filter_difficulty}"
+            converted_file = f"{args.result_dir}/converted_{MODEL_TO_NAME[args.model]}_{args.task}_{args.split}_{args.subset}_{args.filter_difficulty}"
             f"_{args.start}_{args.end}.json"
         if os.path.exists(converted_file):
             result_file = converted_file

@@ -98,15 +98,15 @@ class LiveCodeBenchTaskHandler(TaskHandler):
         return conversations
 
     def load_and_filter_dataset(
-        self, start, end, split=None, source=None, filter_difficulty=None, args=None
+        self, start, end, split=None, subset=None, difficulty=None, args=None
     ):
-        dataset: HFDataset = self.load_dataset(source=source, split=split)
+        dataset: HFDataset = self.load_dataset(subset=subset, split=split)
         # Filter by CLI or config
-        if filter_difficulty or self.task_config.preprocess_config.difficulty:
+        if difficulty or "difficulty" in self.task_config.preprocess_config:
             difficulty = (
-                filter_difficulty
-                if filter_difficulty
-                else self.task_config.preprocess_config.difficulty
+                difficulty
+                if difficulty
+                else self.task_config.preprocess_config["difficulty"]
             )
             dataset = dataset.filter(
                 lambda example: example["difficulty"] == difficulty

@@ -1,6 +1,6 @@
 handler: gpqa_diamond
 dataset_path: Idavidrein/gpqa
-dataset_source: gpqa_diamond
+dataset_subset: gpqa_diamond
 dataset_split: train
 question_key: Question
 answer_key: Answer

@@ -72,21 +72,36 @@ class NUMINATaskHandler(TaskHandler):
         return conversations
 
     def load_and_filter_dataset(
-        self, start, end, split="train", source=None, filter_difficulty=None, args=None
+        self, start, end, split=None, subset=None, difficulty=None, args=None
     ):
-        dataset = self.load_dataset(source=source, split=split).to_pandas()
+        dataset = self.load_dataset(subset=subset, split=split).to_pandas()
+
+        if args.source:
+            dataset = dataset[dataset["source"] == args.source]
         dataset = dataset.iloc[start:end] if end > 0 else dataset.iloc[start:]
         dataset = dataset[dataset["solution"].str.contains("boxed", na=False)]
-        if filter_difficulty:
-            diff_dict = self.get_difficulty_dict(source, start, end)
+
+        if (
+            args.filter_difficulty
+            or "filter_difficulty" in self.task_config.preprocess_config
+        ):
+            lower_bound = (
+                args.math_difficulty_lower_bound
+                if args.filter_difficulty
+                else self.task_config.preprocess_config["math_difficulty_lower_bound"]
+            )
+            upper_bound = (
+                args.math_difficulty_upper_bound
+                if args.filter_difficulty
+                else self.task_config.preprocess_config["math_difficulty_upper_bound"]
+            )
+            diff_dict = self.get_difficulty_dict(args.source, start, end)
             dataset = dataset[
                 dataset["problem"]
                 .map(diff_dict)
-                .apply(
-                    lambda x: x >= args.math_difficulty_lower_bound
-                    and x <= args.math_difficulty_upper_bound
-                )
+                .apply(lambda x: x >= lower_bound and x <= upper_bound)
             ]
+
         return dataset
 
     def process_remaining_data(self, train_data, results):

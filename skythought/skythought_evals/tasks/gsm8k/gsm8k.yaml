@@ -1,6 +1,6 @@
 handler: gsm8k
 dataset_path: "openai/gsm8k"
-dataset_source: main 
+dataset_subset: main 
 dataset_split: test
 question_key: question
 answer_key: answer

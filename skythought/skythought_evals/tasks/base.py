@@ -8,14 +8,10 @@ from datasets import load_dataset
 from pydantic import BaseModel, Field
 
 
-class PreprocessConfig(BaseModel):
-    difficulty: str
-
-
 class TaskConfig(BaseModel):
     handler: str
     dataset_path: str
-    dataset_source: Optional[str] = None
+    dataset_subset: Optional[str] = None
     dataset_split: str
     dataset_kwargs: Dict[str, Any] = Field(default_factory=dict)
     question_key: str
@@ -26,7 +22,7 @@ class TaskConfig(BaseModel):
     fewshot_config: List[Dict[str, Any]] = Field(default_factory=list)
     num_fewshot: int = 0
 
-    preprocess_config: Optional[PreprocessConfig] = None
+    preprocess_config: Dict[str, Any] = Field(default_factory=dict)
 
     @classmethod
     def from_yaml(cls, yaml_file_path) -> "TaskConfig":
@@ -65,17 +61,17 @@ class TaskHandler:
             records = json.load(f)
         return records
 
-    def load_dataset(self, source=None, split=None, **kwargs) -> HFDataset:
+    def load_dataset(self, subset=None, split=None, **kwargs) -> HFDataset:
         dataset = load_dataset(
             path=self.task_config.dataset_path,
-            name=source if source else self.task_config.dataset_source,
+            name=subset if subset else self.task_config.dataset_subset,
             split=split if split else self.task_config.dataset_split,
             **self.task_config.dataset_kwargs
         )
         return dataset
 
     def load_and_filter_dataset(
-        self, start, end, split="train", source=None, filter_difficulty=None, args=None
+        self, start, end, split=None, subset=None, difficulty=None, args=None
     ):
         raise NotImplementedError("Subclasses should implement this method.")
 
