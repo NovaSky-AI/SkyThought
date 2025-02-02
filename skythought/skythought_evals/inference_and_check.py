@@ -75,9 +75,7 @@ def perform_inference_and_check(
         args=args,
     )
     remaining_data = handler.process_remaining_data(train_data, results)
-    conversations = handler.make_conversations(
-        remaining_data, system_prompt, args.model
-    )
+    conversations = handler.make_conversations(remaining_data, system_prompt)
     for temp in temperatures:
         if args.model.startswith("openai"):
             fetch_partial = partial(
@@ -318,9 +316,7 @@ def perform_inference_and_save(
         args=args,
     )
     remaining_data = handler.process_remaining_data(train_data, results)
-    conversations = handler.make_conversations(
-        remaining_data, system_prompt, args.model
-    )
+    conversations = handler.make_conversations(remaining_data, system_prompt)
 
     for temp in temperatures:
         if args.model.startswith("openai"):
