@@ -5,8 +5,10 @@ from skythought_evals.util.math_parsing_util import (
 )
 
 from ..math.math_handler import MathTaskHandler
+from ..task_util import register_handler
 
 
+@register_handler("olympiadbench_math")
 class OlympiadBenchMathTaskHandler(MathTaskHandler):
     def check_correctness(self, problem, generation):
         # all problems have final answer in a list

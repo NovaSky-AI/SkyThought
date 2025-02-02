@@ -1,6 +1,8 @@
 from ..math.math_handler import MathTaskHandler
+from ..task_util import register_handler
 
 
+@register_handler("amc23")
 class AMC23TaskHandler(MathTaskHandler):
     def load_and_filter_dataset(
         self, start, end, split=None, subset=None, difficulty=None, args=None

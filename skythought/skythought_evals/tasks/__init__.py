@@ -12,23 +12,7 @@ from .mmlu.mmlu_handler import MMLUProTaskHandler, MMLUTaskHandler
 from .numina.numina_handler import NUMINATaskHandler
 from .olympiadbench.olympiadbench_handler import OlympiadBenchMathTaskHandler
 from .taco.taco_handler import TACOTaskHandler
-
-TASK_HANDLER_MAP = {
-    "numina": NUMINATaskHandler,
-    "apps": APPSTaskHandler,
-    "taco": TACOTaskHandler,
-    "math500": MathTaskHandler,
-    "aime": AIMETaskHandler,
-    "gpqa_diamond": GPQADiamondTaskHandler,
-    "mmlu": MMLUTaskHandler,
-    "mmlu_pro": MMLUProTaskHandler,
-    "livecodebench": LiveCodeBenchTaskHandler,
-    "gsm8k": GSM8KTaskHandler,
-    "arc_c": ARCChallengeTaskHandler,
-    "amc23": AMC23TaskHandler,
-    "minervamath": MinervaMathTaskHandler,
-    "olympiadbench_math": OlympiadBenchMathTaskHandler,
-}
+from .task_util import TASK_HANDLER_MAP
 
 __all__ = [
     AIMETaskHandler,

@@ -4,8 +4,10 @@ from skythought_evals.util.math_parsing_util import (
 )
 
 from ..base import TaskConfig, TaskHandler
+from ..task_util import register_handler
 
 
+@register_handler("mmlu")
 class MMLUTaskHandler(TaskHandler):
     def generate_prompt(self, prompt):
         return self.task_config.templating_parameters["template"].format(prompt=prompt)

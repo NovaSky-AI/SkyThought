@@ -7,8 +7,10 @@ from skythought_evals.util.math_parsing_util import (
 )
 
 from ..base import TaskHandler
+from ..task_util import register_handler
 
 
+@register_handler("numina")
 class NUMINATaskHandler(TaskHandler):
 
     def generate_prompt(self, prompt):

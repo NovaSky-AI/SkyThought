@@ -1,3 +1,0 @@
-labeled_numina_difficulty/labeled_amc_aime_0_-1.json filter=lfs diff=lfs merge=lfs -text
-labeled_numina_difficulty/labeled_math_0_-1.json filter=lfs diff=lfs merge=lfs -text
-labeled_numina_difficulty/labeled_olympiads_0_-1.json filter=lfs diff=lfs merge=lfs -text

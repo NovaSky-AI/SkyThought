@@ -5,8 +5,10 @@ from skythought_evals.util.math_parsing_util import (
 )
 
 from ..base import TaskHandler
+from ..task_util import register_handler
 
 
+@register_handler("math")
 class MathTaskHandler(TaskHandler):
     def generate_prompt(self, problem):
         return self.task_config.templating_parameters["template"].format(**problem)

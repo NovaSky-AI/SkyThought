@@ -3,8 +3,10 @@ import random
 from skythought_evals.util.math_parsing_util import get_multiple_choice_answer
 
 from ..base import TaskHandler
+from ..task_util import register_handler
 
 
+@register_handler("gpqa_diamond")
 class GPQADiamondTaskHandler(TaskHandler):
 
     def generate_prompt(self, problem):

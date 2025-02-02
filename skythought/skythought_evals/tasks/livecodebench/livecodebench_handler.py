@@ -5,6 +5,7 @@ from datasets import Dataset as HFDataset
 from skythought_evals.util.common import has_code
 
 from ..base import TaskHandler
+from ..task_util import register_handler
 from .livecodebench_util import (
     map_to_example,
     post_process_code,
@@ -13,6 +14,7 @@ from .livecodebench_util import (
 )
 
 
+@register_handler("livecodebench")
 class LiveCodeBenchTaskHandler(TaskHandler):
 
     def generate_prompt(self, problem):
