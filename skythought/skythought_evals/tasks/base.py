@@ -61,7 +61,7 @@ class TaskHandler(ABC):
     def make_conversations(
         self,
         data: List[Dict[str, Any]],
-        system_prompt: Optional[str],
+        system_prompt: Optional[str] = None,
         user_template: Optional[str] = None,
     ) -> List[ConversationType]:
         raise NotImplementedError("Subclasses should implement this method.")

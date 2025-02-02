@@ -1,6 +1,7 @@
 import json
 import multiprocessing
 from multiprocessing import Manager
+from typing import Any, Dict, List, Optional
 
 import numpy as np
 from skythought_evals.util.common import has_code
@@ -80,7 +81,12 @@ class TACOTaskHandler(TaskHandler):
 
         return response_entry
 
-    def make_conversations(self, data, system_prompt, user_template=None):
+    def make_conversations(
+        self,
+        data: List[Dict[str, Any]],
+        system_prompt: Optional[str] = None,
+        user_template: Optional[str] = None,
+    ):
         conversations = []
         for _, problem in enumerate(data):
             starter_code = (

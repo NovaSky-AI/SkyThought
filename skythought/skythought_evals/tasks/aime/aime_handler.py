@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Any, Dict, List, Optional
 
 from ..math.math_handler import MathTaskHandler
 
@@ -9,7 +9,12 @@ class AIMETaskHandler(MathTaskHandler):
             prompt=problem["problem"]
         )
 
-    def make_conversations(self, data, system_prompt, user_template):
+    def make_conversations(
+        self,
+        data: List[Dict[str, Any]],
+        system_prompt: Optional[str] = None,
+        user_template: Optional[str] = None,
+    ):
         conversations = []
         for problem in data:
             prompt_text = self.generate_prompt(problem)
