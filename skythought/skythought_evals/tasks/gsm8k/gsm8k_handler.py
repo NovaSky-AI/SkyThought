@@ -4,10 +4,8 @@ from typing import Any, Dict
 from skythought_evals.util.math_parsing_util import extract_answer
 
 from ..base import TaskConfig, TaskHandler
-from ..task_util import register_handler
 
 
-@register_handler("gsm8k")
 class GSM8KTaskHandler(TaskHandler):
     def __init__(self, task_config: TaskConfig) -> None:
         super().__init__(task_config)

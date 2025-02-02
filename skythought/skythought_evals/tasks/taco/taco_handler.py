@@ -6,11 +6,9 @@ import numpy as np
 from skythought_evals.util.common import has_code
 
 from ..base import TaskHandler
-from ..task_util import register_handler
 from .taco_util import run_test as taco_run_test
 
 
-@register_handler("taco")
 class TACOTaskHandler(TaskHandler):
 
     def generate_prompt(self, prompt, starter_code=None, fn_name=None):

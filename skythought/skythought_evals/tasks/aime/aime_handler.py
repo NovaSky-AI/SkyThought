@@ -3,10 +3,8 @@ from typing import Dict
 from skythought_evals.util.model_utils import MODEL_TO_NAME
 
 from ..math.math_handler import MathTaskHandler
-from ..task_util import register_handler
 
 
-@register_handler("aime")
 class AIMETaskHandler(MathTaskHandler):
     def generate_prompt(self, problem: Dict, model):
         if MODEL_TO_NAME[model] == "Sky-T1-32B-Preview":

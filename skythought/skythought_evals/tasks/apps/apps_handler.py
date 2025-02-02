@@ -8,10 +8,8 @@ from skythought_evals.util.common import has_code
 
 from ..apps.apps_util import run_test as apps_run_test
 from ..base import TaskHandler
-from ..task_util import register_handler
 
 
-@register_handler("apps")
 class APPSTaskHandler(TaskHandler):
 
     def generate_prompt(self, test_case, prompt, starter_code=None):
