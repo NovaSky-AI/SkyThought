@@ -1,12 +1,8 @@
 import argparse
 import json
-import os
 import subprocess
 
-from tasks.task_util import get_tasks
-
-module_dir = os.path.dirname(os.path.abspath(__file__))
-TASK_NAMES_TO_YAML = get_tasks(os.path.join(module_dir, "tasks"))
+from .tasks import TASK_NAMES_TO_YAML
 
 
 def parse_arguments():

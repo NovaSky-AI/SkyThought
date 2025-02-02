@@ -1,25 +1,18 @@
 from typing import Dict
 
-from skythought_evals.util.model_utils import MODEL_TO_NAME
-
 from ..math.math_handler import MathTaskHandler
 
 
 class AIMETaskHandler(MathTaskHandler):
-    def generate_prompt(self, problem: Dict, model):
-        if MODEL_TO_NAME[model] == "Sky-T1-32B-Preview":
-            return self.task_config.templating_parameters["sky_template"].format(
-                prompt=problem["problem"]
-            )
-        else:
-            return self.task_config.templating_parameters["regular_template"].format(
-                prompt=problem["problem"]
-            )
+    def generate_prompt(self, problem: Dict):
+        return self.task_config.templating_parameters["template"].format(
+            prompt=problem["problem"]
+        )
 
-    def make_conversations(self, data, system_prompt, model=None):
+    def make_conversations(self, data, system_prompt):
         conversations = []
         for problem in data:
-            prompt_text = self.generate_prompt(problem, model)
+            prompt_text = self.generate_prompt(problem)
             conversations.append(
                 [
                     {"role": "system", "content": system_prompt},

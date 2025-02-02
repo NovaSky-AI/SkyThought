@@ -4,4 +4,4 @@ dataset_split: train
 question_key: problem
 answer_key: answer
 templating_parameters:
-  template: "Return your final response within \\boxed{{}}. {prompt}"
+  template: "{prompt}\nReturn your final response within \\boxed{{}}"
