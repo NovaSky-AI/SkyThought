@@ -9,8 +9,9 @@ from itertools import cycle
 
 import openai
 from datasets import load_dataset
-from skythought_evals.util.prompts import aops_criteria, grading_prompt
 from tqdm import tqdm
+
+from .prompts import aops_criteria, grading_prompt
 
 
 # Function to set the OpenAI API key

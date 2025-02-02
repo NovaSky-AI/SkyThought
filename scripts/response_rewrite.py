@@ -3,10 +3,8 @@ import json
 import os
 import random
 
+from skythought_evals.models import ModelConfig
 from skythought_evals.util.math_parsing_util import strip_answer_string
-from skythought_evals.util.model_utils import (
-    SYSTEM_PROMPT,
-)
 from tqdm import tqdm
 from vllm import LLM, SamplingParams
 
@@ -509,7 +507,7 @@ def main():
         variants_dataset, ["fcs", "fcs_plus1", "fcs_reflection"], llm
     )
 
-    system_prompt = SYSTEM_PROMPT[args.target_model]
+    system_prompt = ModelConfig.from_model_id(args.target_model).system_prompt
 
     # Generate conversation format for each variant, which can be used in SimPO/DPO/etc.
     fcs_convo = make_preference_conversations(final_dataset, "fcs", system_prompt)

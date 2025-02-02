@@ -2,7 +2,7 @@ import argparse
 import json
 import os
 
-from skythought_evals.util.prompts import system_prompt
+from .prompts import system_prompt
 
 
 def main():

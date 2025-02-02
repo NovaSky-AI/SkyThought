@@ -6,8 +6,9 @@ import time
 from itertools import cycle
 
 import openai
-from skythought_evals.util.prompts import convert_prompt, convert_prompt_example
 from tqdm import tqdm
+
+from .prompts import convert_prompt, convert_prompt_example
 
 global args
 

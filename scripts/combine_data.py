@@ -1,7 +1,7 @@
 import json
 import random
 
-from skythought_evals.util.prompts import system_prompt
+from .prompts import system_prompt
 
 still2_jsonl_file = "../../data/public_long_form_thought_data_5k.jsonl"
 code_json_file = "../../data/converted_apps_long_form_thought_data_5k.json"

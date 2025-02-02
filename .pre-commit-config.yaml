@@ -5,7 +5,7 @@ repos:
       - id: ruff
         args: [ --fix, --exit-non-zero-on-fix ]
         # NOTE (sumanthrh): Many of the files excluded here are used for validating code generation, and linters do not recognize some of the logic in these files. skythought/train is excluded for now because it's a fork of Llamafactory
-        exclude: (^skythought/train|skythought_evals/tasks/taco/pyext2\.py|skythought_evals/tasks/taco/taco_util\.py|skythought_evals/tasks/apps/apps_util\.py|skythought_evals/util/prompts\.py|skythought_evals/util/model_utils\.py)$
+        exclude: (^skythought/train|skythought_evals/tasks/taco/pyext2\.py|skythought_evals/tasks/taco/taco_util\.py|skythought_evals/tasks/apps/apps_util\.py|scripts/prompts\.py)$
 
 
   # Black needs to be ran after ruff with --fix

@@ -51,7 +51,7 @@ class TaskHandler:
     def update_results(self, problem, response):
         raise NotImplementedError("Subclasses should implement this method.")
 
-    def make_conversations(self, data, system_prompt, model=None):
+    def make_conversations(self, data, system_prompt):
         raise NotImplementedError("Subclasses should implement this method.")
 
     def load_existing_results(self, result_file):
