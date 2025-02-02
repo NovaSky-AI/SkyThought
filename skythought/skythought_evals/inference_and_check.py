@@ -61,7 +61,7 @@ def perform_inference_and_check(
     max_tokens,
     result_file,
     llm,
-    system_prompt,
+    model_config,
     args,
 ):
     results = handler.load_existing_results(result_file)
@@ -75,7 +75,9 @@ def perform_inference_and_check(
         args=args,
     )
     remaining_data = handler.process_remaining_data(train_data, results)
-    conversations = handler.make_conversations(remaining_data, system_prompt)
+    conversations = handler.make_conversations(
+        remaining_data, model_config.system_prompt, model_config.user_template
+    )
     for temp in temperatures:
         if args.model.startswith("openai"):
             fetch_partial = partial(
@@ -302,7 +304,7 @@ def perform_inference_and_save(
     max_tokens,
     result_file,
     llm,
-    system_prompt,
+    model_config,
     args,
 ):
     results = handler.load_existing_results(result_file)
@@ -316,7 +318,9 @@ def perform_inference_and_save(
         args=args,
     )
     remaining_data = handler.process_remaining_data(train_data, results)
-    conversations = handler.make_conversations(remaining_data, system_prompt)
+    conversations = handler.make_conversations(
+        remaining_data, model_config.system_prompt, model_config.user_template
+    )
 
     for temp in temperatures:
         if args.model.startswith("openai"):
@@ -571,9 +575,8 @@ def main():
             if args.model.startswith("openai")
             else LLM(model=args.model, tensor_parallel_size=args.tp)
         )
-        system_prompt = model_config.system_prompt
         perform_inference_and_save(
-            handler, temperatures, max_tokens, result_file, llm, system_prompt, args
+            handler, temperatures, max_tokens, result_file, llm, model_config, args
         )
         return
 
@@ -582,7 +585,6 @@ def main():
         if args.model.startswith("openai")
         else LLM(model=args.model, tensor_parallel_size=args.tp)
     )
-    system_prompt = model_config.system_prompt
 
     perform_inference_and_check(
         handler,
@@ -590,7 +592,7 @@ def main():
         max_tokens,
         result_file,
         llm,
-        system_prompt,
+        model_config,
         args,
     )
 
