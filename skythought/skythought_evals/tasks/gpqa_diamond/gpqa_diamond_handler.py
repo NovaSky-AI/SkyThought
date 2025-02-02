@@ -63,7 +63,7 @@ class GPQADiamondTaskHandler(TaskHandler):
 
         return multiple_choice_string, correct_answer_letter
 
-    def make_conversations(self, data, system_prompt, model=None):
+    def make_conversations(self, data, system_prompt):
         conversations = []
         for problem in data:
             (

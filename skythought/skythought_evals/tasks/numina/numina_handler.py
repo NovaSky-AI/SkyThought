@@ -59,7 +59,7 @@ class NUMINATaskHandler(TaskHandler):
             diff_dict[example["problem"]] = example["gpt_difficulty_parsed"]
         return diff_dict
 
-    def make_conversations(self, data, system_prompt, model=None):
+    def make_conversations(self, data, system_prompt):
         conversations = []
         for problem in data:
             prompt_text = self.generate_prompt(problem["problem"])

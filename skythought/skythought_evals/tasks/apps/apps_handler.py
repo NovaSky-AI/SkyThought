@@ -82,7 +82,7 @@ class APPSTaskHandler(TaskHandler):
 
         return response_entry
 
-    def make_conversations(self, data, system_prompt, model=None):
+    def make_conversations(self, data, system_prompt):
         conversations = []
         for problem in data:
             test_case = json.loads(problem["input_output"])

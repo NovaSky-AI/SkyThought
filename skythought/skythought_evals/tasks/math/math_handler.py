@@ -36,7 +36,7 @@ class MathTaskHandler(TaskHandler):
 
         return response_entry
 
-    def make_conversations(self, data, system_prompt, model=None):
+    def make_conversations(self, data, system_prompt):
         conversations = []
         for problem in data:
             prompt_text = self.generate_prompt(problem)

@@ -42,7 +42,7 @@ class MMLUTaskHandler(TaskHandler):
         options_str = options_str[:-1]  # remove the last space
         return f"Answer Choices: {options_str}"
 
-    def make_conversations(self, data, system_prompt, model=None):
+    def make_conversations(self, data, system_prompt):
         conversations = []
         for problem in data:
             multiple_choice_string = self.get_multiple_choice_answers(problem)
