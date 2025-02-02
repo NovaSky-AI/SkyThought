@@ -1,11 +1,14 @@
 import json
 import os
+from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional
 
 import yaml
 from datasets import Dataset as HFDataset
 from datasets import load_dataset
 from pydantic import BaseModel, Field
+
+ConversationType = List[Dict[str, Any]]
 
 
 class TaskConfig(BaseModel):
@@ -31,7 +34,7 @@ class TaskConfig(BaseModel):
         return cls(**config_dict)
 
 
-class TaskHandler:
+class TaskHandler(ABC):
 
     def __init__(self, task_config: TaskConfig):
         self.task_config = task_config
@@ -45,14 +48,55 @@ class TaskHandler:
     def question_key(self):
         return self.task_config.question_key
 
-    def check_correctness(self, problem, generation):
+    @abstractmethod
+    def check_correctness(
+        self, problem: Dict[str, Any], generation: Dict[str, Any]
+    ) -> bool:
+        pass
+
+    @abstractmethod
+    def update_results(self, problem: Dict[str, Any], response: Dict[str, Any]):
+        pass
+
+    def make_conversations(
+        self,
+        data: List[Dict[str, Any]],
+        system_prompt: Optional[str],
+        user_template: Optional[str] = None,
+    ) -> List[ConversationType]:
         raise NotImplementedError("Subclasses should implement this method.")
 
-    def update_results(self, problem, response):
-        raise NotImplementedError("Subclasses should implement this method.")
+    def make_conversation_from_contents(
+        self,
+        contents: List[str],
+        system_prompt: Optional[str] = None,
+        user_template: Optional[str] = None,
+    ) -> ConversationType:
+        """Makes a conversation given a list of user/assistant message strings.
 
-    def make_conversations(self, data, system_prompt):
-        raise NotImplementedError("Subclasses should implement this method.")
+        If system_prompt is provided, it will be added as the first message.
+        If user_template is provided, it will be used to format the user messages. This is useful for model-specific formatting.
+
+        Args:
+            content: A list of user/assistant message strings.
+            system_prompt: An optional string for the system prompt.
+            user_template: An optional string for the user template.
+
+        Returns:
+            A list of dictionaries representing the conversation.
+        """
+
+        conversation = []
+        if system_prompt:
+            conversation.append({"role": "system", "content": system_prompt})
+
+        for i, content in enumerate(contents):
+            if i % 2 == 0:
+                content = user_template.format(content) if user_template else content
+                conversation.append({"role": "user", "content": content})
+            else:
+                conversation.append({"role": "assistant", "content": content})
+        return conversation
 
     def load_existing_results(self, result_file):
         if not os.path.exists(result_file):
@@ -70,10 +114,12 @@ class TaskHandler:
         )
         return dataset
 
+    @abstractmethod
     def load_and_filter_dataset(
         self, start, end, split=None, subset=None, difficulty=None, args=None
     ):
-        raise NotImplementedError("Subclasses should implement this method.")
+        pass
 
+    @abstractmethod
     def process_remaining_data(self, train_data, results):
-        raise NotImplementedError("Subclasses should implement this method.")
+        pass

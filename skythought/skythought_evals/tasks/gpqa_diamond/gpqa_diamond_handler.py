@@ -63,7 +63,7 @@ class GPQADiamondTaskHandler(TaskHandler):
 
         return multiple_choice_string, correct_answer_letter
 
-    def make_conversations(self, data, system_prompt):
+    def make_conversations(self, data, system_prompt, user_template):
         conversations = []
         for problem in data:
             (
@@ -74,10 +74,11 @@ class GPQADiamondTaskHandler(TaskHandler):
             problem["prompt"] = problem["Question"] + "\n" + multiple_choice_string
             prompt_text = self.generate_prompt(problem)
             conversations.append(
-                [
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": prompt_text},
-                ]
+                self.make_conversation_from_contents(
+                    [prompt_text],
+                    system_prompt=system_prompt,
+                    user_template=user_template,
+                )
             )
         return conversations
 

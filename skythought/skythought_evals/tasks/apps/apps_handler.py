@@ -82,7 +82,7 @@ class APPSTaskHandler(TaskHandler):
 
         return response_entry
 
-    def make_conversations(self, data, system_prompt):
+    def make_conversations(self, data, system_prompt, user_template):
         conversations = []
         for problem in data:
             test_case = json.loads(problem["input_output"])
@@ -91,10 +91,11 @@ class APPSTaskHandler(TaskHandler):
                 test_case, problem["question"], starter_code
             )
             conversations.append(
-                [
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": prompt_text},
-                ]
+                self.make_conversation_from_contents(
+                    [prompt_text],
+                    system_prompt=system_prompt,
+                    user_template=user_template,
+                )
             )
         return conversations
 

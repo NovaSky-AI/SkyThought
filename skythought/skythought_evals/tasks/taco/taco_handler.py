@@ -80,7 +80,7 @@ class TACOTaskHandler(TaskHandler):
 
         return response_entry
 
-    def make_conversations(self, data, system_prompt):
+    def make_conversations(self, data, system_prompt, user_template=None):
         conversations = []
         for _, problem in enumerate(data):
             starter_code = (
@@ -99,10 +99,11 @@ class TACOTaskHandler(TaskHandler):
                 problem["question"], starter_code, fn_name
             )
             conversations.append(
-                [
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": prompt_text},
-                ]
+                self.make_conversation_from_contents(
+                    [prompt_text],
+                    system_prompt=system_prompt,
+                    user_template=user_template,
+                )
             )
         return conversations
 
