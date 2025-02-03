@@ -1,2 +1,0 @@
-converted_skyov1_long_form_thought_data_15k.json filter=lfs diff=lfs merge=lfs -text
-Sky-T1_data_15k.json filter=lfs diff=lfs merge=lfs -text

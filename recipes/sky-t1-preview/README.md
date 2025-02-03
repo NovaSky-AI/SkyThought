@@ -11,6 +11,8 @@ Set the env variable `SKYT_HOME` as the directory for the final dataset.
 
 ## Training Data Curation
 
+To generate the training data for Sky-T1, we use the QwQ-32B-Preview model. We curate the data mixture to cover diverse domains that require reasoning, and a reject sampling procedure to improve the data quality. We also add the science and riddle portion from the [STILL-2 model](https://arxiv.org/pdf/2412.09413).
+
 The final data contains (1) 5k coding data from APPs and TACO, (2) 10k math data from AIME, MATH, and Olympiads subsets of the NuminaMATH dataset and (3) 1k science and puzzle data from STILL-2.
 
 ### Step 0 (Only for NUMINA math dataset): Label Math Difficulty from NUMINA
