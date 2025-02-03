@@ -1,0 +1,61 @@
+# Sky-T1-32B-Preview 
+
+[Model](https://huggingface.co/NovaSky-AI/Sky-T1-32B-Preview) | [Dataset](https://huggingface.co/datasets/NovaSky-AI/Sky-T1_data_17k) | [Blog](https://novasky-ai.github.io/posts/sky-t1/)
+
+Give below are the instructions to replicate the data preprocessing and training steps for Sky-T1-32B-Preview. 
+
+## Setup
+
+Make sure you have installed the `skythought-evals` package as outlined in the [README.md](../README.md). All the data curation commands are provided from the root directory of the repo.
+Set the env variable `SKYT_HOME` as the directory for the final dataset. 
+
+## Training Data Curation
+
+The final data contains (1) 5k coding data from APPs and TACO, (2) 10k math data from AIME, MATH, and Olympiads subsets of the NuminaMATH dataset and (3) 1k science and puzzle data from STILL-2.
+
+### Step 0 (Only for NUMINA math dataset): Label Math Difficulty from NUMINA
+
+We provide the labelled NUMINA dataset used for training here: https://huggingface.co/datasets/NovaSky-AI/labeled_numina_difficulty . For replication, read on below.
+
+Put one or multiple OPENAI_API_KEY in a file, e.g. keys.txt (one per line). If there is more than one key, the script will use them in a round-robin way to speed up generation. Label Math difficulty using GPT-4o-mini: 
+#### Example usage: 
+```
+python scripts/label_math_difficulty.py --source [amc_aime, math, olympiads] --keys keys.txt
+```
+The expected output is labeled_source_0_-1.json. We also provide instructions to download these files under the labeled_numina_difficulty folder (Download from HuggingFace).
+
+### Step 1: Data Inference
+Inference the results from QwQ on several datasets. In preview version, we use data from the following dataset.
+
+```shell
+python -m skythought_evals.inference_and_check --task apps --model Qwen/QwQ-32B-Preview --tp 8 --max_tokens 16384 --split test --difficulty all --result-dir $SKYT_HOME/data --inference
+
+python -m skythought_evals.inference_and_check --task taco --model Qwen/QwQ-32B-Preview --tp 8 --max_tokens 16384 --split train --difficulty MEDIUM--result-dir $SKYT_HOME/data --inference
+
+python -m skythought_evals.inference_and_check --task taco --model Qwen/QwQ-32B-Preview --tp 8 --max_tokens 16384 --split test --difficulty all --result-dir $SKYT_HOME/data --inference
+
+python -m skythought_evals.inference_and_check --task numina --model Qwen/QwQ-32B-Preview --tp 8 --max_tokens 16384 --split train --source math --filter-difficulty --result-dir $SKYT_HOME/data --inference
+
+python -m skythought_evals.inference_and_check --task numina --model Qwen/QwQ-32B-Preview --tp 8 --max_tokens 16384 --split train --source amc_aime --filter-difficulty --result-dir $SKYT_HOME/data --inference
+
+python -m skythought_evals.inference_and_check --task numina --model Qwen/QwQ-32B-Preview --tp 8 --max_tokens 16384 --split train --source olympiads --end 20000 --filter-difficulty --result-dir $SKYT_HOME/data --inference
+```
+
+### Step 2: Format the response
+After obtaining a list file for training data, convert them to a unified format (Note: This uses GPT-4o-mini to rewrite. The output is long and takes ~100 dollars for our preview data).
+```shell
+python scripts/convert_format.py --input_dir $SKYT_HOME/data --keys keys.txt
+```
+
+### Step 3: Reject Sampling on the formatted data (Example Usage with previous script)
+```shell 
+python -m skythought_evals.inference_and_check --task apps --model Qwen/QwQ-32B-Preview --tp 8 --max_tokens 16384 --split test --subset all --result-dir $SKYT_HOME/data --check
+```
+Similar for other datasets.
+
+### Convert to ShareGPT format for training
+After obtaining multiple converted files, merge them together and convert to the ShareGPT format to perform training. In our preview model, we also add the science and riddle portion from the [STILL-2 model](https://arxiv.org/pdf/2412.09413), where interested readers can download their part of data and simply concatenating to the data obtained above.
+```shell
+python scripts/convert_to_data.py --input_dir $SKYT_HOME/data --output $SKYT_HOME/data/train_data.json
+```
+
