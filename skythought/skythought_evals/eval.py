@@ -15,7 +15,7 @@ def parse_arguments():
         "--evals",
         required=True,
         type=str,
-        help="Comma-separated list of evals to run (no spaces).",
+        help=f"Comma-separated list of evals to run (no spaces). We currently support the following tasks {list(TASK_NAMES_TO_YAML.keys())}",
     )
     parser.add_argument("--tp", type=int, default=8, help="Tensor Parallelism Degree")
     parser.add_argument(
