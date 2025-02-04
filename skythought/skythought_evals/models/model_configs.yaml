@@ -39,7 +39,7 @@ Qwen/Qwen2.5-Math-72B-Instruct:
 PRIME-RL/Eurus-2-7B-PRIME:
   # system prompt can also point to a text file. the path to the file should be relative to the parent dir of model_configs.yaml
   system_prompt:  
-    path: prime.txt
+    path: system_prompts/prime.txt
 
 NovaSky-AI/Sky-T1-32B-Preview: &sky_t1_32b_preview 
       system_prompt: "Your role as an assistant involves thoroughly exploring questions through a systematic long \
