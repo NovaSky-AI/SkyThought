@@ -20,7 +20,7 @@ TASK_HANDLER_MAP = {
     "numina": NUMINATaskHandler,
     "apps": APPSTaskHandler,
     "taco": TACOTaskHandler,
-    "math500": MathTaskHandler,
+    "math": MathTaskHandler,
     "aime": AIMETaskHandler,
     "gpqa_diamond": GPQADiamondTaskHandler,
     "mmlu": MMLUTaskHandler,
