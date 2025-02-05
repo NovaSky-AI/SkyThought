@@ -44,6 +44,7 @@ models:
 
   Qwen/Qwen2-7B-Instruct:
     system_prompt: *qwen_cot_system_prompt 
+    
   Qwen/QwQ-32B-Preview: 
     system_prompt: *qwen_cot_system_prompt
 

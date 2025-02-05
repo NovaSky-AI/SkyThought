@@ -54,6 +54,22 @@ conda activate eval
 pip install -e .
 ```
 
+We support a wide variety of datasets in mathematics, science and coding:
+
+- AIME'24
+- MATH500
+- GPQADiamond
+- MMLU
+- ARC-Challenge
+- OlympiadBench
+- AMC'23 
+- TACO 
+- APPS
+- LiveCodeBench
+- MMLU Pro
+- MinervaMath
+- GSM8K
+
 For running evaluation, please refer to [skythought_evals/README.md](skythought/skythought_evals/README.md).
 
 
