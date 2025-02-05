@@ -7,7 +7,7 @@ from functools import partial
 
 import numpy as np
 from openai import OpenAI
-from skythought_evals.models import ModelConfig
+from skythought_evals.models import ModelConfig, get_system_prompt_keys
 from skythought_evals.tasks import (
     TASK_HANDLER_MAP,
     TASK_NAMES_TO_YAML,
@@ -501,6 +501,13 @@ def main():
         help="Highest difficulty level for math.",
     )
     parser.add_argument(
+        "--system-prompt-template",
+        type=str,
+        default=None,
+        help="System prompt template to use",
+        choices=get_system_prompt_keys(),
+    )
+    parser.add_argument(
         "--n", type=int, default=1, help="Number of samples generated per problem."
     )
     parser.add_argument("--seed", type=int, default=41, help="Random seed.")
@@ -518,7 +525,7 @@ def main():
     handler_cls = TASK_HANDLER_MAP[handler_name]
     handler = handler_cls(task_config)
 
-    model_config = ModelConfig.from_model_id(args.model)
+    model_config = ModelConfig.from_model_id(args.model, args.system_prompt_template)
 
     temperatures = [1] if args.model.startswith("openai/o1") else args.temperatures
 

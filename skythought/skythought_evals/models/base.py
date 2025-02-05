@@ -5,9 +5,9 @@ from typing import Optional, Union
 import yaml
 from pydantic import BaseModel, Field, PrivateAttr, field_validator, model_validator
 
-CONFIG_FILE_PATH = Path(__file__).parent / "model_configs.yaml"
+MODEL_CONFIG_FILE_PATH = Path(__file__).parent / "model_configs.yaml"
 # cache the configs in a global var
-ALL_CONFIGS = None
+ALL_MODEL_CONFIGS = None
 
 
 class StringInFile(BaseModel):
@@ -16,7 +16,7 @@ class StringInFile(BaseModel):
 
     @model_validator(mode="after")
     def validate_and_extract_string(self):
-        full_path = Path(CONFIG_FILE_PATH).parent / self.path
+        full_path = Path(MODEL_CONFIG_FILE_PATH).parent / self.path
         if full_path.exists():
             with open(full_path, "r") as f:
                 self._string = f.read()
@@ -48,18 +48,33 @@ class ModelConfig(BaseModel):
         return v
 
     @classmethod
-    def from_model_id(cls, model_id: str):
-        global ALL_CONFIGS
-        if ALL_CONFIGS is None:
-            ALL_CONFIGS = read_yaml(CONFIG_FILE_PATH)
-        if model_id in ALL_CONFIGS:
-            init_kwargs = ALL_CONFIGS[model_id]
-            init_kwargs["model_id"] = model_id
+    def from_model_id(cls, model_id: str, system_prompt_key: Optional[str] = None):
+        global ALL_MODEL_CONFIGS
+        init_kwargs = {}
+        if ALL_MODEL_CONFIGS is None:
+            ALL_MODEL_CONFIGS = read_yaml(MODEL_CONFIG_FILE_PATH)
+        if model_id in ALL_MODEL_CONFIGS["models"]:
+            init_kwargs = ALL_MODEL_CONFIGS["models"][model_id]
+        elif system_prompt_key:
+            if system_prompt_key not in ALL_MODEL_CONFIGS["system_prompts"]:
+                raise ValueError(
+                    f"Invalid system prompt template {system_prompt_key} provided."
+                )
+            init_kwargs["system_prompt"] = ALL_MODEL_CONFIGS["system_prompts"][
+                system_prompt_key
+            ]
         else:
             init_kwargs = {}
-            init_kwargs["model_id"] = model_id
             warnings.warn(
-                f"Model {model_id} not found in {CONFIG_FILE_PATH}. Initializing without any system prompt.",
+                f"Model {model_id} not found in {MODEL_CONFIG_FILE_PATH}. Initializing without any system prompt.",
                 stacklevel=2,
             )
+        init_kwargs["model_id"] = model_id
         return cls(**init_kwargs)
+
+
+def get_system_prompt_keys():
+    global ALL_MODEL_CONFIGS
+    if ALL_MODEL_CONFIGS is None:
+        ALL_MODEL_CONFIGS = read_yaml(MODEL_CONFIG_FILE_PATH)
+    return list(ALL_MODEL_CONFIGS["system_prompts"].keys())
