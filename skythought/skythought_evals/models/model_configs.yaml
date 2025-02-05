@@ -2,7 +2,7 @@ system_prompts:
   qwen_cot: &qwen_cot_system_prompt "You are a helpful and harmless assistant. You are Qwen developed by Alibaba. You should think step-by-step." 
   prime_rl: &prime_rl_system_prompt
     # system prompt can also point to a text file. the path to the file should be relative to the parent dir of model_configs.yaml
-    path: prime.txt
+    path: system_prompts/prime.txt
   skythought:  &sky_t1_system_prompt  "Your role as an assistant involves thoroughly exploring questions through a systematic long \
         thinking process before providing the final precise and accurate solutions. This requires \
         engaging in a comprehensive cycle of analysis, summarizing, exploration, reassessment, reflection, \
