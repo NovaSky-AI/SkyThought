@@ -6,7 +6,7 @@ Give below are the instructions to replicate the data preprocessing and training
 
 ## Setup
 
-Make sure you have installed the `skythought-evals` package as outlined in the [README.md](../README.md). All the data curation commands are provided from the root directory of the repo.
+Make sure you have installed the `skythought-evals` package as outlined in the [README.md](/README.md#usage). All the data curation commands are provided from the root directory of the repo.
 Set the env variable `SKYT_HOME` as the directory for the final dataset. 
 
 ## Training Data Curation
