@@ -2,7 +2,7 @@
 
 ## Requirements 
 
-Make sure you have installed the `skythought-evals` package as outlined in the [README.md](../README.md).
+Make sure you have installed the `skythought-evals` package as outlined in the [README.md](/README.md#usage).
 
 For running OpenAI model, export the OpenAI key. 
 ```shell
