@@ -1,4 +1,3 @@
-
 # Sky-T1-32B-Flash
 
 [Model](https://huggingface.co/NovaSky-AI/Sky-T1-32B-Flash) | [Dataset](https://huggingface.co/datasets/NovaSky-AI/Sky-T1_preference_data_10k) | [Blog](https://novasky-ai.github.io/posts/reduce-overthinking/)
@@ -7,7 +6,7 @@ For a detailed breakdown of the duration curation steps and training methodology
 
 ## Setup
 
-Make sure you have installed the `skythought-evals` package as outlined in the [README.md](../README.md). All the data curation commands are provided from the root directory of the repo.
+Make sure you have installed the `skythought-evals` package as outlined in the [README.md](/README.md#usage). All the data curation commands are provided from the root directory of the repo.
 
 
 ## Stage 1: Data Generation
