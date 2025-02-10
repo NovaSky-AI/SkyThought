@@ -6,4 +6,4 @@ answer_key: answer
 templating_parameters:
   template: "Return your final response within \\boxed{{}}. {prompt}"
 preprocess_config:
-  url: 2024
+  url: "2024"
