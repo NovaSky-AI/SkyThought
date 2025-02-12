@@ -1,0 +1,15 @@
+accelerate
+codetiming
+datasets
+dill
+hydra-core
+numpy
+pybind11
+ray
+tensordict<0.6
+transformers
+vllm<=0.6.3
+wandb
+pyext
+word2number
+pylatexenc

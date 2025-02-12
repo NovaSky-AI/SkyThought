@@ -20,6 +20,7 @@
 
 
 # News
+- **[2025/02/11]** ⚡️ We released Sky-T1-7B ([model](https://huggingface.co/NovaSky-AI/Sky-T1-7B)) and Sky-T1-mini ([model](https://huggingface.co/NovaSky-AI/Sky-T1-mini))t odemonstrate the potential of RL in further enhancing model's capability beyond distillation.
 - **[2025/01/23]** ⚡️ We released Sky-T1-32B-Flash ([model](https://huggingface.co/NovaSky-AI/Sky-T1-32B-Flash), [data](https://huggingface.co/datasets/NovaSky-AI/Sky-T1_preference_data_10k)) to tackle overthinking and reduce reasoning sequence lengths while maintaining accuracy.
 - **[2025/01/19]** 🎉 [Chat demo](http://164.152.23.196:3000/) for Sky-T1-32B-Preview is alive! Please check it out!
 - **[2025/01/10]** 🎉 We have released our Sky-T1-32B-Preview [model](https://huggingface.co/NovaSky-AI/Sky-T1-32B-Preview) and [data](https://huggingface.co/datasets/NovaSky-AI/Sky-T1_data_17k) through [HuggingFace](https://huggingface.co/NovaSky-AI)!
@@ -27,6 +28,7 @@
 
 # Links
 
+- 📜 [Sky-T1-7B and Sky-T1-mini Blog Post](https://novasky-ai.github.io/posts/sky-t1-7B/)
 - 📜 [Sky-T1-32B-Flash Blog Post](https://novasky-ai.github.io/posts/reduce-overthinking/)
 - 📜 [Sky-T1-32B-Preview model Blog Post](https://novasky-ai.github.io/posts/sky-t1/)
 - 🤗 [Sky-T1-32B-Preview model](https://huggingface.co/NovaSky-AI)
