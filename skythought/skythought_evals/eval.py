@@ -2,6 +2,7 @@ import argparse
 import json
 import os
 import subprocess
+import warnings
 
 from .tasks import TASK_NAMES_TO_YAML
 
@@ -26,17 +27,23 @@ def parse_arguments():
     )
     parser.add_argument("--subset", type=str, help="Subset for the dataset.")
     parser.add_argument(
-        "--output_file",
-        required=True,
-        type=str,
-        help="Output file to write results to.",
-    )
-    parser.add_argument(
         "--temperatures",
         type=float,
         nargs="+",
         default=[0],
         help="Temperature for sampling.",
+    )
+    parser.add_argument(
+        "--n", type=int, default=1, help="Number of samples generated per problem."
+    )
+    parser.add_argument(
+        "--result-dir", type=str, default=".", help="Directory to save result files."
+    )
+    parser.add_argument(
+        "--output-file",
+        type=str,
+        default="",
+        help="[OBSOLETE] Output file to save results to.",
     )
     return parser.parse_args()
 
@@ -66,21 +73,19 @@ def write_logs_to_file(logs, output_file):
 
 def main():
     args = parse_arguments()
-
+    if args.output_file:
+        warnings.warn(
+            "`output-file` CLI argument is obsolete and will be ignored.", stacklevel=1
+        )
     # Extract the arguments
     model_path = args.model
     evals = args.evals.split(",")
-    output_file = args.output_file
     tp = args.tp
     temperatures = [str(t) for t in args.temperatures]
 
     script_path = os.path.join(
         os.path.dirname(os.path.abspath(__file__)), "inference_and_check.py"
     )
-
-    # Hold all logs
-    all_logs = ""
-    results = {}
 
     # Run the Python command for each eval and collect logs
     for eval_name in evals:
@@ -100,41 +105,47 @@ def main():
             "--temperatures",
         ]
         command.extend(temperatures)  # Add temperatures as separate arguments
+        command.extend(
+            [
+                "--n",
+                args.n,
+                "--result-dir",
+                args.result_dir,
+            ]
+        )
 
         if args.difficulty:
             command.append("--difficulty")
             command.append(args.difficulty)
 
         print(f"Running eval {eval_name} with command {command}")
-        all_logs += f"\nRunning eval: {eval_name} with command {command}\n"
         try:
-            with subprocess.Popen(
-                command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
-            ) as proc:
-                output_lines = []
-                for line in proc.stdout:
-                    print(line, end="")  # Stream output to the console
-                    output_lines.append(line)
-                    all_logs += line
-                proc.wait()
-                if proc.returncode != 0:
-                    raise subprocess.CalledProcessError(proc.returncode, command)
+            subprocess.run(command, check=True)
+            # TODO (sumanthrh): cleanup code here but provide a way to extract accuracy from all the runs
+            # ideally, we should invoke functions from inference_and_check and juust have then return
+            # metrics.
+            # with subprocess.Popen(
+            #     command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
+            # ) as proc:
+            #     output_lines = []
+            #     for line in proc.stdout:
+            #         print(line, end="")  # Stream output to the console
+            #         output_lines.append(line)
+            #         all_logs += line
+            #     proc.wait()
+            #     if proc.returncode != 0:
+            #         raise subprocess.CalledProcessError(proc.returncode, command)
 
-                # Capture output for post-processing
-                output = "".join(output_lines)
-                accuracy = extract_accuracy_from_output(output)
-                results[eval_name] = accuracy
+            #     # Capture output for post-processing
+            #     output = "".join(output_lines)
+            #     accuracy = extract_accuracy_from_output(output)
+            #     results[eval_name] = accuracy
 
         except subprocess.CalledProcessError as e:
             error_message = f"Error occurred while running eval {eval_name}: {e}\n"
             print(error_message)
-            all_logs += error_message
 
-    # Write logs of all stdout / stderr to a file
-    write_logs_to_file(all_logs, output_file)
-
-    print("Results:")
-    print(results)
+    print(f"Evals for tasks {args.evals} ran successfully.")
 
 
 if __name__ == "__main__":

@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Optional, Union
 
 import yaml
-from pydantic import BaseModel, Field, PrivateAttr, field_validator, model_validator
+from pydantic import BaseModel, Field, PrivateAttr, model_validator
 
 MODEL_CONFIG_FILE_PATH = Path(__file__).parent / "model_configs.yaml"
 # cache the configs in a global var
@@ -36,16 +36,16 @@ def read_yaml(path: str):
 
 class ModelConfig(BaseModel):
     model_id: str
-    name: str = Field(default="")
+    name: Optional[str] = Field(default=None)
     # can be a string or a path to a file with the string
     system_prompt: Optional[Union[str, StringInFile]] = None
     user_template: Optional[Union[str, StringInFile]] = None
 
-    @field_validator("name", mode="before")
-    def validate_name(cls, v):
-        if v is None:
-            return cls.model_id.split("/")[-1]
-        return v
+    @model_validator(mode="after")
+    def validate_name(self):
+        if self.name is None:
+            self.name = self.model_id.split("/")[-1]
+        return self
 
     @classmethod
     def from_model_id(cls, model_id: str, system_prompt_key: Optional[str] = None):

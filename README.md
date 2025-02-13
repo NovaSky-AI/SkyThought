@@ -36,11 +36,10 @@
 # Getting Started
 
 We open source the code and scripts we used for data curation, training, and evaluation for Sky-T1-32B-Preview, you can find more details in each directory.
-- ``recipes``: Recipes - data curation steps and training strategies - for building our models `Sky-T1-32B-Flash`, `Sky-T1-32B-Preview` and `Sky-T1-7B` series. 
-- ``skythought/skythought_evals``: Our data generation and evaluation library. 
-- ``skythought/train``: Training scripts for Sky-T1. We use [Llama-Factory](https://github.com/hiyouga/LLaMA-Factory) to perform training. The model was trained for 3 epochs with a learning rate of 1e-5 and a batch size of 96. Our model training was completed in 19 hours on 8 H100 GPUs using DeepSpeed Zero-3 offloading, costing approximately $450 as per Lambda Cloud pricing.
-- ``skythought/skythought-rl``: RL training code for Sky-T1.
-
+- [`recipes`](./recipes/): Recipes - data curation steps and training strategies - for building our models `Sky-T1-32B-Flash`, `Sky-T1-32B-Preview` and `Sky-T1-7B` series. 
+- [`skythought/skythought_evals`](./skythought/skythought_evals/): Our data generation and evaluation library. 
+- [`skythought/train`](./skythought/train/): Training scripts for Sky-T1. We use [Llama-Factory](https://github.com/hiyouga/LLaMA-Factory) to perform training. 
+- [`skythought/skythought-rl`](./skythought/skythought-rl/): RL training code for Sky-T1-7B and Sky-T1-mini.
 
 # Evaluation
 

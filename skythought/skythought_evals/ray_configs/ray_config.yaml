@@ -1,7 +1,7 @@
 llm_engine: vllm # currently only vllm supported
 accelerator_type: H100  # accelerator name as specified here: https://docs.ray.io/en/master/ray-core/accelerator-types.html#accelerator-types
 engine_kwargs: # vllm engine kwargs 
-  tensor_parallel_size: 1
+  tensor_parallel_size: 4
   gpu_memory_utilization: 0.9
   # other optional vllm engine kwargs to tune performance!
   # pipeline_parallel_size: 1
@@ -19,5 +19,5 @@ runtime_env:
   env_vars:
     VLLM_ATTENTION_BACKEND: "FLASH_ATTN"
 env_config:
-  num_replicas: 8 # number of vllm replicas 
+  num_replicas: 2  # number of vllm replicas 
   batch_size: 128 # ray pipeline internal batch size (used for map_batches call internally). Should usually be set to a value in [64, 128, 256] for best performance.

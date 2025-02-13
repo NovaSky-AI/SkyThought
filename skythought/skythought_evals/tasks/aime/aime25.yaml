@@ -1,0 +1,8 @@
+handler: aime
+dataset_path: opencompass/AIME2025
+dataset_split: train
+question_key: question
+answer_key: answer
+templating_parameters:
+  template: "{prompt}\nReturn your final response within \\boxed{{}}"
+

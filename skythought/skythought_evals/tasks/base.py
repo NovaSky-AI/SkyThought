@@ -1,5 +1,3 @@
-import json
-import os
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional
 
@@ -97,13 +95,6 @@ class TaskHandler(ABC):
             else:
                 conversation.append({"role": "assistant", "content": content})
         return conversation
-
-    def load_existing_results(self, result_file):
-        if not os.path.exists(result_file):
-            return {}
-        with open(result_file, "r", encoding="utf-8") as f:
-            records = json.load(f)
-        return records
 
     def load_dataset(self, subset=None, split=None, **kwargs) -> HFDataset:
         dataset = load_dataset(

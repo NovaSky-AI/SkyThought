@@ -61,3 +61,6 @@ After obtaining multiple converted files, merge them together and convert to the
 python scripts/convert_to_data.py --input_dir $SKYT_HOME/data --output $SKYT_HOME/data/train_data.json
 ```
 
+## Training
+
+The model was trained for 3 epochs with a learning rate of 1e-5 and a batch size of 96 using [LlamaFactory](https://github.com/hiyouga/LLaMA-Factory). Our model training was completed in 19 hours on 8 H100 GPUs using DeepSpeed Zero-3 offloading, costing approximately $450 as per Lambda Cloud pricing. 

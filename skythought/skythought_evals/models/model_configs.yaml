@@ -32,15 +32,16 @@ models:
     # 'name' is by default <model_name> in the huggingface format <org>/<model_name>, but can be customized here
     name: o1-mini 
     system_prompt: null
-    user_template: "Question: {input}\nAnswer: "
+    # user template's use positional argument for formatting
+    user_template: "Question: {}\nAnswer: "
 
   openai/o1-preview:
     system_prompt: null
-    user_template: "Question: {input}\nAnswer: "
+    user_template: "Question: {}\nAnswer: "
 
   openai/gpt-4o-mini:
     system_prompt: null
-    user_template: "User: {input}\nAssistant: "
+    user_template: "User: {}\nAssistant: "
 
   Qwen/Qwen2-7B-Instruct:
     system_prompt: *qwen_cot_system_prompt 
@@ -67,7 +68,7 @@ models:
     system_prompt: *qwen_cot_system_prompt
 
   PRIME-RL/Eurus-2-7B-PRIME:
-    system_prompt:  *prime_rl_system_prompt
+    system_prompt: *prime_rl_system_prompt
 
   NovaSky-AI/Sky-T1-32B-Preview:  
     system_prompt: *sky_t1_system_prompt
