@@ -37,6 +37,7 @@ if __name__=='__main__':
 
     hard_set = ["numina_amc_aime", "numina_olympiads"]
     input_dataset = load_dataset(args.input)
+    still3 = load_dataset("RUC-AIBOX/STILL-3-Preview-RL-Data")
     for split in ['train']:
         output_dataset=[]
         cur_dataset = input_dataset[split]
@@ -61,6 +62,38 @@ if __name__=='__main__':
                 }]
             data_entry["prompt"] = prompt
             output_dataset.append(data_entry)
+
+        cur_dataset = still3[split]
+        for data_entry in tqdm(cur_dataset):
+            if args.sky_sys:
+                prompt = [{
+                    "role": "system",
+                    "content": short_system_prompt
+                },
+                {
+                    "role": "user",
+                    "content": data_entry["question"] + "Return your final response within \\boxed{{}}."
+                }]
+            else:
+                prompt = [
+                {
+                    "role": "user",
+                    "content": data_entry["question"] + "Please reason step by step and return your final response within \\boxed{{}}."
+                }]
+            cur_data = {
+                "data_source": "still3",
+                "prompt": prompt,
+                "ability": 'math',
+                "reward_model": {
+                    "style": "rule",
+                    "ground_truth": data_entry['answer'],
+                },
+                "extra_info": {
+                    'split': 'dummy',
+                    'index': 0
+                }
+            }
+            output_dataset.append(cur_data)
         
         print(len(output_dataset))
         output_dataset = Dataset.from_list(output_dataset)

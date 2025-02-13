@@ -48,7 +48,7 @@ if __name__=='__main__':
                 },
                 {
                     "role": "user",
-                    "content": data_entry["question"] + "Return your final response within \\boxed{{}}. "
+                    "content": data_entry["question"] + "Return your final response within \\boxed{{}}."
                 }],
                 "ability": 'math',
                 "reward_model": {
