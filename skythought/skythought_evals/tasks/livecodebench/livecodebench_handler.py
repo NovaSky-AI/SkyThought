@@ -1,5 +1,5 @@
 import copy
-from typing import Any, Dict, List, Optional
+from typing import Dict
 
 from datasets import Dataset as HFDataset
 from skythought_evals.util.common import has_code
@@ -53,8 +53,6 @@ class LiveCodeBenchTaskHandler(TaskHandler):
         return result == "passed"
 
     def update_results(self, problem, response):
-        if not isinstance(response, str):
-            response = response.outputs[0].text.strip()
         # Initialize the response structure
         response_entry = {
             "content": response,
@@ -85,26 +83,8 @@ class LiveCodeBenchTaskHandler(TaskHandler):
 
         return response_entry
 
-    def make_conversations(
-        self,
-        data: List[Dict[str, Any]],
-        system_prompt: Optional[str] = None,
-        user_template: Optional[str] = None,
-    ):
-        conversations = []
-        for problem in data:
-            prompt_text = self.generate_prompt(problem)
-            conversations.append(
-                self.make_conversation_from_contents(
-                    [prompt_text],
-                    system_prompt=system_prompt,
-                    user_template=user_template,
-                )
-            )
-        return conversations
-
     def load_and_filter_dataset(
-        self, start, end, split=None, subset=None, difficulty=None, args=None
+        self, start, end, split=None, subset=None, difficulty=None
     ):
         dataset: HFDataset = self.load_dataset(subset=subset, split=split)
         # Filter by CLI or config
@@ -132,10 +112,3 @@ class LiveCodeBenchTaskHandler(TaskHandler):
             map_to_example, remove_columns=dataset.column_names, writer_batch_size=100
         ).to_pandas()
         return dataset.iloc[start:end] if end > 0 else dataset.iloc[start:]
-
-    def process_remaining_data(self, train_data, results):
-        return [
-            row.to_dict()
-            for _, row in train_data.iterrows()
-            if str(row[self.question_key]) not in results
-        ]

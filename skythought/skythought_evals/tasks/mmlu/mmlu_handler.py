@@ -1,5 +1,3 @@
-from typing import Any, Dict, List, Optional
-
 from skythought_evals.util.math_parsing_util import (
     get_multiple_choice_answer,
     mmlu_pro_extract_answer,
@@ -9,7 +7,9 @@ from ..base import TaskConfig, TaskHandler
 
 
 class MMLUTaskHandler(TaskHandler):
-    def generate_prompt(self, prompt):
+    def generate_prompt(self, problem):
+        multiple_choice_string = self.get_multiple_choice_answers(problem)
+        prompt = problem["question"] + "\n" + multiple_choice_string
         return self.task_config.templating_parameters["template"].format(prompt=prompt)
 
     def check_correctness(self, problem, generation):
@@ -19,8 +19,6 @@ class MMLUTaskHandler(TaskHandler):
         return answer == pred
 
     def update_results(self, problem, response):
-        if not isinstance(response, str):
-            response = response.outputs[0].text.strip()
         # Initialize the response structure
         response_entry = {
             "content": response,
@@ -44,36 +42,8 @@ class MMLUTaskHandler(TaskHandler):
         options_str = options_str[:-1]  # remove the last space
         return f"Answer Choices: {options_str}"
 
-    def make_conversations(
-        self,
-        data: List[Dict[str, Any]],
-        system_prompt: Optional[str] = None,
-        user_template: Optional[str] = None,
-    ):
-        conversations = []
-        for problem in data:
-            multiple_choice_string = self.get_multiple_choice_answers(problem)
-            prompt_text = self.generate_prompt(
-                problem["question"] + "\n" + multiple_choice_string
-            )
-            conversations.append(
-                self.make_conversation_from_contents(
-                    [prompt_text],
-                    system_prompt=system_prompt,
-                    user_template=user_template,
-                )
-            )
-        return conversations
-
-    def process_remaining_data(self, train_data, results):
-        return [
-            row.to_dict()
-            for _, row in train_data.iterrows()
-            if str(row["question"]) not in results
-        ]
-
     def load_and_filter_dataset(
-        self, start, end, split=None, subset=None, difficulty=None, args=None
+        self, start, end, split=None, subset=None, difficulty=None
     ):
         dataset = self.load_dataset(subset=subset, split=split).to_pandas()
         return dataset.iloc[start:end] if end > 0 else dataset.iloc[start:]
@@ -117,7 +87,7 @@ class MMLUProTaskHandler(MMLUTaskHandler):
         return f"Answer Choices: {options}"
 
     def load_and_filter_dataset(
-        self, start, end, split=None, subset=None, difficulty=None, args=None
+        self, start, end, split=None, subset=None, difficulty=None
     ):
         dataset = self.load_dataset(subset=subset, split=split).to_pandas()
         return dataset.iloc[start:end] if end > 0 else dataset.iloc[start:]

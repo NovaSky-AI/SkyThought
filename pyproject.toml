@@ -1,6 +1,37 @@
+[project]
+name = "skythought"
+version = "0.1.0"
+description = "Skythought Evals"
+authors = [
+    { name = "NovaSky Team"}
+]
+requires-python = ">=3.9,<3.12"  # Added from setup.py
+dependencies = [
+    "vllm==0.7.0",
+    "pyext",
+    "word2number",
+    "scipy",
+    "datasets",
+    "latex2sympy2",
+    "pydantic",
+    "setuptools",
+    "typer",
+]
+
+[tool.setuptools.packages.find]
+where = ["skythought"]
+include = ["skythought_evals*"]
+
+
+[project.scripts]
+skythought = "skythought_evals.cli:main"
+
 [tool.ruff]
 line-length = 160
 
 [tool.ruff.lint]
 extend-select = ["E", "F", "I", "ASYNC", "B"]
 ignore = ["F811", "B006"]
+
+[project.optional-dependencies]
+dev = ["pytest", "pytest-mock", "black", "ruff"]

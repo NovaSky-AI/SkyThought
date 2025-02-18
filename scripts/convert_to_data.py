@@ -8,7 +8,7 @@ from .prompts import system_prompt
 def main():
     parser = argparse.ArgumentParser(description="Convert JSON data for processing.")
     parser.add_argument(
-        "--input_dir", type=str, help="Directory containing input JSON files."
+        "--input_dir", type=str, help="Directory containing result files."
     )
     parser.add_argument("--output", type=str, help="Output JSON file.")
     args = parser.parse_args()
@@ -17,7 +17,7 @@ def main():
 
     # Iterate through all files in the input directory
     for filename in os.listdir(args.input_dir):
-        if filename.endswith(".json") and filename.startswith("converted"):
+        if filename.endswith("results.json"):
             filepath = os.path.join(args.input_dir, filename)
             with open(filepath, "r") as f:
                 cur_data = json.load(f)

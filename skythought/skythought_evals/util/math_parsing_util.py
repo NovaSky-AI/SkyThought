@@ -76,6 +76,10 @@ def _fix_sqrt(string):
 
 
 def strip_answer_string(string):
+    """Strips and cleans the raw output string so that it becomes more standardized
+
+    Example: Fixes fractions, turns numbers in word form into digits, removes units, etc.
+    """
     string = str(string).strip()
     # linebreaks
     string = string.replace("\n", "")
@@ -240,6 +244,7 @@ def strip_answer_string(string):
 
 
 def extract_answer(pred_str, use_last_number=True):
+    """Parses out the final expression or numeric value from a typical LLM chain-of-thought."""
     pred_str = pred_str.replace("\u043a\u0438", "")
     if "final answer is $" in pred_str and "$. I hope" in pred_str:
         # minerva_math
@@ -298,6 +303,9 @@ def extract_answer(pred_str, use_last_number=True):
 
 
 def get_multiple_choice_answer(pred: str):
+    """Attempts to parse the letter A, B, C, or D from the string.
+
+    If it can't, it returns the string in raw form."""
     tmp = re.findall(r"\b(A|B|C|D)\b", pred.upper())
     if tmp:
         pred = tmp
@@ -334,6 +342,7 @@ def mmlu_pro_extract_answer(text):
 
 
 def choice_answer_clean(pred: str):
+    """Helper function for standardizing multiple choice answers"""
     pred = pred.strip("\n").rstrip(".").rstrip("/").strip(" ").lstrip(":")
     # Clean the answer based on the dataset
     tmp = re.findall(r"\b(A|B|C|D|E)\b", pred.upper())

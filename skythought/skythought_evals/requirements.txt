@@ -6,3 +6,4 @@ datasets
 latex2sympy2
 pydantic
 setuptools
+typer

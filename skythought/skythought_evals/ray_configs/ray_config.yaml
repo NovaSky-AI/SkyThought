@@ -3,6 +3,7 @@ accelerator_type: H100  # accelerator name as specified here: https://docs.ray.i
 engine_kwargs: # vllm engine kwargs 
   tensor_parallel_size: 4
   gpu_memory_utilization: 0.9
+  dtype: float32
   # other optional vllm engine kwargs to tune performance!
   # pipeline_parallel_size: 1
   # max_num_seqs: 448

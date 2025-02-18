@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional
+from typing import Dict
 
 from ..math.math_handler import MathTaskHandler
 
@@ -9,26 +9,8 @@ class AIMETaskHandler(MathTaskHandler):
             prompt=problem[self.question_key]
         )
 
-    def make_conversations(
-        self,
-        data: List[Dict[str, Any]],
-        system_prompt: Optional[str] = None,
-        user_template: Optional[str] = None,
-    ):
-        conversations = []
-        for problem in data:
-            prompt_text = self.generate_prompt(problem)
-            conversations.append(
-                self.make_conversation_from_contents(
-                    [prompt_text],
-                    system_prompt=system_prompt,
-                    user_template=user_template,
-                )
-            )
-        return conversations
-
     def load_and_filter_dataset(
-        self, start, end, split=None, subset=None, difficulty=None, args=None
+        self, start, end, split=None, subset=None, difficulty=None
     ):
         train_data = self.load_dataset(subset=subset, split=split).to_pandas()
         if self.task_config.preprocess_config:

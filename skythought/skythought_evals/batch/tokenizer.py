@@ -106,12 +106,18 @@ class ChatTemplateTokenizer:
         messages = batch["messages"].tolist()
 
         # Tokenize text prompts.
-        full_prompts = [
-            self.tokenizer.apply_chat_template(
-                message, tokenize=False, add_generation_prompt=True
+        full_prompts = []
+        for conversation in messages:
+            # add generation prompt only if the last message is from the user
+            add_generation_prompt = conversation[-1]["role"] == "user"
+            full_prompts.append(
+                self.tokenizer.apply_chat_template(
+                    conversation,
+                    tokenize=False,
+                    add_generation_prompt=add_generation_prompt,
+                    continue_final_message=not add_generation_prompt,
+                )
             )
-            for message in messages
-        ]
         tokens = self.tokenizer(full_prompts)["input_ids"]
         time_taken_tokenizer = time.perf_counter() - start_t
 

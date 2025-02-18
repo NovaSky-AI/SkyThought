@@ -90,16 +90,17 @@ if __name__ == "__main__":
     api_key_cycle = cycle(api_keys)
 
     # Process each file in the input directory
-    for filename in os.listdir(args.input_dir):
-        if filename.endswith(".json"):
+    files = os.listdir(args.input_dir)
+    for filename in files:
+        if filename.endswith("results.json"):
             input_path = os.path.join(args.input_dir, filename)
 
             # Load the data
             with open(input_path, "r") as f:
                 data = json.load(f)
 
-            # Prepare output file
-            output_file = os.path.join(args.input_dir, f"converted_{filename}")
+            # Prepare output file. Overwrite the original file
+            output_file = input_path
 
             # Use multiprocessing to process the content
             results = []

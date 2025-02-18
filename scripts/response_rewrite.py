@@ -79,8 +79,7 @@ def load_dataset(dataset_path: str):
 
 def make_scoring_conversations(dataset, system_prompt):
     conversations = []
-    for _, key in enumerate(dataset):
-        problem = dataset[key]
+    for _, problem in dataset.items():
         gt_answer = strip_answer_string(problem["answer"])
         for response_key in problem["responses"]:
             response = problem["responses"][response_key]["content"]
@@ -157,8 +156,8 @@ def filter_solutions(dataset):
 
 def make_splitting_conversations(data, system_prompt):
     conversations = []
-    for problem in data:
-        response = data[problem]["responses"]["shortest"]
+    for key in data:
+        response = data[key]["responses"]["shortest"]
         prompt_text = response["content"]
         conversations.append(
             [

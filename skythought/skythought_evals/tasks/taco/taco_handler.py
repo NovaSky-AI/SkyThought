@@ -1,7 +1,6 @@
 import json
 import multiprocessing
 from multiprocessing import Manager
-from typing import Any, Dict, List, Optional
 
 import numpy as np
 from skythought_evals.util.common import has_code
@@ -12,7 +11,19 @@ from .taco_util import run_test as taco_run_test
 
 class TACOTaskHandler(TaskHandler):
 
-    def generate_prompt(self, prompt, starter_code=None, fn_name=None):
+    def generate_prompt(self, problem):
+        prompt = problem["question"]
+        starter_code = (
+            None if len(problem["starter_code"]) == 0 else problem["starter_code"]
+        )
+        try:
+            input_outpout = json.loads(problem["input_output"])
+            fn_name = (
+                None if not input_outpout.get("fn_name") else input_outpout["fn_name"]
+            )
+        except ValueError:
+            fn_name = None
+
         _input = self.task_config.templating_parameters["initial_template"].format(
             prompt=prompt
         )
@@ -57,8 +68,6 @@ class TACOTaskHandler(TaskHandler):
         return bool(result and np.all(result[0]))
 
     def update_results(self, problem, response):
-        if not isinstance(response, str):
-            response = response.outputs[0].text.strip()
         # Initialize the response structure
         response_entry = {
             "content": response,
@@ -81,40 +90,8 @@ class TACOTaskHandler(TaskHandler):
 
         return response_entry
 
-    def make_conversations(
-        self,
-        data: List[Dict[str, Any]],
-        system_prompt: Optional[str] = None,
-        user_template: Optional[str] = None,
-    ):
-        conversations = []
-        for _, problem in enumerate(data):
-            starter_code = (
-                None if len(problem["starter_code"]) == 0 else problem["starter_code"]
-            )
-            try:
-                input_outpout = json.loads(problem["input_output"])
-                fn_name = (
-                    None
-                    if not input_outpout.get("fn_name")
-                    else input_outpout["fn_name"]
-                )
-            except ValueError:
-                fn_name = None
-            prompt_text = self.generate_prompt(
-                problem["question"], starter_code, fn_name
-            )
-            conversations.append(
-                self.make_conversation_from_contents(
-                    [prompt_text],
-                    system_prompt=system_prompt,
-                    user_template=user_template,
-                )
-            )
-        return conversations
-
     def load_and_filter_dataset(
-        self, start, end, split=None, subset=None, difficulty=None, args=None
+        self, start, end, split=None, subset=None, difficulty=None
     ):
         dataset = self.load_dataset(subset=subset, split=split).to_pandas()
         if difficulty or "difficulty" in self.task_config.preprocess_config:
@@ -128,10 +105,3 @@ class TACOTaskHandler(TaskHandler):
             )
 
         return dataset.iloc[start:end] if end > 0 else dataset.iloc[start:]
-
-    def process_remaining_data(self, train_data, results):
-        return [
-            row.to_dict()
-            for _, row in train_data.iterrows()
-            if str(row["question"]) not in results
-        ]

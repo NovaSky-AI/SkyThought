@@ -1,5 +1,5 @@
 import re
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict
 
 from skythought_evals.util.math_parsing_util import extract_answer
 
@@ -23,8 +23,6 @@ class GSM8KTaskHandler(TaskHandler):
         return model_answer == gt_answer
 
     def update_results(self, problem, response):
-        if not isinstance(response, str):
-            response = response.outputs[0].text.strip()
         # Initialize the response structure
         response_entry = {
             "content": response,
@@ -41,36 +39,11 @@ class GSM8KTaskHandler(TaskHandler):
 
         return response_entry
 
-    def make_conversations(
-        self,
-        data: List[Dict[str, Any]],
-        system_prompt: Optional[str] = None,
-        user_template: Optional[str] = None,
-    ):
-        conversations = []
-        for problem in data:
-            prompt_text = self.generate_prompt(problem)
-            conversations.append(
-                self.make_conversation_from_contents(
-                    [prompt_text],
-                    system_prompt=system_prompt,
-                    user_template=user_template,
-                )
-            )
-        return conversations
-
     def load_and_filter_dataset(
-        self, start, end, split=None, subset=None, difficulty=None, args=None
+        self, start, end, split=None, subset=None, difficulty=None
     ):
         train_data = self.load_dataset(subset=subset, split=split).to_pandas()
         return train_data.iloc[start:end] if end > 0 else train_data.iloc[start:]
-
-    def process_remaining_data(self, train_data, results):
-        return [
-            row.to_dict()
-            for _, row in train_data.iterrows()
-            if str(row["question"]) not in results
-        ]
 
     def extract_gt_answer(self, completion):
         match = self.gt_re.search(completion)
