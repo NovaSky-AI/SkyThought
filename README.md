@@ -20,6 +20,7 @@
 
 
 # News
+- **[2025/02/21]** 🎉 We released S*: Test time scaling for code generation ([paper](https://arxiv.org/pdf/2502.14382), [code](https://github.com/NovaSky-AI/SkyThought/tree/main/skythought/test-time-scaling)), a simple and extensible test time scaling framework for code generation.
 - **[2025/02/11]** 🎉 We released Sky-T1-7B ([model](https://huggingface.co/NovaSky-AI/Sky-T1-7B)) and Sky-T1-mini ([model](https://huggingface.co/NovaSky-AI/Sky-T1-mini)) to demonstrate the potential of RL in further enhancing model's capability beyond distillation.
 - **[2025/01/23]** ⚡️ We released Sky-T1-32B-Flash ([model](https://huggingface.co/NovaSky-AI/Sky-T1-32B-Flash), [data](https://huggingface.co/datasets/NovaSky-AI/Sky-T1_preference_data_10k)) to tackle overthinking and reduce reasoning sequence lengths while maintaining accuracy.
 - **[2025/01/19]** 🎉 [Chat demo](http://164.152.23.196:3000/) for Sky-T1-32B-Preview is alive! Please check it out!
