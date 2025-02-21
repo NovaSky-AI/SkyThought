@@ -13,4 +13,4 @@ repos:
     rev: 24.10.0
     hooks:
       - id: black
-        exclude: (^skythought/train/.*|^skythought/skythought-rl/.*|tasks/taco/pyext2\.py)$
+        exclude: (^skythought/train/.*|^skythought/skythought-rl/.*|tasks/taco/pyext2\.py|skythought/test-time-scaling/.*)$
