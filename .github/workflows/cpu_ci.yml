@@ -6,9 +6,6 @@ on:
       - main 
       - rc/**
   pull_request:
-    branches: 
-      - main
-      - rc/**
 
 permissions:
   checks: write   # for status checks to appear
