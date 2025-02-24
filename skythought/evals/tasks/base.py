@@ -58,7 +58,7 @@ class TaskHandler(ABC):
         pass
 
     @abstractmethod
-    def update_results(self, problem: Dict[str, Any], response: str):
+    def update_results(self, problem: Dict[str, Any], response: str) -> Dict[str, Any]:
         pass
 
     def make_conversations(

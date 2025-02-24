@@ -530,6 +530,14 @@ def score(
             case_sensitive=False,
         ),
     ],
+    idx: Annotated[
+        str,
+        typer.Option(
+            ...,
+            help="Unique index of the sample in the results JSON to re-score."
+            "If provided, only the scores for this sample are computed/re-computed. ",
+        ),
+    ] = None,
 ):
     if not os.path.exists(run_dir):
         raise ValueError(f"Run directory {run_dir} does not exist.")
@@ -556,7 +564,7 @@ def score(
 
     run_summary = SummaryResults(**run_summary)
 
-    score_results(handler, run_dir, run_summary)
+    score_results(handler, run_dir, run_summary, idx)
 
 
 def main():
