@@ -537,7 +537,9 @@ def score_results(
             ]
             for index in id_to_results
         }
-        accuracy = sum(map(sum, id_to_scores.values())) / len(id_to_scores) * N
+        accuracy = round(
+            sum(map(sum, id_to_scores.values())) / (len(id_to_scores) * N), 4
+        )
 
     sample_count = 0
     if id_to_results:
