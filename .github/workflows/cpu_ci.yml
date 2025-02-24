@@ -2,9 +2,13 @@ name: Skythought evals
 
 on: 
   push: 
-    - branches: main
+    branches: 
+      - main 
+      - rc/**
   pull_request:
-    - branches: main
+    branches: 
+      - main
+      - rc/**
 
 permissions:
   checks: write   # for status checks to appear
