@@ -548,6 +548,8 @@ def score(
     run_dir = Path(run_dir)
 
     ids: List[str] = comma_separated_to_list(ids)
+    # make them unique
+    ids = list(set(ids))
 
     if task not in TASK_NAMES_TO_YAML:
         raise ValueError(
