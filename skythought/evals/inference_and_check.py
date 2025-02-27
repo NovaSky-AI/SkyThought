@@ -351,19 +351,11 @@ def score_responses(
     return accuracy, id_to_scores, total_finish
 
 
-<<<<<<< HEAD
-def score_responses_for_idx(
-    handler: TaskHandler,
-    id_to_results: Dict[str, Dict[str, Any]],
-    *,
-    idx: str,
-=======
 def score_responses_for_indices(
     handler: TaskHandler,
     id_to_results: Dict[str, Dict[str, Any]],
     *,
     indices: List[str],
->>>>>>> origin/main
 ) -> List[int]:
     """Computes correctness for model responses for the given task for the unique index `idx`.
 
@@ -375,23 +367,6 @@ def score_responses_for_indices(
     """
     if not id_to_results:
         return []
-<<<<<<< HEAD
-
-    # Figure out how many generations per problem
-    N = len(next(iter(id_to_results.values()))["responses"])
-    record = id_to_results[idx]
-    scores = []
-    for i in range(N):
-        content = record["responses"][i]["content"]
-        response_entry = handler.update_results(record, content)
-
-        # Update correctness and reason in the original results dict
-        id_to_results[idx]["responses"][i]["correctness"] = response_entry[
-            "correctness"
-        ]
-        id_to_results[idx]["responses"][i]["reason"] = response_entry["reason"]
-        scores.append(response_entry["correctness"])
-=======
     logger.info(f"Computing scores for {len(indices)} samples")
     for idx in indices:
         # Figure out how many generations per problem
@@ -408,7 +383,6 @@ def score_responses_for_indices(
             ]
             id_to_results[idx]["responses"][i]["reason"] = response_entry["reason"]
             scores.append(response_entry["correctness"])
->>>>>>> origin/main
     return scores
 
 
