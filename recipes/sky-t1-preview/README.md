@@ -34,11 +34,11 @@ skythought generate --task apps --model Qwen/QwQ-32B-Preview --backend vllm --ba
 
 skythought generate --task taco --model Qwen/QwQ-32B-Preview --backend vllm --backend-args tp=8 --sampling-params max_tokens=16384 --task-args '{"dataset_split": "train", "preprocess_config": {"difficulty": "MEDIUM"}}' --result-dir $SKYT_HOME/data
 
-skythought generate --task numina --model Qwen/QwQ-32B-Preview --backend vllm --backend-args tp=8 --sampling-params max_tokens=16384 --task-args '{"dataset_split": "train", "preprocess_config": {"difficulty": "math"}}' --result-dir $SKYT_HOME/data
+skythought generate --task numina_math --model Qwen/QwQ-32B-Preview --backend vllm --backend-args tp=8 --sampling-params max_tokens=16384 --result-dir $SKYT_HOME/data
 
-skythought generate --task numina --model Qwen/QwQ-32B-Preview --backend vllm --backend-args tp=8 --sampling-params max_tokens=16384 --task-args '{"dataset_split": "train", "preprocess_config": {"difficulty": "amc_aime"}}' --result-dir $SKYT_HOME/data
+skythought generate --task numina_amc_aime --model Qwen/QwQ-32B-Preview --backend vllm --backend-args tp=8 --sampling-params max_tokens=16384 --result-dir $SKYT_HOME/data
 
-skythought generate --task numina --model Qwen/QwQ-32B-Preview --backend vllm --backend-args tp=8 --sampling-params max_tokens=16384 --task-args '{"dataset_split": "train", "preprocess_config": {"difficulty": "olympiads"}}' --result-dir $SKYT_HOME/data --start 0 --end 20000
+skythought generate --task numina_olympiads --model Qwen/QwQ-32B-Preview --backend vllm --backend-args tp=8 --sampling-params max_tokens=16384 --result-dir $SKYT_HOME/data --start 0 --end 20000
 ```
 
 This will save the results in individual folders in `result-dir`. The directory structure should be as follows:
@@ -63,10 +63,13 @@ python scripts/convert_format.py --input_dir $SKYT_HOME/data --keys keys.txt
 
 ### Step 3: Reject Sampling on the formatted data (Example Usage with previous script)
 
+For each folder in `result-dir` saved previously (ex: `Qwen_QwQ-32B-Preview_numina_myHash`), obtain the scores with the following command
+
 ```shell 
 skythought score --task apps --path <path_to_run_folder>
 ```
-Similar for other datasets.
+
+This will overwrite the `results.json` files and add a `"correctness"` entry to each model response. 
 
 ### Convert to ShareGPT format for training
 After obtaining multiple converted files, merge them together and convert to the ShareGPT format to perform training. In our preview model, we also add the science and riddle portion from the [STILL-2 model](https://arxiv.org/pdf/2412.09413), where interested readers can download their part of data and simply concatenating to the data obtained above.

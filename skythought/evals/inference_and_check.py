@@ -351,11 +351,19 @@ def score_responses(
     return accuracy, id_to_scores, total_finish
 
 
+<<<<<<< HEAD
 def score_responses_for_idx(
     handler: TaskHandler,
     id_to_results: Dict[str, Dict[str, Any]],
     *,
     idx: str,
+=======
+def score_responses_for_indices(
+    handler: TaskHandler,
+    id_to_results: Dict[str, Dict[str, Any]],
+    *,
+    indices: List[str],
+>>>>>>> origin/main
 ) -> List[int]:
     """Computes correctness for model responses for the given task for the unique index `idx`.
 
@@ -367,6 +375,7 @@ def score_responses_for_idx(
     """
     if not id_to_results:
         return []
+<<<<<<< HEAD
 
     # Figure out how many generations per problem
     N = len(next(iter(id_to_results.values()))["responses"])
@@ -382,6 +391,24 @@ def score_responses_for_idx(
         ]
         id_to_results[idx]["responses"][i]["reason"] = response_entry["reason"]
         scores.append(response_entry["correctness"])
+=======
+    logger.info(f"Computing scores for {len(indices)} samples")
+    for idx in indices:
+        # Figure out how many generations per problem
+        N = len(next(iter(id_to_results.values()))["responses"])
+        record = id_to_results[idx]
+        scores = []
+        for i in range(N):
+            content = record["responses"][i]["content"]
+            response_entry = handler.update_results(record, content)
+
+            # Update correctness and reason in the original results dict
+            id_to_results[idx]["responses"][i]["correctness"] = response_entry[
+                "correctness"
+            ]
+            id_to_results[idx]["responses"][i]["reason"] = response_entry["reason"]
+            scores.append(response_entry["correctness"])
+>>>>>>> origin/main
     return scores
 
 
@@ -518,7 +545,7 @@ def score_results(
     handler: TaskHandler,
     run_dir: Path,
     run_summary: SummaryResults,
-    idx: Optional[str] = None,
+    indices: Optional[List[str]] = None,
 ) -> None:
     # load existing results
     result_file = run_dir / RESULTS_FILENAME
@@ -526,11 +553,11 @@ def score_results(
     id_to_results = load_existing_results(result_file)
     logger.info(f"Loaded {len(id_to_results)} existing results for scoring.")
 
-    if not idx:
+    if not indices:
         accuracy, id_to_scores, total_finish = score_responses(handler, id_to_results)
     else:
         N = len(next(iter(id_to_results.values()))["responses"])
-        score_responses_for_idx(handler, id_to_results, idx=idx)
+        score_responses_for_indices(handler, id_to_results, indices=indices)
         id_to_scores = {
             index: [
                 id_to_results[index]["responses"][i]["correctness"] for i in range(N)

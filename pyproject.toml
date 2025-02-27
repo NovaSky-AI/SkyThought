@@ -16,6 +16,7 @@ dependencies = [
     "pydantic",
     "setuptools",
     "typer",
+    "hf_transfer",
 ]
 license = { text = "Apache-2.0" }
 readme = "README.md"
