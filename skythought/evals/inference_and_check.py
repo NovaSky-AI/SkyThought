@@ -294,6 +294,7 @@ def generate_responses_for_dataset(
 def score_responses(
     handler: TaskHandler,
     id_to_results: Dict[str, Dict[str, Any]],
+    *,
     max_workers: int = 32,
 ) -> Tuple[float, Dict[str, List[int]], int]:
     """Computes correctness for model responses for the given task
@@ -341,13 +342,48 @@ def score_responses(
             # TODO (sumanthrh): this can be improved
             if unique_id not in id_to_scores:
                 id_to_scores[unique_id] = [0 for _ in range(N)]
-            id_to_scores[unique_id][i] = new_response_entry["correctness"]
+            id_to_scores[unique_id][i] = int(new_response_entry["correctness"])
 
             total_correct += new_response_entry["correctness"]
             total_finish += 1
 
     accuracy = round(total_correct / total_finish, 4) if total_finish else 0
     return accuracy, id_to_scores, total_finish
+
+
+def score_responses_for_indices(
+    handler: TaskHandler,
+    id_to_results: Dict[str, Dict[str, Any]],
+    *,
+    indices: List[str],
+) -> List[int]:
+    """Computes correctness for model responses for the given task for the unique index `idx`.
+
+    The 'id_to_results' dictionary is assumed to be a mapping between problem ID -> { responses: [...], ... },
+    This is updated in-place.
+
+    Returns:
+       - list of scores
+    """
+    if not id_to_results:
+        return []
+    logger.info(f"Computing scores for {len(indices)} samples")
+    for idx in indices:
+        # Figure out how many generations per problem
+        N = len(next(iter(id_to_results.values()))["responses"])
+        record = id_to_results[idx]
+        scores = []
+        for i in range(N):
+            content = record["responses"][i]["content"]
+            response_entry = handler.update_results(record, content)
+
+            # Update correctness and reason in the original results dict
+            id_to_results[idx]["responses"][i]["correctness"] = response_entry[
+                "correctness"
+            ]
+            id_to_results[idx]["responses"][i]["reason"] = response_entry["reason"]
+            scores.append(response_entry["correctness"])
+    return scores
 
 
 def generate_and_score(
@@ -480,7 +516,10 @@ def generate_and_save(
 
 
 def score_results(
-    handler: TaskHandler, run_dir: Path, run_summary: SummaryResults
+    handler: TaskHandler,
+    run_dir: Path,
+    run_summary: SummaryResults,
+    indices: Optional[List[str]] = None,
 ) -> None:
     # load existing results
     result_file = run_dir / RESULTS_FILENAME
@@ -488,9 +527,20 @@ def score_results(
     id_to_results = load_existing_results(result_file)
     logger.info(f"Loaded {len(id_to_results)} existing results for scoring.")
 
-    accuracy, id_to_scores, total_finish = score_responses(handler, id_to_results)
-
-    logger.info(f"Accuracy: {accuracy}")
+    if not indices:
+        accuracy, id_to_scores, total_finish = score_responses(handler, id_to_results)
+    else:
+        N = len(next(iter(id_to_results.values()))["responses"])
+        score_responses_for_indices(handler, id_to_results, indices=indices)
+        id_to_scores = {
+            index: [
+                id_to_results[index]["responses"][i]["correctness"] for i in range(N)
+            ]
+            for index in id_to_results
+        }
+        accuracy = round(
+            sum(map(sum, id_to_scores.values())) / (len(id_to_scores) * N), 4
+        )
 
     sample_count = 0
     if id_to_results:
@@ -501,7 +551,9 @@ def score_results(
 
     run_summary.accuracy = accuracy
     run_summary.pass_at_k = pass_at_k_metrics
+
+    logger.info(f"Accuracy: {accuracy}")
     save_summary(summary_file, run_summary)
 
     save_results(result_file, id_to_results)
-    logger.info(f"Re-scored results saved to {result_file}")
+    logger.info(f"Scored results saved to {result_file}")
