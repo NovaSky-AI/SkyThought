@@ -21,7 +21,7 @@ from typing import List
 from unittest.mock import mock_open, patch
 
 import numpy as np
-from pyext import RuntimeModule
+from skythought.evals.scoring.utils.pyext2 import RuntimeModule
 
 
 class CODE_TYPE(Enum):

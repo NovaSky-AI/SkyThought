@@ -6,7 +6,6 @@ from skythought.evals.util.common import TimeoutException, timeout
 from skythought.evals.util.math_parsing_util import (
     extract_answer,
     math_equal,
-    strip_answer_string,
 )
 
 from ..base import TaskHandler
@@ -21,9 +20,7 @@ class NUMINATaskHandler(TaskHandler):
     @timeout(5)  # Add timeout of 5 seconds
     def check_correctness(self, problem, generation):
         solution = extract_answer(problem[self.task_config.answer_key])
-        solution = strip_answer_string(solution)
         pred = extract_answer(generation)
-        pred = strip_answer_string(pred)
         return math_equal(pred, solution)
 
     def update_results(self, problem, response):

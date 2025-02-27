@@ -8,7 +8,6 @@ authors = [
 requires-python = ">=3.9,<3.11"
 dependencies = [
     "vllm==0.7.0",
-    "pyext",
     "word2number",
     "scipy",
     "datasets",
@@ -45,7 +44,7 @@ skythought = ["evals/**/*.yaml", "evals/**/*.yml"]
 skythought = "skythought.evals.cli:main"
 
 [project.optional-dependencies]
-dev = ["pytest", "pytest-mock", "black", "ruff", "pre-commit"]
+dev = ["pytest", "pytest-mock", "pytest-asyncio", "black", "ruff", "pre-commit"]
 
 [tool.ruff]
 line-length = 160

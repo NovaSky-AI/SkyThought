@@ -53,7 +53,9 @@ class TACOTaskHandler(TaskHandler):
 
         def _temp_run(problem, generation, debug, result):
             try:
-                result.append(taco_run_test(problem, test=generation, debug=debug))
+                result.append(
+                    taco_run_test(problem["input_output"], test=generation, debug=debug)
+                )
             except Exception as e:
                 print(f"Error in _temp_run: {e}")
 

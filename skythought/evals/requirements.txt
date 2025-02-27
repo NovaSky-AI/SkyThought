@@ -1,9 +1,0 @@
-vllm==0.7.0
-pyext
-word2number
-scipy
-datasets
-latex2sympy2
-pydantic
-setuptools
-typer

@@ -16,7 +16,7 @@ from unittest.mock import mock_open, patch
 
 import numpy as np
 
-from .pyext2 import RuntimeModule
+from ..utils.pyext2 import RuntimeModule
 
 
 class CODE_TYPE(Enum):
