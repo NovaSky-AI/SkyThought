@@ -1,6 +1,7 @@
 handler: aime
 dataset_path: opencompass/AIME2025
-dataset_split: train
+dataset_subset: AIME2025-I
+dataset_split: test
 question_key: question
 answer_key: answer
 templating_parameters:

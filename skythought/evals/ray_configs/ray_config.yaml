@@ -1,5 +1,5 @@
 llm_engine: vllm # currently only vllm supported
-accelerator_type: H100  # accelerator name as specified here: https://docs.ray.io/en/master/ray-core/accelerator-types.html#accelerator-types
+accelerator_type: null  # accelerator name as specified here: https://docs.ray.io/en/master/ray-core/accelerator-types.html#accelerator-types
 engine_kwargs: # vllm engine kwargs 
   tensor_parallel_size: 4
   gpu_memory_utilization: 0.9

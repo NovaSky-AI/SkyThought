@@ -10,14 +10,25 @@ For running OpenAI model, export the OpenAI key.
 export OPENAI_API_KEY={openai_api_key}
 ```
 
+## Usage
+
+We provide three commands in the CLI: 
+
+- `skythought evaluate` : Evaluate a model on a given task.
+- `skythought generate`: Generate model outputs for a pre-configured task.
+- `skythought score`: Score saved generations for a given task.
+
+For a walkthrough on the basics, please refer to the [example](../../examples/evaluate.ipynb). 
+
 ## Generation and Evaluation
 
 ### Benchmark Evaluation
 
-Given below are two examples for evaluation. For a walkthrough on the basics, please refer to the [example](../../examples/evaluate.ipynb). 
+Given below are two examples for evaluation.
 
 ```shell
 skythought evaluate --model NovaSky-AI/Sky-T1-32B-Preview --task aime  --backend vllm --backend-args tensor_parallel_size=8  --sampling-params temperature=0.6,top_p=0.95 --n 8 --result-dir ./
+
 skythought evaluate --model NovaSky-AI/Sky-T1-32B-Preview --task gpqa_diamond --backend vllm --backend-args tensor_parallel_size=8 --sampling-params temperature=0.6,top_p=0.95 --n 8
 ```
 
@@ -43,6 +54,13 @@ skythought evaluate --model Qwen/QwQ-32B-Preview --task aime --backend ray --bac
 
 By default, we make use of the configuration in [ray_configs/ray_config.yaml](./ray_configs/ray_config.yaml). You can also customize the following parameters for ray: 
 
+- `tensor_parallel_size`: Tensor parallel size per replica. Defaults to 4.  
+- `accelerator_type`: GPU accelerator type. See [the list of available types](https://docs.ray.io/en/latest/ray-core/accelerator-types.html) for more information. Defaults to None, which means any available GPUs in the Ray cluster will be used.  
+- `num_replicas`: Number of model replicas to use for inference. Defaults to 2.  
+- `batch_size`: Batch size per model replica for inference.  
+- `gpu_memory_utilization`: Fraction of GPU memory allocated to the model executor in vLLM. Defaults to 0.9.  
+- `dtype`: Data type used for inference. Defaults to "auto".
+
 
 ### Optimized settings for 32B and 7B models
 
@@ -54,7 +72,7 @@ For 32B models, we recommend using the default backend configuration for best pe
 skythought evaluate --model Qwen/QwQ-32B-Preview --task aime24 --backend ray --result-dir ./
 ```
 
-For 7B models, we recommend using `tensor_parallel_size=1` and `num_replicas=8` for best performance. FOr example, the previous command will change to:
+For 7B models, we recommend using `tensor_parallel_size=1` and `num_replicas=8` for best performance. For example, the previous command will change to:
 
 ```shell
 skythought evaluate --model Qwen/Qwen2-7B-Instruct --task math500 --backend ray --backend-args tensor_parallel_size=1,num_replicas=8 --result-dir ./
@@ -78,7 +96,13 @@ Currently we support distill and reject sampling for NUMINA, APPS, and TACO data
 #### Example Usage
 
 ```shell
-skythought generate --model Qwen/QwQ-32B-Preview --task apps --backend ray --backend-args tensor_parallel_size=8 --sampling-params max_tokens=16384 --result-dir $SKYT_HOME/data
+skythought generate --model Qwen/QwQ-32B-Preview --task numina_amc_aime --backend ray --backend-args tensor_parallel_size=8 --sampling-params max_tokens=16384 --result-dir $SKYT_HOME/data
+```
+
+Once the generations are saved, you can then apply any postprocessing on the results (saved in a `results.json` file in separate run folder) and then run:
+
+```shell
+skythought score --task numina_amc_aime --run-dir <path>
 ```
 
 ### Reproducibility Issues
@@ -90,4 +114,43 @@ We've noticed that it can be hard to reproduce results in reasoning benchmarks. 
 - vLLM settings:  With vLLM, we’ve also noticed that at half-precision, different batch sizes can affect downstream evaluation results by a few percentage points. Further, different tensor parallelism settings can also change results in half-precision.
 - vLLM version: Different versions of vLLM will use different CUDA-Toolkit or Flash attention versions. Even for the same settings, these differences in the underlying kernels used can change results. 
 
- We recommend to run all evaluation benchmarks at full precision, i.e float32 to avoid this. By default, we run evaluation in `float32`, which can be customized with the `--backend-args` flag for local inference. In full-precision, evaluation results should be robust to changes in batch size, tensor parallel size, version differences, etc.
+ We recommend to run evaluation benchmarks at full precision, i.e float32 to avoid this. In full-precision, evaluation results should be robust to changes in batch size, tensor parallel size, version differences, etc.
+
+
+## Key Concepts
+
+### Tasks
+
+A Task consists of task-specific configuration and implements 
+- Dataset loading and preprocessing 
+- Creating of input conversation to the model
+- Scoring of model responses
+
+The configuration (`TaskConfig`) contains dataset loading related details such as Hugging Face dataset ID, the particular subset for this benchmark (e.g., ”Challenge” subset for ARC), and a task template, which contains task-specific instructions to be used (Eg: `Return your answer in \boxed{}`). Each configuration is stored in a YAML. For example, you can see the YAML in this [aime24.yaml file](./tasks/aime/aime24.yaml)
+
+Internally, a Task implementation is termed a "TaskHandler", you can see one such implementation [here](./tasks/aime/aime_handler.py). 
+
+
+To add a new task `mytask`: 
+- First, see if the task can be simply specified as a configuration (One example is [`aime25`](./tasks/aime/aime25.yaml)). If so, you can add a YAML file in the appropriate folder and re-use an existing handler. (All available handlers are specified [here](./tasks/__init__.py)). 
+- If not, you should create a new `TaskHandler` subclass for this task along with a task configuration YAML (`mytask.yaml`). 
+
+### Models
+
+A Model consists of the model ID and templating configuration. This configuration optionally contains the system prompt and an assistant prefill message. Different reasoning models use their own system prompt, and some perform best when the response is prefilled with special tokens. 
+
+We store our pre-configured models as well as a list of system prompt templates [here](./models/model_configs.yaml). 
+
+### Backend
+
+The Backend is concerned with how the LLM instance is created and queried. For flexibility, we support 
+- Local inference with vLLM (basic single node) or Ray+vLLM (more scalable single and multi-node inference)
+- Remote inference behind an OpenAI-compatible endpoint. 
+
+The Backend also consists of configuration at instantiation (ex; the data type for the model), along with sampling parameters during generation (temperature, max tokens, etc).
+
+During evaluation, the above tie in together and the flow is as follows: 
+1. Load dataset and create conversations based on the Task and Model specified by the user
+2. Generate model responses from the Backend based on the provided sampling parameters
+3. Score model responses based on the Task 
+4. Output final results

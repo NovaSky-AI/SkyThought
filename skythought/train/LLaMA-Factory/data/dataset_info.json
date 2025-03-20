@@ -656,5 +656,15 @@
       "chosen": "chosen",
       "rejected": "rejected"
     }
-  }
+  }, 
+  "Sky-T1-Lora": {
+    "file_name": "your data path here",
+    "ranking": true,
+    "formatting": "sharegpt",
+    "columns": {
+      "messages": "conversations",
+      "chosen": "chosen",
+      "rejected": "rejected"
+    }
+  },
 }

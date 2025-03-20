@@ -1,5 +1,5 @@
 from ast import literal_eval
-from typing import Any
+from typing import Any, List
 
 import msgpack
 import xxhash
@@ -38,6 +38,11 @@ def parse_multi_args(vals: str) -> dict:
         raise ValueError(
             f"Expected comma separated list of parameters arg1=val1,args2=val2 or a dictionary, got invalid argument {vals}. "
         ) from err
+
+
+def comma_separated_to_list(vals: str) -> List[str]:
+    vals = vals.replace(" ", "")
+    return vals.split(",")
 
 
 def to_tuple(d) -> tuple:

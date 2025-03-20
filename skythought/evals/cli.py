@@ -2,7 +2,7 @@ import json
 import logging
 import os
 from pathlib import Path
-from typing import Tuple
+from typing import List, Tuple
 
 import click
 import typer
@@ -20,7 +20,11 @@ from skythought.evals.inference_and_check import (
 )
 from skythought.evals.models import ModelConfig, get_system_prompt_keys
 from skythought.evals.tasks import TASK_HANDLER_MAP, TASK_NAMES_TO_YAML, TaskConfig
-from skythought.evals.util.cli_util import get_deterministic_hash, parse_multi_args
+from skythought.evals.util.cli_util import (
+    comma_separated_to_list,
+    get_deterministic_hash,
+    parse_multi_args,
+)
 from skythought.evals.util.common import set_seed
 from skythought.evals.util.results import SummaryResults
 
@@ -28,6 +32,8 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = typer.Typer(pretty_exceptions_enable=False)
+
+SAMPLING_PARAMS_DEFAULT = "temperature=0,top_p=1,max_tokens=32768"
 
 
 def get_run_config(
@@ -109,7 +115,10 @@ def parse_common_args(
             f"Task {task} not found. Should be one of {TASK_NAMES_TO_YAML.keys()}"
         )
     task_args_as_dict = parse_multi_args(task_args)
-    sampling_params_as_dict = parse_multi_args(sampling_params)
+    user_provided_sampling_params_as_dict = parse_multi_args(sampling_params)
+    sampling_params_as_dict = parse_multi_args(SAMPLING_PARAMS_DEFAULT)
+    sampling_params_as_dict.update(user_provided_sampling_params_as_dict)
+
     backend_args_as_dict = parse_multi_args(backend_args)
 
     if n is not None:
@@ -189,7 +198,7 @@ def evaluate(
     backend_args: Annotated[
         str,
         typer.Option(
-            help="Backend parameters to use for inference. For open-source models, we perform inference in float32 by default",
+            help="Backend parameters to use for inference.",
             case_sensitive=False,
         ),
     ] = "",
@@ -199,7 +208,7 @@ def evaluate(
             help="Sampling parameters to use for inference.",
             case_sensitive=False,
         ),
-    ] = "temperature=0,top_p=1,max_tokens=32768",
+    ] = SAMPLING_PARAMS_DEFAULT,
     result_dir: Annotated[
         str,
         typer.Option(
@@ -225,7 +234,9 @@ def evaluate(
     seed: Annotated[int, typer.Option(help="Random seed.")] = 41,
     assistant_prefill: Annotated[
         str,
-        typer.Option(help=r'Assistant prefill for the model response. Ex: "<think>\n"'),
+        typer.Option(
+            help=r'Assistant prefill for the model response, overriding any pre-configured assistant prefill for this model. Ex: "<think>\n"'
+        ),
     ] = None,
     as_test: Annotated[
         bool, typer.Option(help="Perform a test run on 10 samples of the dataset.")
@@ -530,11 +541,23 @@ def score(
             case_sensitive=False,
         ),
     ],
+    ids: Annotated[
+        str,
+        typer.Option(
+            help="Comma-separated list of indices in the results JSON to re-score."
+            "If provided, only the scores for these samples are computed/re-computed. If None, we compute scores for all samples",
+        ),
+    ] = None,
 ):
     if not os.path.exists(run_dir):
         raise ValueError(f"Run directory {run_dir} does not exist.")
 
     run_dir = Path(run_dir)
+
+    if ids:
+        ids: List[str] = comma_separated_to_list(ids)
+        # make them unique
+        ids = list(set(ids))
 
     if task not in TASK_NAMES_TO_YAML:
         raise ValueError(
@@ -556,7 +579,7 @@ def score(
 
     run_summary = SummaryResults(**run_summary)
 
-    score_results(handler, run_dir, run_summary)
+    score_results(handler, run_dir, run_summary, ids)
 
 
 def main():

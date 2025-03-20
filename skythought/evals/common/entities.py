@@ -83,8 +83,8 @@ class RayLLMEngineArgs(BaseModel):
     gpu_memory_utilization: Optional[float] = Field(
         default=None, description="GPU memory utilization for the inference engine"
     )
-    dtype: Optional[Literal["float32", "float16", "bfloat16", "float8"]] = Field(
-        default=None, description="Data type for inference engine."
+    dtype: Optional[Literal["float32", "float16", "bfloat16", "float8", "auto"]] = (
+        Field(default=None, description="Data type for inference engine.")
     )
 
     def get_ray_llm_config(self):

@@ -1,7 +1,7 @@
 import logging
 import math
 from collections import defaultdict
-from typing import Any, Dict
+from typing import Dict, List
 
 import numpy as np
 
@@ -17,7 +17,7 @@ def _pass_at_k(n, c, k):
     return float(1.0 - np.prod(1.0 - k / np.arange(n - c + 1, n + 1)))
 
 
-def pass_at_k(N: int, id_to_scores: Dict[str, Dict[str, Any]]):
+def pass_at_k(N: int, id_to_scores: Dict[str, List[int]]):
     final_passk_scores = {}
     k_to_passk_scores = defaultdict(list)  # k -> list of scores
     for _, sample_scores in id_to_scores.items():
