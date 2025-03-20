@@ -23,7 +23,6 @@ Now, try to solve the following question through the above guidelines:"
 
 def convert_to_sharegpt_format(row: Dict[str, Any], prompt_column, response_column):
     prompt = row[prompt_column]
-    # accept
     # Create the conversation format
     conversations = [
         {"from": "user", "value": prompt},

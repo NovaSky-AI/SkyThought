@@ -2,6 +2,8 @@
 This is the recipe for data curation for the Sky T1 Preview model . 
 """
 
+# NOTE (sumanthrh): This script still has some rough edges and is a work in progress
+
 import argparse
 import os
 from pathlib import Path
@@ -93,7 +95,6 @@ if args.as_test:
     numina_ds_olympiads = numina_ds_olympiads.limit(num_samples)
     numina_ds_math = numina_ds_math.limit(num_samples)
 
-# 2. Get model responses for each of the datasets
 datasets = [
     apps_ds,
     taco_ds_medium,
@@ -165,7 +166,6 @@ for i, ds in enumerate(datasets):
 
     config = vLLMEngineProcessorConfig(
         model="Qwen/QwQ-32B-Preview",
-        # model="Qwen/Qwen2-0.5B-Instruct",
         engine_kwargs=dict(
             enable_prefix_caching=True,
             enable_chunked_prefill=True,
