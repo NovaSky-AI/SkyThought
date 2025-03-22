@@ -6,6 +6,6 @@ dataset_kwargs:
   # NOTE: This is using the subset for rule-based evaluation in the below PR
   revision: refs/pr/2 
 question_key: problem
-answer_key: solution
+answer_key: answer
 templating_parameters: 
   template: "Return your final response within \\boxed{{}}. {problem}"
