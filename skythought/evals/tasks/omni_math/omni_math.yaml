@@ -1,0 +1,11 @@
+handler: math
+dataset_path: "KbsdJames/Omni-MATH"  # repo ID in huggingface
+dataset_subset: null # which subset on huggingface
+dataset_split: test_rule_based # Rule based evaluation
+dataset_kwargs:
+  # NOTE: This is using the subset for rule-based evaluation in the below PR
+  revision: refs/pr/2 
+question_key: problem
+answer_key: answer
+templating_parameters: 
+  template: "Return your final response within \\boxed{{}}. {problem}"
