@@ -12,8 +12,7 @@ class OMNIMathTaskHandler(MathTaskHandler):
         return self.task_config.templating_parameters["template"].format(**problem)
 
     def check_correctness(self, problem, generation):
-        # no preprocessing needed for answer key
-        answer = problem[self.task_config.answer_key]
+        answer = extract_answer(problem[self.task_config.answer_key])
         pred = extract_answer(generation)
         pred = strip_answer_string(pred)
         return math_equal(pred, answer)
