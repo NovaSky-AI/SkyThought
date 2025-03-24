@@ -7,6 +7,7 @@ from .arc.arc_handler import ARCChallengeTaskHandler
 from .base import ConversationType, TaskConfig, TaskHandler
 from .gpqa_diamond.gpqa_diamond_handler import GPQADiamondTaskHandler
 from .gsm8k.gsm8k_handler import GSM8KTaskHandler
+from .liveaops.liveaops_handler import LiveAOPSTaskHandler
 from .livecodebench.livecodebench_handler import LiveCodeBenchTaskHandler
 from .math.math_handler import MathTaskHandler
 from .minervamath.minervamath_handler import MinervaMathTaskHandler
@@ -15,7 +16,6 @@ from .numina.numina_handler import NUMINATaskHandler
 from .olympiadbench.olympiadbench_handler import OlympiadBenchMathTaskHandler
 from .omni_math.omni_handler import OMNIMathTaskHandler
 from .taco.taco_handler import TACOTaskHandler
-from .liveaops.liveaops_handler import LiveAOPSTaskHandler
 from .task_util import get_tasks
 
 TASK_HANDLER_MAP = {

@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional
-
 from urllib.parse import urlparse
+
 import pandas as pd
 import yaml
 from datasets import Dataset as HFDataset
@@ -97,9 +97,13 @@ class TaskHandler(ABC):
             # Try to load URL
             # Only JSON supported for now
             if split is not None or subset is not None:
-                raise ValueError("URL-based dataset does not support loading arguments like `split`, `subset`")
+                raise ValueError(
+                    "URL-based dataset does not support loading arguments like `split`, `subset`"
+                )
             # By default, Huggingface will create a DatasetDict object with "train" split
-            dataset = load_dataset("json", data_files=[self.task_config.dataset_path])["train"]
+            dataset = load_dataset("json", data_files=[self.task_config.dataset_path])[
+                "train"
+            ]
 
         # add an index column efficiently with map
         dataset = dataset.map(add_idx_map, with_indices=True)
