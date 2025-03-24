@@ -15,7 +15,7 @@ class TaskConfig(BaseModel):
     handler: str
     dataset_path: str
     dataset_subset: Optional[str] = None
-    dataset_split: str
+    dataset_split: Optional[str] = None
     dataset_kwargs: Dict[str, Any] = Field(default_factory=dict)
     question_key: str
     # Optional answer key for datasets with a single correct answer
@@ -99,7 +99,7 @@ class TaskHandler(ABC):
             if split is not None or subset is not None:
                 raise ValueError("URL-based dataset does not support loading arguments like `split`, `subset`")
             # By default, Huggingface will create a DatasetDict object with "train" split
-            dataset = load_dataset("json", data_files=[data_path])["train"]
+            dataset = load_dataset("json", data_files=[self.task_config.dataset_path])["train"]
 
         # add an index column efficiently with map
         dataset = dataset.map(add_idx_map, with_indices=True)
