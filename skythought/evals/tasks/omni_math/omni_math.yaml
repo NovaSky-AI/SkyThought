@@ -1,4 +1,4 @@
-handler: math
+handler: omni_math
 dataset_path: "KbsdJames/Omni-MATH"  # repo ID in huggingface
 dataset_subset: null # which subset on huggingface
 dataset_split: test_rule_based # Rule based evaluation

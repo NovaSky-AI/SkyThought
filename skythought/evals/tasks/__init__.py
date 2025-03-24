@@ -15,6 +15,7 @@ from .numina.numina_handler import NUMINATaskHandler
 from .olympiadbench.olympiadbench_handler import OlympiadBenchMathTaskHandler
 from .omni_math.omni_handler import OMNIMathTaskHandler
 from .taco.taco_handler import TACOTaskHandler
+from .liveaops.liveaops_handler import LiveAOPSTaskHandler
 from .task_util import get_tasks
 
 TASK_HANDLER_MAP = {
@@ -33,6 +34,7 @@ TASK_HANDLER_MAP = {
     "minervamath": MinervaMathTaskHandler,
     "olympiadbench_math": OlympiadBenchMathTaskHandler,
     "omni_math": OMNIMathTaskHandler,
+    "liveaops": LiveAOPSTaskHandler,
 }
 TASK_NAMES_TO_YAML = get_tasks(os.path.dirname(__file__))
 

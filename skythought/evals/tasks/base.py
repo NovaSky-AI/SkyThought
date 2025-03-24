@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional
 
+from urllib.parse import urlparse
 import pandas as pd
 import yaml
 from datasets import Dataset as HFDataset
@@ -82,12 +83,24 @@ class TaskHandler(ABC):
         return conversations
 
     def load_dataset(self, subset=None, split=None, **kwargs) -> HFDataset:
-        dataset = load_dataset(
-            path=self.task_config.dataset_path,
-            name=subset if subset else self.task_config.dataset_subset,
-            split=split if split else self.task_config.dataset_split,
-            **self.task_config.dataset_kwargs,
-        )
+        # check if the path provided is a valid URL
+        parsed = urlparse(self.task_config.dataset_path)
+        if not parsed.scheme:
+            # HF dataset
+            dataset = load_dataset(
+                path=self.task_config.dataset_path,
+                name=subset if subset else self.task_config.dataset_subset,
+                split=split if split else self.task_config.dataset_split,
+                **self.task_config.dataset_kwargs,
+            )
+        else:
+            # Try to load URL
+            # Only JSON supported for now
+            if split is not None or subset is not None:
+                raise ValueError("URL-based dataset does not support loading arguments like `split`, `subset`")
+            # By default, Huggingface will create a DatasetDict object with "train" split
+            dataset = load_dataset("json", data_files=[data_path])["train"]
+
         # add an index column efficiently with map
         dataset = dataset.map(add_idx_map, with_indices=True)
         return dataset
