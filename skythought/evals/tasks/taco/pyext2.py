@@ -253,7 +253,7 @@ class _RuntimeModule(object):
 
            :param docstring: Optional. The module's docstring.
 
-           :param \*\*d: All the keyword args, mapped from name->value.
+           :param **d: All the keyword args, mapped from name->value.
 
            Example: ``RuntimeModule.from_objects('name', 'doc', a=1, b=2)``'''
         module = types.ModuleType(module_name_for_code_eval, docstring)
@@ -387,9 +387,9 @@ def annotate(*args, **kwargs):
 def fannotate(*args, **kwargs):
     '''Set function annotations using decorators.
 
-       :param \*args: The first positional argument is used for the function's return value; all others are discarded.
+       :param *args: The first positional argument is used for the function's return value; all others are discarded.
 
-       :param \**kwargs: This is a mapping of argument names to annotations.
+       :param **kwargs: This is a mapping of argument names to annotations.
 
        Example::
 
