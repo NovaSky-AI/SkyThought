@@ -127,10 +127,10 @@ except ImportError:
     IPython = None
 else:
     # Replace IPython's argspec
-    oipyargspec = IPython.core.oinspect.getfullargspec
+    oipyargspec = IPython.core.oinspect.getargspec
     def _ipyargspec(func):
         return __targspec(func, oipyargspec, '__orig_arg_ipy__')
-    IPython.core.oinspect.getfullargspec = _ipyargspec
+    IPython.core.oinspect.getargspec = _ipyargspec
 
 class overload(object):
     '''Simple function overloading in Python.'''
@@ -177,7 +177,7 @@ class overload(object):
             _newf.__is_overload__ = True
             _newf.__orig_arg__ = argspec(f)
             if IPython:
-                _newf.__orig_arg_ipy__ = IPython.core.oinspect.getfullargspec(f)
+                _newf.__orig_arg_ipy__ = IPython.core.oinspect.getargspec(f)
             return _newf
         return _wrap
     @classmethod
@@ -232,7 +232,7 @@ class overload(object):
             _newf.__is_overload__ = True
             _newf.__orig_arg__ = argspec(f)
             if IPython:
-                _newf.__orig_arg_ipy__ = IPython.core.oinspect.getfullargspec(f)
+                _newf.__orig_arg_ipy__ = IPython.core.oinspect.getargspec(f)
             return _newf
         return _wrap
 
