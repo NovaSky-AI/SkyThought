@@ -5,7 +5,7 @@ description = "Skythought Evals: Evaluation and Data Generation Tools for Reason
 authors = [
     { name = "NovaSky Team" }
 ]
-requires-python = ">=3.9,<3.11"
+requires-python = ">=3.9,<3.13"
 dependencies = [
     "vllm==0.7.0",
     "word2number",
