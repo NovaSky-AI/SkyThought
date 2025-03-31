@@ -507,7 +507,7 @@ def main():
         variants_dataset, ["fcs", "fcs_plus1", "fcs_reflection"], llm
     )
 
-    system_prompt = ModelConfig.from_model_id(args.target_model).system_prompt
+    system_prompt = str(ModelConfig.from_model_id(args.target_model).system_prompt)
 
     # Generate conversation format for each variant, which can be used in SimPO/DPO/etc.
     fcs_convo = make_preference_conversations(final_dataset, "fcs", system_prompt)
