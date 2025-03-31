@@ -27,7 +27,7 @@ class StringInFile(BaseModel):
     @property
     def string(self):
         return self._string
-    
+
     def __str__(self) -> str:
         return self._string
 
@@ -52,7 +52,7 @@ class ModelConfig(BaseModel):
         if self.name is None:
             self.name = self.model_id.split("/")[-1]
         return self
-    
+
     @classmethod
     def from_model_id(
         cls,
