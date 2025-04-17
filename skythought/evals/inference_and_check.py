@@ -233,11 +233,11 @@ def generate_responses_for_dataset(
     if not remaining_data:
         logger.info("No remaining data to generate.")
         return id_to_results, [], []
-
+    
     # Prepare conversations
     conversations = handler.make_conversations(
         remaining_data,
-        str(model_config.system_prompt),
+        str(model_config.system_prompt) if model_config.system_prompt else None,
         model_config.user_template,
         model_config.assistant_prefill,
     )
