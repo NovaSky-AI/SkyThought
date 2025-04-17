@@ -233,7 +233,7 @@ def generate_responses_for_dataset(
     if not remaining_data:
         logger.info("No remaining data to generate.")
         return id_to_results, [], []
-    
+
     # Prepare conversations
     conversations = handler.make_conversations(
         remaining_data,
