@@ -107,19 +107,19 @@ def _run_test_ray(input_outputs, generation, timeout, debug):
         result = []
     return bool(result and np.all(result))
 
+def _temp_run(input_outputs, generation, debug, result):
+    try:
+        result.append(
+            apps_run_test(input_outputs=input_outputs, test=generation, debug=debug)
+        )
+    except Exception:
+        pass
 
 def _run_test_mp(input_outputs, generation, timeout, debug):
-    def _temp_run(input_outputs, generation, debug, result) -> List[List[bool]]:
-        try:
-            result.append(
-                apps_run_test(input_outputs=input_outputs, test=generation, debug=debug)
-            )
-        except Exception:
-            pass
-
-    manager = Manager()
+    ctx = multiprocessing.get_context("spawn")
+    manager = ctx.Manager()
     result = manager.list()
-    p = multiprocessing.Process(
+    p = ctx.Process(
         target=_temp_run, args=(input_outputs, generation, False, result)
     )
     p.start()

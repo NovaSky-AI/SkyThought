@@ -73,7 +73,7 @@ class NUMINAPreprocessor:
         return {**row, "user_input": _input}
 
 
-def taco_coerce_types(row, schema: Schema):
+def coerce_types(row, schema: Schema):
     for key, schema_type in zip(schema.names, schema.types):
         value = pa.array([row[key]])
         if value.type != schema_type:

@@ -4,6 +4,7 @@ from typing import Any, Dict, Literal
 
 import ray
 
+from skythought.evals.tasks.livecodebench.livecodebench_util import restore_original_references, save_original_references
 from skythought.evals.util.common import has_code
 
 from ..base import Scorer
@@ -47,18 +48,19 @@ class TACOScorer(Scorer):
                 return {self.SCORE_COLUMN: False}
 
 
+def _temp_run(input_outputs, generation, debug, result):
+    try:
+        result.append(taco_run_test(input_outputs, test=generation, debug=debug))
+    except Exception as e:
+        print(f"Error in _temp_run: {e}")
+
 def _taco_run_tests_mp(input_outputs, generation):
 
-    def _temp_run(input_outputs, generation, debug, result):
-        try:
-            result.append(taco_run_test(input_outputs, test=generation, debug=debug))
-        except Exception as e:
-            print(f"Error in _temp_run: {e}")
-
     # run the test in a separate process for safety
-    manager = Manager()
+    ctx = multiprocessing.get_context("spawn")
+    manager = ctx.Manager()
     result = manager.list()
-    p = multiprocessing.Process(
+    p = ctx.Process(
         target=_temp_run, args=(input_outputs, generation, False, result)
     )
     p.start()

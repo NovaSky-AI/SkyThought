@@ -292,9 +292,10 @@ def unsafe_lcb_runTests_mp(
     problem, completion, timeout, runtime_debug, is_extracted
 ) -> List[Tuple[bool, str, str, float]]:
     test_cases = problem["test"]
-    manager = multiprocessing.Manager()
+    ctx = q.get_context("spawn")
+    manager = ctx.Manager()
     result = manager.list()
-    p = multiprocessing.Process(
+    p = ctx.Process(
         target=run_tests_for_one_example,
         args=(test_cases, completion, runtime_debug, is_extracted, result),
     )
