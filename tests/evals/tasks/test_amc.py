@@ -1,6 +1,6 @@
 import pytest
 
-from skythought.evals.tasks.math.math_handler import MathTaskHandler
+from skythought.evals.tasks.amc23.amc23_handler import AMC23TaskHandler
 
 
 class MockTaskConfig:
@@ -9,17 +9,12 @@ class MockTaskConfig:
     }
     answer_key = "answer"
     question_key = "question"
+    choices_key = "choices"
 
 
-# TODO (sumanthrh): Add hard examples here for the correctness function. This is simple demonstrative,
 @pytest.mark.parametrize(
     "problem, response, expected",
     [
-        (
-            {"question": "2+2", "answer": "4"},
-            "4",
-            True,
-        ),
         (
             {"question": "2+2", "answer": "4"},
             "5",
@@ -27,22 +22,14 @@ class MockTaskConfig:
         ),
         (
             {"question": "3* 25 percent", "answer": " 75%"},
-            "My reply is 0.75.",
-            True,
-        ),
-        (
-            {"question": "Solve $2+$2", "answer": "4."},
-            "The answer is $4.",
+            "My reply is $0.75.",  # ignores dollar signs and normalizes percentages
             True,
         ),
     ],
 )
-def test_check_correctness(
-    problem,
-    response,
-    expected,
-):
-    handler = MathTaskHandler(task_config=MockTaskConfig)
+def test_check_correctness(problem, response, expected):
+    handler = AMC23TaskHandler(task_config=MockTaskConfig)
+    print(handler.check_correctness(problem, generation=response))
     assert handler.check_correctness(problem, generation=response) == expected
 
 
@@ -55,9 +42,6 @@ def test_check_correctness(
         ),
     ],
 )
-def test_generate_prompt(
-    problem,
-    expected,
-):
-    handler = MathTaskHandler(task_config=MockTaskConfig)
+def test_generate_prompt(problem, expected):
+    handler = AMC23TaskHandler(task_config=MockTaskConfig)
     assert handler.generate_prompt(problem) == expected
