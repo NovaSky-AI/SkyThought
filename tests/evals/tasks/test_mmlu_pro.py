@@ -4,7 +4,7 @@ from skythought.evals.tasks.mmlu.mmlu_handler import MMLUProTaskHandler
 
 
 class MockTaskConfig:
-    templating_parameters = {"template": "Question: {question}\n\nChoices:\n{choices}"}
+    templating_parameters = {"template": "Question: {prompt}"}
     answer_key = "answer"
     question_key = "question"
     choices_key = "choices"
@@ -47,12 +47,17 @@ def test_check_correctness(problem, response, expected):
         (
             {
                 "question": "What is the main function of the left ventricle?",
-                "choices": "A) Pumps blood to the lungs\nB) Pumps blood to the body\nC) Collects blood from the body\nD) Stores blood",
+                "options": [
+                    "Pumps blood to the lungs",
+                    "Pumps blood to the body",
+                    "Collects blood from the body",
+                    "Stores blood",
+                ],
                 "answer": "B",
                 "answer_index": 1,
             },
-            "Question: What is the main function of the left ventricle?\n\nChoices:"
-            "\nA) Pumps blood to the lungs\nB) Pumps blood to the body\nC) Collects blood from the body\nD) Stores blood",
+            "Question: What is the main function of the left ventricle?\n"
+            "Answer Choices: (A) Pumps blood to the lungs (B) Pumps blood to the body (C) Collects blood from the body (D) Stores blood",
         ),
     ],
 )

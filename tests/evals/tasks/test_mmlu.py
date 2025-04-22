@@ -4,7 +4,7 @@ from skythought.evals.tasks.mmlu.mmlu_handler import MMLUTaskHandler
 
 
 class MockTaskConfig:
-    templating_parameters = {"template": "{question}\n\nChoices:\n{choices}"}
+    templating_parameters = {"template": "{prompt}"}
     answer_key = "answer"
     question_key = "question"
     choices_key = "choices"
@@ -17,7 +17,7 @@ class MockTaskConfig:
             {
                 "question": "What is the capital of France?",
                 "choices": "A) London\nB) Paris\nC) Berlin\nD) Madrid",
-                "answer": "B",
+                "answer": 1,
             },
             "The answer is B) Paris",
             True,
@@ -26,9 +26,9 @@ class MockTaskConfig:
             {
                 "question": "Which element has the atomic number 1?",
                 "choices": "A) Helium\nB) Oxygen\nC) Hydrogen\nD) Carbon",
-                "answer": "C",
+                "answer": 2,
             },
-            "C",
+            "A",
             False,
         ),
     ],
@@ -42,8 +42,12 @@ def test_check_correctness(problem, response, expected):
     "problem, expected",
     [
         (
-            {"question": "What is the capital of France?", "answer": "B"},
-            "What is the capital of France?\n\nChoices:\nA) London\nB) Paris\nC) Berlin\nD) Madrid",
+            {
+                "question": "What is the capital of France?",
+                "answer": "B",
+                "choices": ["London", "Paris", "Berlin", "Madrid"],
+            },
+            "What is the capital of France?\nAnswer Choices: (A) London (B) Paris (C) Berlin (D) Madrid",
         ),
     ],
 )
