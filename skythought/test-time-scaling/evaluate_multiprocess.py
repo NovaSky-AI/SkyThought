@@ -313,7 +313,7 @@ def get_accuracy_all_rounds(dataset, num_process_evaluate, method="selfdebug", t
     return final_accuracy
 
 
-def generate_and_evaluate(arguments): ##TODO Alex, take in a method here to support all methods
+def generate_and_evaluate(arguments): ##TODO take in a method here to support all methods
     """
     Takes in a single dspy example, generate code and evaluate it. 
 
@@ -346,7 +346,7 @@ def generate_and_evaluate(arguments): ##TODO Alex, take in a method here to supp
         # assert False
     ## Initialize the code generator
     if method == "selfdebug":
-        ## initialize debug lm to be 40mini : TODO(Alex): delete this if not work, or add a new argument for this if this works
+        ## initialize debug lm to be 40mini : TODO delete this if not work, or add a new argument for this if this works
         debug_lm = dspy.LM('openai/gpt-4o-mini', cache=use_dspy_cache)
         test_program = CodeGeneratorWithSelfDebug(extracted_tests, num_round=args.num_round, n=args.n, temperature=args.temperature, 
                                                   lm=lm, selection=args.selection, context=args.context, judge_lm=judge_lm, pre_computed_tests=tests, 

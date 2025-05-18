@@ -882,7 +882,7 @@ class CodeGeneratorWithSelfDebug(dspy.Module):
     ):
         prompt = example["prompt"]
 
-        ## TODO: (Alex) Here make sure this is the right place to read cache
+        ## TODO: Here make sure this is the right place to read cache
         if self.args.load_cached_preds:
             ## load the cached prediction completions and get the public accuracy to replicate zipped_history
             codes = self.cached_preds_dict[task_id]['codes']
@@ -961,7 +961,7 @@ class CodeGeneratorWithSelfDebug(dspy.Module):
                                     api_key=os.environ.get("OPENAI_API_KEY"),  # This is the default and can be omitted
                                 )
                                 # print(f"Using {self.args.generator} to generate code")
-                                # TODO: DL, please clean up these massy naming
+                                # TODO: please clean up these massy naming
                                 generator = self.args.generator
                                 if generator == "4o-mini":
                                     generator = "gpt-4o-mini"
@@ -1090,7 +1090,7 @@ class CodeGeneratorWithSelfDebug(dspy.Module):
                     zipped_history[n].append(("", 0, "", "", 0)) ## if any exception occur (like context window limit exceeded, fallback to simply empty completion)  
         # print(zipped_history[-1][-1])
         # print(f"=" * 10 + "Finished generating selfdebug prediction" + "=" * 10)
-        return self.selection_function(zipped_history, task_id, prompt, is_stdin, example), None ## (Alex) example is newly added, could get rid of the redundancy for prompt and is_stdin
+        return self.selection_function(zipped_history, task_id, prompt, is_stdin, example), None ## example is newly added, could get rid of the redundancy for prompt and is_stdin
 
     def get_anchor_break_and_feedback(self, prompt, pred, extracted_tests, public_test_acc, public_test_feedback_string, generated_test_anchors):
         anchor_break = False
@@ -1312,7 +1312,7 @@ class CodeGeneratorWithSelfDebug(dspy.Module):
                         ]
                         # print(private_tests)
                         if self.selection == "generated_tests":
-                            with dspy.context(lm=self.debug_lm): ## TODO (Alex): here I simply used debug_lm because debug_lm is fixed to be 4omini, we can make this an argument
+                            with dspy.context(lm=self.debug_lm): ## TODO here I simply used debug_lm because debug_lm is fixed to be 4omini, we can make this an argument
                                 timeout_input_list = generate_tests_for_one_example(example, generation_fun=generate_timeout_tests_repeat,num_timeout_tests=3)
                             best_rate = -1
                             public_correct_samples_pass_rate = []
@@ -1338,7 +1338,7 @@ class CodeGeneratorWithSelfDebug(dspy.Module):
                             preds_pass = [
                                 list(
                                     map(
-                                        lambda test: 1# test["count"] # @DL: This is weird, should just reduce the same tests.
+                                        lambda test: 1# test["count"] # This is weird, should just reduce the same tests.
                                         if check_test(
                                             [test["test"]], post_process_code(public_correct_sample), 0, prompt, "dummy", runtime_debug=True, raw=True, is_extracted=False
                                         )[0]
@@ -2042,7 +2042,7 @@ def generate_tests_for_whole_dataset(
         zero_correct_tests_count,
     )
 
-def generate_tests_for_one_example(example,  ##TODO :Alex, make sure what ever takes the output of this function to be able to handle the new output format
+def generate_tests_for_one_example(example,  ##TODO Make sure what ever takes the output of this function to be able to handle the new output format
     generation_fun,
     completions = None,
     judge_lm=None,

@@ -200,7 +200,7 @@ def unsafe_lcb_run_timeout_tests(timeout_input_list, completion, timeout, is_std
     result = manager.list()
     p = multiprocessing.Process(target=run_single_timeout_test_list, args=(timeout_input_list, completion, timeout, is_stdin, result))
     p.start()
-    p.join(timeout = timeout * len(timeout_input_list) + 3) # TODO Alex: what should be the timeout here?
+    p.join(timeout = timeout * len(timeout_input_list) + 3) # TODO what should be the timeout here?
     if p.is_alive():
         p.kill()
     
@@ -247,7 +247,7 @@ def unsafe_lcb_runTests(problem, completion, timeout, runtime_debug, is_extracte
     p.start()
     # print(f"There are {len(test_cases)} test cases.")
     if fast_check:
-        p.join(fast_check_global_time_out) # TODO Alex: Check whether number of task cases is correct
+        p.join(fast_check_global_time_out) # TODO Check whether number of task cases is correct
     else:
         p.join(timeout = (timeout+1) * len(test_cases) + 5)
     if p.is_alive():
