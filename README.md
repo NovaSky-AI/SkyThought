@@ -31,16 +31,3 @@ python evaluate_multiprocess.py \
 ```
 
 To run experiments with local serve models, use ```vllm serve model_name``` to serve the model first.
-
-
-
-#### Citation
-```
-@article{li2025sstar,
-  title={S*: Test Time Scaling for Code Generation},
-  author={Li, Dacheng and Cao, Shiyi and Cao, Chengkun and Li, Xiuyu and Tan, Shangyin and Keutzer, Kurt and Xing, Jiarong and Gonzalez, Joseph E. and Stoica, Ion},
-  year={2025}
-}
-```
-
-
