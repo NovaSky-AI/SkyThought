@@ -1,9 +1,0 @@
-handler: gsm8k
-dataset_path: "openai/gsm8k"
-dataset_subset: main 
-dataset_split: test
-question_key: question
-answer_key: answer
-templating_parameters:
-  template: "Given the following problem, reason and give a final answer to the problem.\nProblem: {question}\nYour response should end with \"The final answer is [answer]\" where [answer] is the response to the problem."
-

@@ -1,9 +1,0 @@
-handler: aime
-dataset_path: AI-MO/aimo-validation-aime
-dataset_split: train
-question_key: problem
-answer_key: answer
-templating_parameters:
-  template: "Return your final response within \\boxed{{}}. {prompt}"
-preprocess_config:
-  url: "2024"

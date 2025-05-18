@@ -1,8 +1,0 @@
-handler: liveaops
-dataset_path: https://livemathbench.github.io/data/LiveAoPSBench-2024.jsonl
-dataset_subset: null # which subset on huggingface. Not applicable for a URL dataset
-dataset_split: null # Rule based evaluation
-question_key: question
-answer_key: answer
-templating_parameters: 
-  template: "Return your final response within \\boxed{{}}. {question}"

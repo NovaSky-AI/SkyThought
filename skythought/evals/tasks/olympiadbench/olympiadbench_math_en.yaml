@@ -1,8 +1,0 @@
-handler: olympiadbench_math
-dataset_path: Hothan/OlympiadBench
-dataset_subset: OE_TO_maths_en_COMP
-dataset_split: train
-question_key: question
-answer_key: final_answer
-templating_parameters:
-  template: "Return your final response within \\boxed{{}}. {question}"

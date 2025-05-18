@@ -1,9 +1,0 @@
-handler: arc_c
-dataset_path: allenai/ai2_arc
-dataset_subset: ARC-Challenge
-dataset_split: train
-question_key: question
-answer_key: answerKey
-templating_parameters:
-  # We combine choices for a question into choices_text entry in the dataset
-  template: "Given the following question and four candidate answers (A, B, C and D), choose the best answer. Your response should end with \"The best answer is [the_answer_letter]\" where [the_answer_letter] is one of the four letter choice (A, B, C, or D).\n{question}\n{choices_text}"
