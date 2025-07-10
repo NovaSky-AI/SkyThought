@@ -10,7 +10,7 @@ dependencies = [
     "vllm==0.7.0",
     "word2number",
     "scipy",
-    "datasets",
+    "datasets<4.0.0",
     "latex2sympy2",
     "pydantic",
     "setuptools",
