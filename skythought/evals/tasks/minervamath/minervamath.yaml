@@ -1,8 +1,8 @@
 handler: math
-dataset_path: "svc-huggingface/minerva-math" # repo ID in huggingface
+dataset_path: "math-ai/minervamath" # repo ID in huggingface
 dataset_subset: null # which subset on huggingface
-question_key: problem
-answer_key: solution
+question_key: question
+answer_key: answer
 dataset_split: test
 templating_parameters: 
-  template: "Return your final response within \\boxed{{}}. {problem}"
+  template: "Return your final response within \\boxed{{}}. {question}"
